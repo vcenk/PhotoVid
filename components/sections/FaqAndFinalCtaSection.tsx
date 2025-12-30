@@ -22,7 +22,7 @@ interface FaqItem {
 const FAQS: FaqItem[] = [
   {
     question: "Do I need video editing skills?",
-    answer: "Not at all. Photophia replaces complex timelines and keyframes with simplified neural workflows. You describe the vision, and our engine handles the technical rendering."
+    answer: "Not at all. Photovid replaces complex timelines and keyframes with simplified neural workflows. You describe the vision, and our engine handles the technical rendering."
   },
   {
     question: "What are templates and industry packs?",
@@ -153,7 +153,7 @@ export const FaqAndFinalCtaSection: React.FC = () => {
                 </div>
                 <div>
                   <p className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">Support Access</p>
-                  <a href="mailto:support@photophia.ai" className="text-sm font-bold text-zinc-900 hover:text-indigo-600 transition-colors">Contact Support</a>
+                  <a href="mailto:support@photovid.ai" className="text-sm font-bold text-zinc-900 hover:text-indigo-600 transition-colors">Contact Support</a>
                 </div>
               </div>
             </motion.div>
@@ -175,7 +175,7 @@ export const FaqAndFinalCtaSection: React.FC = () => {
             </motion.div>
             
             <h2 className="text-5xl md:text-8xl font-bold text-zinc-900 tracking-tighter leading-[0.9] mb-10 font-serif">
-              Launch <span className="italic text-zinc-500">Photophia</span> <br />
+              Launch <span className="italic text-zinc-500">Photovid</span> <br />
               Studio in seconds.
             </h2>
             

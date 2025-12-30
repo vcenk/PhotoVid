@@ -1,7 +1,9 @@
 import React from 'react';
 import { Navbar } from './components/layout/Navbar';
 import { Hero } from './components/sections/Hero';
+import { HoneycombVideos } from './components/sections/HoneycombVideos';
 import { WorkflowDemo } from './components/sections/WorkflowDemo';
+import { MosaicSlideshow } from './components/sections/MosaicSlideshow';
 import { UseCasesSection } from './components/sections/UseCasesSection';
 import { TemplatePacks } from './components/sections/TemplatePacks';
 import { KineticShowcaseWall } from './components/sections/KineticShowcaseWall';
@@ -27,9 +29,13 @@ const App: React.FC = () => {
         <main className="relative z-10">
           <Hero />
 
-          <div className="border-b border-zinc-200 dark:border-white/5 bg-white/50 dark:bg-black/40 backdrop-blur-sm transition-colors duration-500">
+          <div className="border-b border-zinc-200 dark:border-white/5 bg-white/10 backdrop-blur-sm transition-colors duration-500">
              <LogoMarquee />
           </div>
+          
+          <SectionWrapper id="honeycomb" className="p-0 bg-black">
+             <HoneycombVideos />
+          </SectionWrapper>
 
           <SectionWrapper id="workflow" className="bg-white dark:bg-zinc-950 transition-colors duration-500">
              <div className="text-center mb-16 px-6">
@@ -43,7 +49,11 @@ const App: React.FC = () => {
             <WorkflowDemo />
           </SectionWrapper>
 
-          <SectionWrapper id="use-cases" className="bg-stone-100 dark:bg-zinc-900/30 border-y border-zinc-200 dark:border-white/5 transition-colors duration-500">
+          <SectionWrapper id="mosaic" className="p-0 bg-black">
+             <MosaicSlideshow />
+          </SectionWrapper>
+
+          <SectionWrapper id="use-cases" className="bg-white/5 border-y border-zinc-200/20 backdrop-blur-sm transition-colors duration-500">
             <UseCasesSection />
           </SectionWrapper>
 

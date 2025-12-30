@@ -135,7 +135,7 @@ export const Navbar: React.FC = () => {
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
         >
           <div className={`text-2xl md:text-4xl font-black tracking-tighter transition-colors duration-500 ${isScrolled ? 'text-zinc-900 dark:text-white' : 'text-white'}`}>
-            PHOTOPHIA<span className="text-indigo-500 transition-transform group-hover:scale-125 inline-block">.</span>
+            PHOTOVID<span className="text-indigo-500 transition-transform group-hover:scale-125 inline-block">.</span>
           </div>
         </div>
 

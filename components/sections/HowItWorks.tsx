@@ -49,7 +49,7 @@ const STEPS = [
   {
     id: 1,
     title: "Describe it or Upload",
-    description: "Start with a prompt or drop in a photo. Photophia preps it for motion.",
+    description: "Start with a prompt or drop in a photo. Photovid preps it for motion.",
     icon: Sparkles,
     tag: "Guided",
   },
@@ -198,7 +198,7 @@ export default function HowItWorks() {
                     <div className="w-2.5 h-2.5 rounded-full bg-zinc-800" />
                   </div>
                   <div className="w-px h-4 bg-white/10 mx-2" />
-                  <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400">Photophia Studio</span>
+                  <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400">Photovid Studio</span>
                 </div>
                 <div className="flex items-center gap-4">
                   <div className="px-3 py-1 rounded-full bg-violet-500/10 border border-violet-500/20 text-[10px] font-bold text-violet-400 flex items-center gap-2">

@@ -99,7 +99,7 @@ export const Footer = () => {
           
           {/* Copyright Row */}
           <div className="w-full flex flex-col md:flex-row justify-between items-center gap-4 text-[10px] font-bold uppercase tracking-widest text-zinc-400 mb-12">
-            <p>&copy; 2024 Photophia Inc.</p>
+            <p>&copy; 2024 Photovid Inc.</p>
             <div className="flex gap-8">
               <a href="#" className="hover:text-zinc-900">Privacy Policy</a>
               <a href="#" className="hover:text-zinc-900">Terms of Service</a>
@@ -114,7 +114,7 @@ export const Footer = () => {
             viewport={{ once: true }}
             className="w-full text-center text-[18vw] leading-[0.8] font-black tracking-tighter text-zinc-950 select-none pointer-events-none"
           >
-            photophia
+            photovid
           </motion.h1>
           
         </div>

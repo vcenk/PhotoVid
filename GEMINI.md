@@ -1,7 +1,7 @@
-# Photophia - Cinematic Background Project
+# Photovid - Cinematic Background Project
 
 ## Project Overview
-Photophia is a visually rich web application designed as an "AI Studio for Creators." It focuses on turning static photos into cinematic motion. The project is a **React Single Page Application (SPA)** built with **Vite**.
+Photovid is a visually rich web application designed as an "AI Studio for Creators." It focuses on turning static photos into cinematic motion. The project is a **React Single Page Application (SPA)** built with **Vite**.
 
 **Note on Architecture:**
 The project structure exhibits a hybrid characteristic:

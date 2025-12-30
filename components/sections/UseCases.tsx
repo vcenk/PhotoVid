@@ -153,9 +153,11 @@ export const UseCases: React.FC = () => {
                   Creators first. <br />
                   <span className="text-zinc-500 italic">Results everywhere.</span>
                 </h2>
-                <p className="text-lg md:text-xl text-zinc-400 font-sans leading-relaxed max-w-md">
-                  Photophia is built for creators who want cinematic motion without timelines, plugins, or learning curves.
-                </p>
+          className="max-w-xl text-lg text-zinc-500 leading-relaxed"
+        >
+          Photovid is built for creators who want cinematic motion without timelines, plugins, or learning curves.
+        </motion.p>
+      </div>
               </div>
 
               {/* Bullet Points */}

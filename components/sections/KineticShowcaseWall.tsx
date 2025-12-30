@@ -177,11 +177,11 @@ export const KineticShowcaseWall = () => {
            SHOWCASE
          </h2>
          <p className="mt-4 text-sm md:text-lg text-white/80 font-bold uppercase tracking-[0.5em] bg-black/50 backdrop-blur-md px-6 py-2 rounded-full border border-white/10">
-            Made with Photophia
+            Made with Photovid
          </p>
       </div>
 
-      <style jsx>{`
+      <style>{`
         .stroke-text {
           -webkit-text-stroke: 2px white;
         }

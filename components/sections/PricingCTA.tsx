@@ -30,7 +30,7 @@ const PLANS: PricingPlan[] = [
       { text: "Standard motion models", included: true },
       { text: "720p HD exports", included: true },
       { text: "Community support", included: true },
-      { text: "Photophia Watermark", included: false },
+      { text: "Photovid Watermark", included: false },
       { text: "Pro Template Access", included: false },
     ]
   },
@@ -185,7 +185,7 @@ export const PricingCTA: React.FC = () => {
 
             <div className="flex flex-col items-center gap-6">
               <ShimmerButton className="shadow-2xl shadow-white/10">
-                Launch Photophia Studio <Rocket size={18} />
+                Launch Photovid Studio <Rocket size={18} />
               </ShimmerButton>
               
               <div className="flex flex-wrap justify-center gap-8 opacity-40 grayscale">

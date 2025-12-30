@@ -62,9 +62,11 @@ export default function LoginPage() {
 
         <div className="p-10 rounded-[40px] border border-zinc-200 bg-white shadow-2xl shadow-zinc-200">
           <div className="text-center mb-10">
-            <div className="text-2xl font-bold tracking-tighter text-zinc-900 mb-4">
-              PHOTOPHIA<span className="text-indigo-600">.</span>
-            </div>
+        <div className="absolute top-8 left-8 z-20">
+          <Link href="/" className="text-2xl font-black tracking-tighter text-white">
+            PHOTOVID<span className="text-indigo-600">.</span>
+          </Link>
+        </div>
             <h1 className="text-3xl font-bold text-zinc-900 tracking-tight mb-2 font-serif italic text-zinc-500">Welcome back.</h1>
             <p className="text-zinc-500 text-sm">Enter your email to receive a secure magic link.</p>
           </div>

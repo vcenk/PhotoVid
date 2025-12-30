@@ -104,7 +104,7 @@ export const UseCasesSection = () => {
             transition={{ delay: 0.2 }}
             className="max-w-2xl mx-auto text-lg text-zinc-500 dark:text-zinc-400"
           >
-            Photophia isn't just a general tool. It adapts to your industry with 
+            Photovid isn't just a general tool. It adapts to your industry with 
             trained models and specialized motion presets.
           </motion.p>
         </div>

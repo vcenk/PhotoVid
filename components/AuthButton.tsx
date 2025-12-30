@@ -2,28 +2,8 @@
 "use client";
 
 import React from 'react';
-import { useRouter } from 'next/navigation';
 import { createClient } from '../lib/supabase/client';
 import { LogOut, Layout, User } from 'lucide-react';
-import { motion } from 'framer-motion';
-
-/**
- * A safe hook to handle navigation. 
- * Falls back to window.location if the Next.js App Router context is missing.
- */
-const useSafeRouter = () => {
-  try {
-    const router = useRouter();
-    return router;
-  } catch (e) {
-    return {
-      push: (url: string) => { window.location.href = url; },
-      refresh: () => { window.location.reload(); },
-      replace: (url: string) => { window.location.replace(url); },
-      back: () => { window.history.back(); }
-    };
-  }
-};
 
 interface AuthButtonProps {
   user: any;
@@ -31,20 +11,19 @@ interface AuthButtonProps {
 }
 
 export const AuthButton: React.FC<AuthButtonProps> = ({ user, isScrolled }) => {
-  const router = useSafeRouter();
   const supabase = createClient();
 
   const handleSignOut = async () => {
     if (!supabase) return;
     await supabase.auth.signOut();
-    router.refresh();
-    router.push('/');
+    window.location.reload();
+    window.location.href = '/';
   };
 
   if (!user) {
     return (
       <button 
-        onClick={() => router.push('/login')}
+        onClick={() => window.location.href = '/login'}
         className={`
           hidden sm:flex items-center gap-3 rounded-full font-black text-xs uppercase tracking-[0.15em] transition-all active:scale-95 px-10 py-4 shadow-lg
           ${isScrolled 
@@ -61,7 +40,7 @@ export const AuthButton: React.FC<AuthButtonProps> = ({ user, isScrolled }) => {
   return (
     <div className="flex items-center gap-4">
       <button 
-        onClick={() => router.push('/studio')}
+        onClick={() => window.location.href = '/studio'}
         className={`
           hidden sm:flex items-center gap-3 rounded-full font-black text-xs uppercase tracking-[0.15em] transition-all active:scale-95 px-10 py-4 shadow-lg
           ${isScrolled 

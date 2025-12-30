@@ -39,7 +39,11 @@ export const Hero = () => {
   if (!isMounted) return null;
 
   return (
-    <section id="hero-start" className="relative h-screen w-full overflow-hidden bg-black text-white">
+    <section 
+      id="hero-start" 
+      className="relative h-screen w-full overflow-hidden text-white"
+      style={{ background: 'linear-gradient(135deg, #ff6b6b 0%, #feca57 100%)' }}
+    >
       {/* 1. Background Video Layer */}
       <AnimatePresence mode="wait">
         <motion.div
@@ -55,11 +59,12 @@ export const Hero = () => {
             muted 
             loop 
             playsInline
-            className="h-full w-full object-cover opacity-50 scale-105"
+            className="h-full w-full object-cover opacity-60 scale-105 mix-blend-overlay brightness-110 contrast-125"
             src={activeMode.video} 
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-black/40" />
-          <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20" />
+          {/* Enhanced Gradient Overlay for Text Readability */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-black/40" />
+          <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-30 mix-blend-overlay" />
         </motion.div>
       </AnimatePresence>
 
@@ -108,7 +113,76 @@ export const Hero = () => {
         </div>
 
         {/* Dynamic Headlines */}
-        <div className="max-w-5xl space-y-6">
+        <div className="max-w-5xl space-y-6 relative">
+          
+          {/* CATEGORY-SPECIFIC FLOATING UI */}
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeMode.id}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 pointer-events-none -z-10"
+            >
+              {activeMode.id === 'creator' && (
+                <>
+                  <motion.div 
+                    animate={{ y: [0, -20, 0], x: [0, 10, 0] }}
+                    transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
+                    className="absolute -top-12 -left-20 px-4 py-2 rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 text-[10px] font-bold text-pink-400 flex items-center gap-2"
+                  >
+                    ❤️ 1.2k Likes
+                  </motion.div>
+                  <motion.div 
+                    animate={{ y: [0, 30, 0], x: [0, -20, 0] }}
+                    transition={{ repeat: Infinity, duration: 5, ease: "easeInOut", delay: 1 }}
+                    className="absolute -bottom-10 -right-20 px-4 py-2 rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 text-[10px] font-bold text-blue-400 flex items-center gap-2"
+                  >
+                    💬 482 Comments
+                  </motion.div>
+                </>
+              )}
+
+              {activeMode.id === 'realestate' && (
+                <>
+                  <motion.div 
+                    animate={{ scale: [1, 1.1, 1], rotate: [0, 5, 0] }}
+                    transition={{ repeat: Infinity, duration: 6, ease: "easeInOut" }}
+                    className="absolute -top-20 right-0 px-4 py-2 rounded-2xl bg-indigo-600 text-white text-[10px] font-bold uppercase tracking-widest shadow-xl"
+                  >
+                    $1,450,000
+                  </motion.div>
+                  <motion.div 
+                    animate={{ y: [0, -15, 0] }}
+                    transition={{ repeat: Infinity, duration: 4, ease: "easeInOut", delay: 0.5 }}
+                    className="absolute bottom-0 -left-24 px-4 py-2 rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 text-[10px] font-bold text-white flex items-center gap-2"
+                  >
+                    📍 Beverly Hills, CA
+                  </motion.div>
+                </>
+              )}
+
+              {activeMode.id === 'ecommerce' && (
+                <>
+                  <motion.div 
+                    animate={{ x: [0, 20, 0] }}
+                    transition={{ repeat: Infinity, duration: 5, ease: "easeInOut" }}
+                    className="absolute -top-10 -right-24 px-4 py-2 rounded-2xl bg-white text-black text-[10px] font-black uppercase tracking-widest"
+                  >
+                    Trending Now
+                  </motion.div>
+                  <motion.div 
+                    animate={{ scale: [0.9, 1, 0.9] }}
+                    transition={{ repeat: Infinity, duration: 3, ease: "easeInOut" }}
+                    className="absolute -bottom-12 -left-10 px-4 py-2 rounded-full bg-emerald-500 text-white text-[10px] font-bold flex items-center gap-2"
+                  >
+                    ⚡ 85% Conversion
+                  </motion.div>
+                </>
+              )}
+            </motion.div>
+          </AnimatePresence>
+
           <motion.div
             key={activeMode.headline}
             initial={{ opacity: 0, y: 20, filter: "blur(10px)" }}
