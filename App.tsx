@@ -1,7 +1,6 @@
 import React from 'react';
 import { Navbar } from './components/layout/Navbar';
 import { Hero } from './components/sections/Hero';
-import { HoneycombVideos } from './components/sections/HoneycombVideos';
 import { WorkflowDemo } from './components/sections/WorkflowDemo';
 import { MosaicSlideshow } from './components/sections/MosaicSlideshow';
 import { UseCasesSection } from './components/sections/UseCasesSection';
@@ -32,10 +31,6 @@ const App: React.FC = () => {
           <div className="border-b border-zinc-200 dark:border-white/5 bg-white/10 backdrop-blur-sm transition-colors duration-500">
              <LogoMarquee />
           </div>
-          
-          <SectionWrapper id="honeycomb" className="p-0 bg-black">
-             <HoneycombVideos />
-          </SectionWrapper>
 
           <SectionWrapper id="workflow" className="bg-white dark:bg-zinc-950 transition-colors duration-500">
              <div className="text-center mb-16 px-6">
