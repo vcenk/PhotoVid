@@ -1,7 +1,6 @@
 
-"use client";
-
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { createClient } from '../lib/supabase/client';
 import { LogOut, Layout, User } from 'lucide-react';
 
@@ -12,18 +11,18 @@ interface AuthButtonProps {
 
 export const AuthButton: React.FC<AuthButtonProps> = ({ user, isScrolled }) => {
   const supabase = createClient();
+  const navigate = useNavigate();
 
   const handleSignOut = async () => {
     if (!supabase) return;
     await supabase.auth.signOut();
-    window.location.reload();
-    window.location.href = '/';
+    navigate('/');
   };
 
   if (!user) {
     return (
       <button 
-        onClick={() => window.location.href = '/login'}
+        onClick={() => navigate('/login')}
         className={`
           hidden sm:flex items-center gap-3 rounded-full font-black text-xs uppercase tracking-[0.15em] transition-all active:scale-95 px-10 py-4 shadow-lg
           ${isScrolled 
@@ -40,7 +39,7 @@ export const AuthButton: React.FC<AuthButtonProps> = ({ user, isScrolled }) => {
   return (
     <div className="flex items-center gap-4">
       <button 
-        onClick={() => window.location.href = '/studio'}
+        onClick={() => navigate('/studio')}
         className={`
           hidden sm:flex items-center gap-3 rounded-full font-black text-xs uppercase tracking-[0.15em] transition-all active:scale-95 px-10 py-4 shadow-lg
           ${isScrolled 

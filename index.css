@@ -1,0 +1,23 @@
+@import "tailwindcss";
+
+@theme {
+  --color-zinc-950: #09090b;
+}
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 240 10% 3.9%;
+  }
+
+  .dark {
+    --background: 240 10% 3.9%;
+    --foreground: 0 0% 98%;
+  }
+
+  body {
+    /* In v4, we can use @apply, but usually just plain CSS is fine inside layer base */
+    background-color: white;
+    color: #18181b;
+  }
+}

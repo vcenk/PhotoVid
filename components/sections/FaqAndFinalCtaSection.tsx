@@ -3,6 +3,7 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import { 
   ChevronDown, 
   ShieldCheck, 
@@ -184,13 +185,12 @@ export const FaqAndFinalCtaSection: React.FC = () => {
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <motion.button 
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="w-full sm:w-auto px-12 py-5 rounded-full bg-zinc-900 text-white text-sm font-black uppercase tracking-widest shadow-xl hover:bg-black transition-all"
+              <Link 
+                to="/login"
+                className="w-full sm:w-auto px-12 py-5 rounded-full bg-zinc-900 text-white text-sm font-black uppercase tracking-widest shadow-xl hover:bg-black transition-all text-center"
               >
                 Get Started Now
-              </motion.button>
+              </Link>
               <motion.button 
                 onClick={() => scrollToSection('templates')}
                 whileHover={{ scale: 1.05 }}

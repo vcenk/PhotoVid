@@ -1,8 +1,5 @@
 {
   "name": "Photovid - Cinematic Background",
-  "description": "A premium, cinematic global page background with animated gradient mesh blobs and subtle noise overlay for the Photovid landing page.",
-  "componentPath": "components/layout/Background.tsx",
-  "dependencies": [
-    "framer-motion"
-  ]
+  "description": "A premium, cinematic global page background with animated gradient mesh blobs and subtle noise overlay for the Photophia landing page.",
+  "requestFramePermissions": []
 }

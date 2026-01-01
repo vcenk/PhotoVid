@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import { Check, Package, Zap, Sparkles } from 'lucide-react';
 
 const PLANS = [
@@ -114,9 +115,10 @@ export const PricingSection = () => {
               ))}
             </ul>
 
-            <button 
+            <Link 
+              to="/login"
               className={`
-                w-full py-4 rounded-xl text-xs font-bold uppercase tracking-widest transition-all
+                w-full py-4 rounded-xl text-xs font-bold uppercase tracking-widest transition-all text-center
                 ${plan.highlight 
                   ? "bg-zinc-900 dark:bg-white text-white dark:text-black hover:bg-zinc-800 dark:hover:bg-zinc-200 shadow-lg" 
                   : "bg-white dark:bg-transparent border border-zinc-200 dark:border-white/20 text-zinc-900 dark:text-white hover:bg-zinc-50 dark:hover:bg-white/5"
@@ -124,7 +126,7 @@ export const PricingSection = () => {
               `}
             >
               {plan.cta}
-            </button>
+            </Link>
           </motion.div>
         ))}
       </div>

@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import { Twitter, Instagram, Linkedin, Github, Hexagon } from 'lucide-react';
 
 const FOOTER_LINKS = [
@@ -80,12 +81,21 @@ export const Footer = () => {
                 <ul className="space-y-4">
                   {column.links.map((link) => (
                     <li key={link.label}>
-                      <a 
-                        href={link.href} 
-                        className="text-sm text-zinc-500 hover:text-indigo-600 transition-colors font-medium"
-                      >
-                        {link.label}
-                      </a>
+                      {link.href.startsWith('/') ? (
+                        <Link 
+                          to={link.href} 
+                          className="text-sm text-zinc-500 hover:text-indigo-600 transition-colors font-medium"
+                        >
+                          {link.label}
+                        </Link>
+                      ) : (
+                        <a 
+                          href={link.href} 
+                          className="text-sm text-zinc-500 hover:text-indigo-600 transition-colors font-medium"
+                        >
+                          {link.label}
+                        </a>
+                      )}
                     </li>
                   ))}
                 </ul>

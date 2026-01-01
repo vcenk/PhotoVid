@@ -3,6 +3,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import { createClient } from '../../lib/supabase/client';
 import { Sparkles, Mail, Loader2, ArrowLeft, AlertTriangle } from 'lucide-react';
 import { Background } from '../../components/layout/Background';
@@ -53,20 +54,15 @@ export default function LoginPage() {
         animate={{ opacity: 1, y: 0 }}
         className="relative z-10 w-full max-w-md"
       >
-        <a 
-          href="/" 
+        <Link 
+          to="/" 
           className="inline-flex items-center gap-2 text-zinc-400 hover:text-zinc-900 transition-colors mb-12 text-sm font-bold uppercase tracking-widest"
         >
           <ArrowLeft size={16} /> Back to home
-        </a>
+        </Link>
 
         <div className="p-10 rounded-[40px] border border-zinc-200 bg-white shadow-2xl shadow-zinc-200">
           <div className="text-center mb-10">
-        <div className="absolute top-8 left-8 z-20">
-          <Link href="/" className="text-2xl font-black tracking-tighter text-white">
-            PHOTOVID<span className="text-indigo-600">.</span>
-          </Link>
-        </div>
             <h1 className="text-3xl font-bold text-zinc-900 tracking-tight mb-2 font-serif italic text-zinc-500">Welcome back.</h1>
             <p className="text-zinc-500 text-sm">Enter your email to receive a secure magic link.</p>
           </div>

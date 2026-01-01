@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import { Play, ArrowRight, Zap, Image as ImageIcon, Music } from 'lucide-react';
 
 const MODES = [
@@ -143,11 +144,11 @@ export const Hero = () => {
           transition={{ delay: 0.4 }}
           className="mt-12 flex flex-col items-center gap-6 sm:flex-row"
         >
-          <a href="/studio" className="group relative flex items-center gap-3 overflow-hidden rounded-full bg-white px-8 py-4 text-sm font-black uppercase tracking-widest text-black transition-all hover:scale-105 hover:shadow-[0_0_40px_rgba(255,255,255,0.3)]">
+          <Link to="/login" className="group relative flex items-center gap-3 overflow-hidden rounded-full bg-white px-8 py-4 text-sm font-black uppercase tracking-widest text-black transition-all hover:scale-105 hover:shadow-[0_0_40px_rgba(255,255,255,0.3)]">
             <span className="relative z-10 flex items-center gap-2">
               Start Creating <Zap size={16} className="fill-current" />
             </span>
-          </a>
+          </Link>
           
           <button className="group flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-zinc-400 hover:text-white transition-colors">
             <Play size={12} className="group-hover:text-indigo-400 transition-colors" /> See Workflow

@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import { Menu, X, ChevronDown, Sun, Moon } from 'lucide-react';
 import { createClient } from '../../lib/supabase/client';
 import { AuthButton } from '../AuthButton';
@@ -30,6 +31,7 @@ export const Navbar: React.FC = () => {
   const [isMoreOpen, setIsMoreOpen] = useState(false);
   const [user, setUser] = useState<any>(null);
   
+  const navigate = useNavigate();
   const moreDropdownRef = useRef<HTMLDivElement>(null);
   const { theme, toggleTheme } = useTheme();
   const supabase = createClient();
@@ -265,7 +267,14 @@ export const Navbar: React.FC = () => {
               ))}
               <div className="h-px bg-zinc-200 dark:bg-white/5 my-4" />
               <button 
-                onClick={() => user ? scrollToSection('studio') : scrollToSection('login')}
+                onClick={() => {
+                  if (user) {
+                    navigate('/studio');
+                  } else {
+                    navigate('/login');
+                  }
+                  setIsMobileMenuOpen(false);
+                }}
                 className="w-full py-6 rounded-[2rem] bg-zinc-900 dark:bg-white text-white dark:text-black font-black text-sm uppercase tracking-[0.2em] shadow-xl active:scale-95 transition-all"
               >
                 {user ? 'Launch Studio' : 'Get Started Now'}

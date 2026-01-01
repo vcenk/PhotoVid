@@ -24,7 +24,7 @@ const PRESETS: Preset[] = [
     prompt: "Anamorphic lens, low angle street scene, soft morning light, hyper-realistic textures, clean professional color grading...",
     tags: ["16:9", "Slow Pan", "Professional"],
     includes: ["Refined Grain", "Color Logic", "Global Lighting"],
-    image: "https://images.unsplash.com/photo-1485846234645-a62644ef7467?auto=format&fit=crop&q=80&w=1200",
+    image: "https://images.unsplash.com/photo-1536440136628-849c177e76a1?q=80&w=1200&auto=format&fit=crop",
   },
   {
     id: "social",
