@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react';
 import { UploadCloud, X, Image as ImageIcon } from 'lucide-react';
-import { useWizard } from '../../contexts/WizardContext';
+import { useWizard } from '../../../lib/store/contexts/WizardContext';
 
 export const FileUploader: React.FC = () => {
   const { uploadedFiles, setUploadedFiles } = useWizard();

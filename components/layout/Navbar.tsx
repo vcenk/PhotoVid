@@ -3,10 +3,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { Menu, X, ChevronDown, Sun, Moon } from 'lucide-react';
-import { createClient } from '../../lib/supabase/client';
-import { AuthButton } from '../AuthButton';
-import { useTheme } from '../theme/ThemeProvider';
+import { Menu, X, ChevronDown, Moon, Sun } from 'lucide-react';
+import { createClient } from '../../lib/database/client';
+import { AuthButton } from '../common/AuthButton';
+import { useTheme } from '../common/ThemeProvider';
 
 const PRIMARY_NAV = [
   { name: 'Home', id: 'hero-start' },
@@ -33,8 +33,8 @@ export const Navbar: React.FC = () => {
   
   const navigate = useNavigate();
   const moreDropdownRef = useRef<HTMLDivElement>(null);
-  const { theme, toggleTheme } = useTheme();
   const supabase = createClient();
+  const { theme, toggleTheme } = useTheme();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -113,9 +113,9 @@ export const Navbar: React.FC = () => {
       return isActive ? "text-white" : "text-zinc-300 hover:text-white";
     }
     if (isActive) {
-      return "text-indigo-600 dark:text-white";
+      return "text-indigo-600";
     }
-    return "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white";
+    return "text-zinc-500 hover:text-zinc-900";
   };
 
   return (
@@ -126,17 +126,17 @@ export const Navbar: React.FC = () => {
         transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
         className={`
           pointer-events-auto flex items-center justify-between w-full transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]
-          ${isScrolled 
-            ? "max-w-6xl px-6 md:px-10 py-4 md:py-5 rounded-3xl bg-white/80 dark:bg-zinc-950/80 backdrop-blur-2xl border border-zinc-200 dark:border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.1)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.4)]" 
+          ${isScrolled
+            ? "max-w-6xl px-6 md:px-10 py-4 md:py-5 rounded-3xl bg-white/80 backdrop-blur-2xl border border-zinc-200 shadow-[0_20px_50px_rgba(0,0,0,0.1)]"
             : "max-w-none px-8 md:px-12 py-10 bg-transparent border-transparent"
           }
         `}
       >
-        <div 
-          className="flex items-center gap-2 cursor-pointer group" 
+        <div
+          className="flex items-center gap-2 cursor-pointer group"
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
         >
-          <div className={`text-2xl md:text-4xl font-black tracking-tighter transition-colors duration-500 ${isScrolled ? 'text-zinc-900 dark:text-white' : 'text-white'}`}>
+          <div className={`text-2xl md:text-4xl font-black tracking-tighter transition-colors duration-500 ${isScrolled ? 'text-zinc-900' : 'text-white'}`}>
             PHOTOVID<span className="text-indigo-500 transition-transform group-hover:scale-125 inline-block">.</span>
           </div>
         </div>
@@ -178,7 +178,7 @@ export const Navbar: React.FC = () => {
                   initial={{ opacity: 0, y: 10, scale: 0.95 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                  className="absolute top-full right-0 mt-6 w-64 py-4 rounded-[2rem] bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-white/10 shadow-2xl flex flex-col overflow-hidden p-2 ring-1 ring-black/5"
+                  className="absolute top-full right-0 mt-6 w-64 py-4 rounded-[2rem] bg-white border border-zinc-200 shadow-2xl flex flex-col overflow-hidden p-2 ring-1 ring-black/5"
                 >
                   {SECONDARY_NAV.map((item) => (
                     <button
@@ -186,9 +186,9 @@ export const Navbar: React.FC = () => {
                       onClick={() => scrollToSection(item.id)}
                       className={`
                         px-8 py-4 text-xs font-black uppercase tracking-widest text-left rounded-2xl transition-all
-                        ${activeId === item.id 
-                          ? "text-indigo-600 dark:text-white bg-zinc-100 dark:bg-white/10" 
-                          : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white hover:bg-zinc-50 dark:hover:bg-white/5"
+                        ${activeId === item.id
+                          ? "text-indigo-600 bg-zinc-100"
+                          : "text-zinc-500 hover:text-zinc-900 hover:bg-zinc-50"
                         }
                       `}
                     >
@@ -199,18 +199,6 @@ export const Navbar: React.FC = () => {
               )}
             </AnimatePresence>
           </div>
-
-          <button 
-             onClick={toggleTheme}
-             className={`p-2 rounded-full transition-colors ${
-               !isScrolled 
-                 ? 'text-white hover:bg-white/10' 
-                 : 'text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/10'
-             }`}
-             aria-label="Toggle Dark Mode"
-          >
-            {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
-          </button>
         </div>
 
         <div className="flex items-center gap-4 md:gap-6">
@@ -218,11 +206,11 @@ export const Navbar: React.FC = () => {
             <AuthButton user={user} isScrolled={isScrolled} />
           </div>
 
-          <button 
+          <button
             className={`lg:hidden p-3 rounded-full transition-colors ${
-              !isScrolled 
-                ? 'text-white hover:bg-white/10' 
-                : 'text-zinc-900 hover:bg-zinc-100 dark:text-white dark:hover:bg-white/10'
+              !isScrolled
+                ? 'text-white hover:bg-white/10'
+                : 'text-zinc-900 hover:bg-zinc-100'
             }`}
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
@@ -238,17 +226,8 @@ export const Navbar: React.FC = () => {
             initial={{ opacity: 0, y: -20, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -20, scale: 0.98 }}
-            className="fixed top-24 left-4 right-4 mx-auto max-w-md p-8 rounded-[2.5rem] bg-white/95 dark:bg-zinc-950/95 backdrop-blur-3xl border border-zinc-200 dark:border-white/10 shadow-[0_30px_100px_rgba(0,0,0,0.3)] lg:hidden pointer-events-auto max-h-[80vh] overflow-y-auto z-[90]"
+            className="fixed top-24 left-4 right-4 mx-auto max-w-md p-8 rounded-[2.5rem] bg-white/95 backdrop-blur-3xl border border-zinc-200 shadow-[0_30px_100px_rgba(0,0,0,0.3)] lg:hidden pointer-events-auto max-h-[80vh] overflow-y-auto z-[90]"
           >
-            <div className="flex justify-end mb-6">
-               <button 
-                 onClick={toggleTheme}
-                 className="flex items-center gap-2 px-4 py-2 rounded-full bg-zinc-100 dark:bg-zinc-900 text-zinc-900 dark:text-white text-xs font-bold uppercase tracking-widest border border-transparent dark:border-white/10"
-               >
-                 {theme === 'dark' ? <><Sun size={14}/> Light Mode</> : <><Moon size={14}/> Dark Mode</>}
-               </button>
-            </div>
-
             <div className="flex flex-col gap-6">
               {[...PRIMARY_NAV, ...SECONDARY_NAV].map((item) => (
                 <button
@@ -256,17 +235,17 @@ export const Navbar: React.FC = () => {
                   onClick={() => scrollToSection(item.id)}
                   className={`
                     text-2xl font-black uppercase tracking-tight text-left py-2
-                    ${activeId === item.id 
-                      ? "text-indigo-600 dark:text-white" 
-                      : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-500 dark:hover:text-white"
+                    ${activeId === item.id
+                      ? "text-indigo-600"
+                      : "text-zinc-500 hover:text-zinc-900"
                     }
                   `}
                 >
                   {item.name}
                 </button>
               ))}
-              <div className="h-px bg-zinc-200 dark:bg-white/5 my-4" />
-              <button 
+              <div className="h-px bg-zinc-200 my-4" />
+              <button
                 onClick={() => {
                   if (user) {
                     navigate('/studio');
@@ -275,7 +254,7 @@ export const Navbar: React.FC = () => {
                   }
                   setIsMobileMenuOpen(false);
                 }}
-                className="w-full py-6 rounded-[2rem] bg-zinc-900 dark:bg-white text-white dark:text-black font-black text-sm uppercase tracking-[0.2em] shadow-xl active:scale-95 transition-all"
+                className="w-full py-6 rounded-[2rem] bg-zinc-900 text-white font-black text-sm uppercase tracking-[0.2em] shadow-xl active:scale-95 transition-all"
               >
                 {user ? 'Launch Studio' : 'Get Started Now'}
               </button>

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { useWizard } from '../../contexts/WizardContext';
-import { useProjects } from '../../contexts/ProjectContext';
+import { useWizard } from '../../../lib/store/contexts/WizardContext';
+import { useProjects } from '../../../lib/store/contexts/ProjectContext';
 import { Download, RefreshCw, Share2, Save, Check } from 'lucide-react';
 
 export const ResultViewer: React.FC = () => {

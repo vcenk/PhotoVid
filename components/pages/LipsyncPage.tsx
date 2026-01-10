@@ -7,7 +7,7 @@ export const LipsyncPage: React.FC = () => {
   const [activeFlyout, setActiveFlyout] = useState<FlyoutType>(null);
 
   return (
-    <div className="h-screen flex bg-zinc-50">
+    <div className="h-screen flex bg-white dark:bg-[#09090b]">
       {/* Navigation Rail */}
       <NavigationRail activeFlyout={activeFlyout} onFlyoutChange={setActiveFlyout} />
 

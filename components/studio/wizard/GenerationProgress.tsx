@@ -1,5 +1,5 @@
 import React from 'react';
-import { useWizard } from '../../contexts/WizardContext';
+import { useWizard } from '../../../lib/store/contexts/WizardContext';
 import { Loader2, AlertCircle, ArrowLeft } from 'lucide-react';
 
 export const GenerationProgress: React.FC = () => {

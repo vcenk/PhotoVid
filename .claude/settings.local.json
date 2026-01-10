@@ -5,7 +5,16 @@
       "WebFetch(domain:www.imagine.art)",
       "Bash(npm run dev:*)",
       "Bash(ls:*)",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "Bash(npm install:*)",
+      "Bash(find:*)",
+      "Bash(for file in *.tsx)",
+      "Bash(do sed -i \"s|from ''../contexts/|from ''../../../lib/store/contexts/|g\" \"$file\")",
+      "Bash(done)",
+      "Bash(do sed -i \"s|from ''../../lib/data/workflows''|from ''../../../lib/data/workflows''|g\" \"$file\")",
+      "Bash(do sed -i \"s|from ''../../lib/types/studio''|from ''../../types/studio''|g\" \"$file\")",
+      "WebSearch",
+      "WebFetch(domain:fal.ai)"
     ]
   }
 }

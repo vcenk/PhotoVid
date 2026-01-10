@@ -4,7 +4,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { createClient } from '../../lib/supabase/client';
+import { createClient } from '../../lib/database/client';
 import { Sparkles, Mail, Loader2, ArrowLeft, AlertTriangle } from 'lucide-react';
 import { Background } from '../../components/layout/Background';
 

@@ -1,6 +1,6 @@
 
 import { redirect } from 'next/navigation'
-import { createClient } from '../../lib/supabase/server'
+import { createClient } from '../../lib/database/server'
 import { Background } from '../../components/layout/Background'
 import { Navbar } from '../../components/layout/Navbar'
 import { Sparkles, Layout, Play, History, Settings, LogOut } from 'lucide-react'

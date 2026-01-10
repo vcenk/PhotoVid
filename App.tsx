@@ -1,8 +1,12 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { ThemeProvider } from './components/theme/ThemeProvider';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { ThemeProvider } from './components/common/ThemeProvider';
 import { LandingPage } from './components/pages/LandingPage';
 import { StudioPage } from './components/pages/StudioPage';
+import { LipsyncPage } from './components/pages/LipsyncPage';
+import { ImagePage } from './components/pages/ImagePage';
+import { AppsPage } from './components/pages/AppsPage';
+import { WorkflowPage } from './components/pages/WorkflowPage';
 import LoginPage from './app/login/page';
 
 // Simple Error Boundary to catch crashes
@@ -29,8 +33,8 @@ class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { has
           <pre className="text-left bg-white p-4 rounded border border-red-200 overflow-auto max-w-2xl text-sm">
             {this.state.error?.toString()}
           </pre>
-          <button 
-            onClick={() => window.location.href = '/'} 
+          <button
+            onClick={() => window.location.href = '/'}
             className="mt-6 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
           >
             Reload App
@@ -51,6 +55,14 @@ const App: React.FC = () => {
           <Routes>
             <Route path="/" element={<LandingPage />} />
             <Route path="/studio" element={<StudioPage />} />
+            <Route path="/studio/apps" element={<AppsPage />} />
+            <Route path="/studio/lipsync" element={<LipsyncPage />} />
+            <Route path="/studio/image" element={<ImagePage />} />
+            <Route path="/studio/workflow" element={<WorkflowPage />} />
+            {/* Redirect old dashboard routes to studio */}
+            <Route path="/dashboard" element={<Navigate to="/studio" replace />} />
+            <Route path="/dashboard/lipsync" element={<Navigate to="/studio/lipsync" replace />} />
+            <Route path="/dashboard/*" element={<Navigate to="/studio" replace />} />
             <Route path="/login" element={<LoginPage />} />
           </Routes>
         </Router>

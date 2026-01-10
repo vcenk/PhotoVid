@@ -1,5 +1,5 @@
 import React from 'react';
-import { useWizard } from '../../contexts/WizardContext';
+import { useWizard } from '../../../lib/store/contexts/WizardContext';
 import { Camera, Zap, Wind, Eye } from 'lucide-react';
 
 const MOTION_STYLES = [
