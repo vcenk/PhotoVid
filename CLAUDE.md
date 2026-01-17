@@ -4,34 +4,38 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Photovid is a React SPA for an AI-powered video creation platform with two main parts:
-1. **Landing Page** (`App.tsx`) - Marketing site showcasing capabilities
-2. **Studio Dashboard** (`app/studio/page.tsx`) - Industry-specific workflow interface for generating cinematic videos from images
+Photovid is a React SPA for an AI-powered video creation platform with:
+1. **Landing Page** (`/`) - Marketing site showcasing capabilities
+2. **Studio Dashboard** (`/studio`) - Industry-specific workflow interface for generating cinematic videos from images
+3. **Specialized Tools** - Lipsync (`/studio/lipsync`), Image generation (`/studio/image`), Apps gallery (`/studio/apps`)
+4. **Industry Portals** - Real Estate (`/studio/apps/real-estate`), Auto Dealership (`/studio/apps/auto`)
+5. **Workflow Canvas** (`/studio/workflow`) - Node-based visual editor using React Flow
 
-**Important Architecture Note:** This is a **Vite + React SPA**, NOT a Next.js application, despite the presence of Next.js dependencies and an `app/` directory. The actual runtime uses Vite as the build tool with `index.html` → `index.tsx` → `App.tsx` as the entry flow. The `app/` directory contains standalone route components (login, studio, auth callback) but these are NOT using Next.js App Router - they're regular React components that would need manual routing integration.
+**Important Architecture Note:** This is a **Vite + React SPA** with **React Router**, NOT a Next.js application, despite Next.js being in dependencies. The entry flow is `index.html` → `index.tsx` → `App.tsx` (which sets up routing). The `app/` directory contains standalone page components imported into the React Router configuration.
 
 ## Tech Stack
 
 - **Build Tool:** Vite 6.2 (TypeScript, React plugin)
 - **Framework:** React 19 (using new JSX transform)
-- **Styling:** Tailwind CSS (via CDN in index.html + class-based dark mode)
+- **Routing:** React Router DOM v7
+- **Styling:** Tailwind CSS v4 (via CDN in index.html + class-based dark mode)
 - **Animation:** Framer Motion (primary), GSAP (secondary)
 - **Icons:** lucide-react
+- **Node Editor:** @xyflow/react (React Flow) for workflow canvas
+- **State Management:** Zustand + React Context
 - **Auth/Backend:** Supabase (@supabase/ssr)
-- **AI Generation:** FAL AI (Kling Video v1.5, Flux Dev)
-- **Storage:** Cloudflare R2 (S3-compatible)
+- **AI Generation:** FAL AI (Kling Video, Flux Dev, Lipsync models)
+- **Storage:** Cloudflare R2 (S3-compatible via AWS SDK)
 - **Type Safety:** TypeScript 5.8
 
 ## Essential Commands
 
-### Development
 ```bash
-npm run dev          # Start dev server on port 3010
+npm run dev          # Start dev server on port 3100
 npm run build        # Production build
 npm run preview      # Preview production build
 ```
 
-### Testing
 No test suite is currently configured.
 
 ## Environment Variables
@@ -69,7 +73,7 @@ VITE_R2_PUBLIC_URL=https://your-public-url.com
 3. `App.tsx` is the main application component wrapped in `ThemeProvider`
 4. All landing page content is composed in `App.tsx` using section components
 
-### Studio Architecture (NEW)
+### Studio Architecture
 
 The Studio is a complete workflow-based video generation system with the following architecture:
 
@@ -80,27 +84,27 @@ The Studio is a complete workflow-based video generation system with the followi
 
 #### State Management (4 Contexts)
 
-1. **StudioContext** (`components/contexts/StudioContext.tsx`)
+1. **StudioContext** (`lib/store/contexts/StudioContext.tsx`)
    - Manages view routing: `dashboard | wizard | canvas | assets`
    - Handles industry/workflow selection
    - Provides navigation functions: `goHome()`, `openCanvas()`, `openAssets()`
 
-2. **WizardContext** (`components/contexts/WizardContext.tsx`)
+2. **WizardContext** (`lib/store/contexts/WizardContext.tsx`)
    - Manages step-by-step workflow execution
    - Handles file uploads, configuration, generation state
    - Orchestrates the generation pipeline (R2 upload → Edge Function → FAL polling)
    - Provides `startGeneration()` which:
-     - Uploads image to R2 via `lib/r2.ts`
+     - Uploads image to R2 via `lib/api/r2.ts`
      - Calls Supabase Edge Function `generate-video`
      - Polls FAL AI for completion using `checkStatus()` and `getResult()`
      - Saves result to AssetContext
 
-3. **ProjectContext** (`components/contexts/ProjectContext.tsx`)
+3. **ProjectContext** (`lib/store/contexts/ProjectContext.tsx`)
    - Manages project CRUD operations
    - Persists projects to Supabase `projects` table
    - Supports both `wizard` and `canvas` modes
 
-4. **AssetContext** (`components/contexts/AssetContext.tsx`)
+4. **AssetContext** (`lib/store/contexts/AssetContext.tsx`)
    - Global asset library for generated videos and uploaded images
    - Persists assets across workflows
    - Used for reusing assets in canvas mode
@@ -136,28 +140,37 @@ Display in ResultViewer
 
 ### Key Directories
 
+- **`components/pages/`** - Top-level page components (StudioPage, LipsyncPage, ImagePage, AppsPage, WorkflowPage)
+- **`components/landing/`** - Landing page sections (Hero, Pricing, UseCases, etc.)
 - **`components/layout/`** - Structural components (Navbar, Background)
-- **`components/sections/`** - Landing page sections (Hero, Pricing, etc.)
-- **`components/theme/`** - ThemeProvider for dark/light mode
-- **`components/contexts/`** - React Contexts for state management (Studio, Wizard, Project, Asset)
+- **`components/common/`** - Shared components (ThemeProvider, AuthButton)
+- **`components/dashboard/`** - Dashboard UI components
+  - `navigation/` - NavigationRail, DashboardTopbar, FlyoutPanels
+  - `home/` - HeroComposer, TemplateCarousels, WorkflowLibrary
+  - `apps/` - AppCard, AppsGrid
+  - `lipsync/` - LipsyncStudio
+  - `image/` - ImageStudio
 - **`components/studio/`** - Studio-specific components
-  - `IndustrySelector.tsx` - Industry selection buttons
-  - `WorkflowGrid.tsx` - Displays workflow cards for selected industry
-  - `AssetLibrary.tsx` - Global asset browser
-  - `wizard/` - Wizard mode components (FileUploader, ConfigurationPanel, GenerationProgress, ResultViewer)
-  - `nodes/` - Canvas mode node components (in progress)
-  - `shared/` - Reusable components across modes
-- **`lib/supabase/`** - Supabase client utilities (client.ts, server.ts, middleware.ts)
-  - `database.sql` - Database schema with projects table and RLS policies
+  - `wizard/` - Wizard mode (FileUploader, ConfigurationPanel, GenerationProgress, ResultViewer)
+  - `shared/` - IndustrySelector, WorkflowGrid, AssetLibrary, TemplateGallery
+  - `workflow/` - React Flow canvas components
+    - `WorkflowCanvas.tsx` - Main canvas container
+    - `NodePalette.tsx` - Draggable node sidebar
+    - `TemplatePanel.tsx` - Pre-built workflow templates
+    - `nodes/` - Custom node types (ImageInputNode, TextToImageNode, LipsyncNode, etc.)
+- **`components/industry/`** - Industry-specific portal pages (IndustryPage, IndustryHero, ToolsGrid)
+- **`components/tools/`** - Individual tool implementations by industry
+  - `real-estate/` - VirtualStagingTool, ItemRemovalTool, PhotoEnhancementTool, SkyReplacementTool, TwilightTool, LawnEnhancementTool, RoomTourTool
+- **`lib/api/`** - External API integrations (fal.ts, r2.ts, openai.ts, lipsync.ts)
+- **`lib/data/`** - Static data (workflows.ts, apps.ts, templates.ts, industries.ts, workflow-templates.ts)
+- **`lib/database/`** - Supabase client utilities (client.ts, server.ts, middleware.ts)
+- **`lib/store/`** - State management
+  - `contexts/` - React Contexts (StudioContext, WizardContext, ProjectContext, AssetContext)
+  - `dashboard.ts` - Zustand store for dashboard state
+- **`lib/services/`** - External service integrations (unsplash.ts)
+- **`lib/workflow/`** - Workflow engine (types.ts, node-definitions.ts, execution-engine.ts)
 - **`lib/types/`** - TypeScript type definitions
-  - `studio.ts` - Industry, Workflow, Project interfaces
-- **`lib/data/`** - Configuration data
-  - `workflows.ts` - Industry and workflow definitions
-- **`lib/`** - API integrations
-  - `fal.ts` - FAL AI client (image-to-video, text-to-image)
-  - `r2.ts` - Cloudflare R2 upload client
-  - `openai.ts` - OpenAI integration (if used)
-- **`app/`** - Standalone page components (login, studio, auth/callback) - NOT Next.js routes
+- **`app/`** - Standalone page components (login) - imported into React Router
 
 ### Theme System
 
@@ -194,7 +207,7 @@ import { INDUSTRIES } from '@/lib/data/workflows';
 ### Supabase Integration
 
 The Supabase client is designed to fail gracefully:
-- `lib/supabase/client.ts` returns `null` if env vars are missing
+- `lib/database/client.ts` returns `null` if env vars are missing
 - All components check for `null` client before attempting auth operations
 - Displays warning messages when auth is unavailable
 - WizardContext falls back to mock generation if Supabase is unavailable
@@ -226,7 +239,7 @@ Row Level Security (RLS) is enabled - users can only access their own projects.
 
 ### External Service Integration
 
-#### FAL AI (`lib/fal.ts`)
+#### FAL AI (`lib/api/fal.ts`)
 - **Primary Model**: `fal-ai/kling-video/v1.5/pro/image-to-video` - Converts images to cinematic videos
 - **Secondary Model**: `fal-ai/flux/dev` - Text-to-image generation
 - **Pattern**: Async job submission → Poll every 5s → Retrieve result
@@ -235,8 +248,12 @@ Row Level Security (RLS) is enabled - users can only access their own projects.
   - `checkStatus(requestId)` - Check job status
   - `getResult(requestId)` - Get final video URL
 
-#### Cloudflare R2 (`lib/r2.ts`)
-- S3-compatible object storage
+#### Lipsync (`lib/api/lipsync.ts`)
+- Multiple model support for audio-driven facial animation
+- Models defined in `lib/data/lipsync-models.ts`
+
+#### Cloudflare R2 (`lib/api/r2.ts`)
+- S3-compatible object storage via AWS SDK
 - Used for storing user-uploaded images before sending to FAL
 - `uploadToR2(file, path)` - Uploads file, returns public URL
 - Path structure: `user-uploads/{timestamp}-{filename}`
@@ -246,45 +263,42 @@ Row Level Security (RLS) is enabled - users can only access their own projects.
 - Accepts: `{ imageUrl, prompt, motionStyle }`
 - Returns: `{ request_id }` or `{ video: { url } }`
 
-### Component Organization
+### Routing Structure (`App.tsx`)
 
-#### Landing Page (`App.tsx`)
-Uses a `SectionWrapper` helper component for consistent section spacing and styling. All major sections are imported and composed in sequence:
-
-1. Hero (with MosaicSlideshow background)
-2. LogoMarquee
-3. WorkflowDemo
-4. MosaicSlideshow (full-width)
-5. UseCasesSection
-6. TemplatePacks
-7. KineticShowcaseWall
-8. PricingSection
-9. FaqAndFinalCtaSection
-10. Footer
-
-Most sections use Framer Motion for animations and GSAP for complex scroll-based effects.
-
-#### Studio Dashboard
-The studio uses conditional rendering based on `StudioContext.currentView`:
-
-```typescript
-{currentView === 'dashboard' && (
-  <>
-    <IndustrySelector />
-    {selectedIndustry && <WorkflowGrid industry={selectedIndustry} />}
-  </>
-)}
-
-{currentView === 'wizard' && selectedWorkflow && (
-  <WizardProvider workflow={selectedWorkflow}>
-    <WizardContainer />
-  </WizardProvider>
-)}
-
-{currentView === 'canvas' && <CanvasEditor />}
-
-{currentView === 'assets' && <AssetLibrary />}
+The app uses React Router v7 with the following routes:
 ```
+/                                           → LandingPage
+/studio                                     → StudioPage (main dashboard)
+/studio/apps                                → AppsPage (industry apps gallery)
+/studio/apps/real-estate                    → IndustryPage (real estate portal)
+/studio/apps/real-estate/virtual-staging    → VirtualStagingTool
+/studio/apps/real-estate/item-removal       → ItemRemovalTool
+/studio/apps/real-estate/photo-enhancement  → PhotoEnhancementTool
+/studio/apps/real-estate/sky-replacement    → SkyReplacementTool
+/studio/apps/real-estate/twilight           → TwilightTool
+/studio/apps/real-estate/lawn-enhancement   → LawnEnhancementTool
+/studio/apps/real-estate/room-tour          → RoomTourTool
+/studio/apps/auto                           → IndustryPage (auto dealership portal)
+/studio/lipsync                             → LipsyncPage
+/studio/image                               → ImagePage
+/studio/workflow                            → WorkflowPage (node-based canvas)
+/login                                      → LoginPage
+/dashboard/*                                → Redirects to /studio
+```
+
+### Workflow Canvas Architecture
+
+The workflow canvas (`WorkflowPage`) uses React Flow for a node-based visual editor:
+
+**Node Types** (defined in `lib/workflow/node-definitions.ts`):
+- Input: ImageInputNode, VideoInputNode, AudioInputNode, PromptInputNode
+- Processing: TextToImageNode, ImageToVideoNode, LipsyncNode, UpscaleNode, InpaintNode
+- Output: PreviewNode
+
+**Execution Engine** (`lib/workflow/execution-engine.ts`):
+- Processes nodes in topological order
+- Handles async operations (API calls to FAL)
+- Manages data flow between connected nodes
 
 ## Important Patterns
 
@@ -341,65 +355,53 @@ The WizardContext implements a robust async generation pattern:
 ### Vite-Specific
 - HMR is enabled; changes hot-reload in dev
 - Environment variables must be defined in `vite.config.ts` to be available
-- Port 3010 is hardcoded; server binds to `0.0.0.0`
+- Port 3100 is hardcoded; server binds to `0.0.0.0`
 - Use `import.meta.env.VITE_*` for environment variables (not `process.env`)
 
 ## Common Gotchas
 
-1. **Next.js confusion**: Don't add Next.js patterns (Server Components, route handlers, etc.). This is a Vite SPA.
-2. **Tailwind CDN**: Custom Tailwind config exists but CDN is loaded in HTML. Configuration may not apply as expected.
-3. **Font loading**: Fonts loaded via Google Fonts CDN, not local files
-4. **Auth routes**: The `app/login/page.tsx` component exists but needs manual routing (no automatic Next.js routing)
-5. **Environment variables**: Use `import.meta.env.VITE_*` for Vite, `process.env.*` for values defined in vite.config.ts
-6. **FAL AI async jobs**: Always poll for completion - don't assume immediate results
-7. **R2 public URLs**: Ensure R2 bucket has public access configured and VITE_R2_PUBLIC_URL is set correctly
-8. **Context nesting**: WizardProvider must be inside StudioProvider, and both need access to AssetContext
-9. **Mock fallback**: If Supabase is unavailable, WizardContext uses mock generation with test video URL
+1. **Next.js confusion**: Don't add Next.js patterns (Server Components, route handlers, etc.). This is a Vite SPA with React Router.
+2. **Tailwind CDN**: Tailwind v4 loaded via CDN in HTML. Custom config may not apply as expected.
+3. **Font loading**: Fonts loaded via Google Fonts CDN, not local files.
+4. **Routing**: Routes defined in `App.tsx` using React Router - not file-based routing.
+5. **Environment variables**: Use `import.meta.env.VITE_*` for Vite, `process.env.*` for values defined in vite.config.ts.
+6. **FAL AI async jobs**: Always poll for completion - don't assume immediate results.
+7. **R2 public URLs**: Ensure R2 bucket has public access and VITE_R2_PUBLIC_URL is set correctly.
+8. **Context nesting**: WizardProvider must be inside StudioProvider, and both need access to AssetContext.
+9. **Mock fallback**: If Supabase is unavailable, WizardContext uses mock generation with test video URL.
+10. **React Flow**: The @xyflow/react package requires nodes and edges to have stable IDs for proper rendering.
 
-## Workflow Development
+## Development Patterns
 
-### Adding a New Industry
-1. Add to `IndustryId` type in `lib/types/studio.ts`
-2. Create industry object in `lib/data/workflows.ts` with icon, description, and workflows array
-3. Add to `INDUSTRIES` array
+### Adding a New Route
+1. Create page component in `components/pages/`
+2. Add route in `App.tsx` within the `<Routes>` block
+3. Add navigation link in appropriate navigation component
 
-### Adding a New Workflow
-1. Define workflow object in appropriate industry's `workflows` array
+### Adding a New Industry Portal
+1. Add industry config in `lib/data/industries.ts` (defines tools, workflows, stats, hero content)
+2. Add portal route in `App.tsx`: `<Route path="/studio/apps/{slug}" element={<IndustryPage industryId="{slug}" />} />`
+3. For tools with custom routes, create tool components in `components/tools/{industry}/` and add routes in `App.tsx`
+
+### Adding a New Workflow Node
+1. Create node component in `components/studio/workflow/nodes/`
+2. Register in `lib/workflow/node-definitions.ts`
+3. Add to node palette in `NodePalette.tsx`
+4. Implement execution logic in `lib/workflow/execution-engine.ts`
+
+### Adding a New Wizard Workflow
+1. Define workflow object in `lib/data/workflows.ts`
 2. Specify `id`, `name`, `description`, `icon`, `requiredFiles`, `estimatedCredits`
 3. Define `steps` array with step types: `upload | configure | generate | review`
-4. Optionally create custom wizard components in `components/studio/wizard/`
 
-### Creating Custom Wizard Steps
-Override default wizard behavior by creating workflow-specific components:
-```typescript
-// components/studio/workflows/RealEstate/PropertyShowcase.tsx
-export const PropertyShowcaseWizard = () => {
-  const { currentStep, uploadedFiles } = useWizard();
-  // Custom UI for property showcase workflow
-};
-```
-
-## Database Setup
-
-Run `lib/supabase/database.sql` in your Supabase SQL Editor to:
-1. Enable UUID extension
-2. Create `projects` table
-3. Set up Row Level Security policies
-4. Create `user-uploads` storage bucket (or use Cloudflare R2)
+### Adding a New Industry Tool
+1. Create tool component in `components/tools/{industry}/{ToolName}Tool.tsx`
+2. Add route in `App.tsx`: `<Route path="/studio/apps/{industry}/{tool-slug}" element={<ToolComponent />} />`
+3. Add tool config in `lib/data/industries.ts` with `route` property pointing to the new route
+4. Tool components typically include: image upload, configuration options, before/after preview, and generation trigger
 
 ## Testing the Generation Pipeline
 
 1. **Without Supabase/FAL**: WizardContext automatically falls back to mock generation
 2. **With R2 Only**: Files upload but generation uses mock video
-3. **With Supabase Edge Function**: Full pipeline requires:
-   - FAL API key configured in Edge Function
-   - R2 credentials in environment
-   - Supabase function deployed: `supabase functions deploy generate-video`
-
-## Performance Considerations
-
-- **File Uploads**: Images are uploaded to R2 before generation to avoid sending large files through Edge Functions
-- **Polling Interval**: 5 seconds balances responsiveness with API rate limits
-- **Timeout**: 5-minute max prevents infinite polling
-- **Progress Updates**: Visual feedback keeps users engaged during 1-3 minute generation times
-- **Asset Library**: Generated videos stored in AssetContext prevent re-generation
+3. **Full Pipeline**: Requires FAL API key in Edge Function, R2 credentials, and deployed Supabase function

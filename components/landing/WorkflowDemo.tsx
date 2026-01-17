@@ -79,7 +79,7 @@ export const WorkflowDemo = () => {
       {/* 1. Progress Tracker (Top) */}
       <div className="flex justify-between items-center mb-16 relative">
         {/* Connecting Line */}
-        <div className="absolute top-1/2 left-0 right-0 h-1 bg-stone-100 -z-10 rounded-full" />
+        <div className="absolute top-1/2 left-0 right-0 h-1 bg-stone-100 dark:bg-zinc-800 -z-10 rounded-full" />
         <div 
           className="absolute top-1/2 left-0 h-1 bg-indigo-600 -z-10 rounded-full transition-all duration-1000 ease-linear" 
           style={{ width: `${(activeStep / (STEPS.length - 1)) * 100}%` }}
@@ -95,18 +95,17 @@ export const WorkflowDemo = () => {
               key={step.id} 
               className="flex flex-col items-center gap-4 cursor-default relative group"
             >
-              <motion.div 
-                animate={{ 
-                  scale: isActive ? 1.1 : 1,
-                  backgroundColor: isActive ? "#ffffff" : isCompleted ? "#f5f5f4" : "#ffffff"
+              <motion.div
+                animate={{
+                  scale: isActive ? 1.1 : 1
                 }}
                 className={`
                   w-16 h-16 rounded-2xl flex items-center justify-center border-2 shadow-sm transition-colors duration-500
-                  ${isActive 
-                    ? 'border-indigo-600 text-indigo-600 shadow-xl shadow-indigo-200' 
+                  ${isActive
+                    ? 'bg-white dark:bg-zinc-800 border-indigo-600 text-indigo-600 dark:text-indigo-400 shadow-xl shadow-indigo-200 dark:shadow-indigo-900/30'
                     : isCompleted
-                      ? 'border-indigo-200 text-indigo-400 bg-indigo-50' 
-                      : 'border-stone-200 text-stone-300'
+                      ? 'bg-indigo-50 dark:bg-indigo-950 border-indigo-200 dark:border-indigo-800 text-indigo-400'
+                      : 'bg-white dark:bg-zinc-900 border-stone-200 dark:border-zinc-700 text-stone-300 dark:text-zinc-600'
                   }
                 `}
               >
@@ -114,7 +113,7 @@ export const WorkflowDemo = () => {
               </motion.div>
               
               <div className="absolute top-20 text-center w-40">
-                <span className={`text-xs font-black uppercase tracking-widest transition-colors duration-300 ${isActive ? 'text-zinc-900' : 'text-zinc-400'}`}>
+                <span className={`text-xs font-black uppercase tracking-widest transition-colors duration-300 ${isActive ? 'text-zinc-900 dark:text-white' : 'text-zinc-400 dark:text-zinc-500'}`}>
                   {step.label}
                 </span>
               </div>
@@ -134,12 +133,12 @@ export const WorkflowDemo = () => {
             animate={{ opacity: 1, y: 0 }}
             className="space-y-4"
           >
-            <h3 className="text-4xl font-bold text-zinc-900 flex items-center gap-3">
+            <h3 className="text-4xl font-bold text-zinc-900 dark:text-white flex items-center gap-3">
               {currentStep.id === 'image' && "Visualize."}
               {currentStep.id === 'video' && "Animate."}
               {currentStep.id === 'audio' && "Resonate."}
             </h3>
-            <p className="text-lg text-zinc-500 font-sans">
+            <p className="text-lg text-zinc-500 dark:text-zinc-400 font-sans">
               {currentStep.description}
             </p>
           </motion.div>

@@ -1,77 +1,94 @@
 import React from 'react';
 import { Navbar } from '../layout/Navbar';
 import { Hero } from '../landing/Hero';
+import { LogoMarquee } from '../landing/LogoMarquee';
+import { BeforeAfterShowcase } from '../landing/BeforeAfterShowcase';
 import { WorkflowDemo } from '../landing/WorkflowDemo';
+import { FeatureGrid } from '../landing/FeatureGrid';
 import { MosaicSlideshow } from '../landing/MosaicSlideshow';
 import { UseCasesSection } from '../landing/UseCasesSection';
 import { TemplatePacks } from '../landing/TemplatePacks';
-import { CreatorPresets } from '../landing/CreatorPresets';
 import { KineticShowcaseWall } from '../landing/KineticShowcaseWall';
+import { TestimonialsCarousel } from '../landing/TestimonialsCarousel';
 import { PricingSection } from '../landing/PricingSection';
 import { FaqAndFinalCtaSection } from '../landing/FaqAndFinalCtaSection';
-import { LogoMarquee } from '../landing/LogoMarquee';
-import { Footer } from '../landing/Footer'; 
+import { Footer } from '../landing/Footer';
 
 const SectionWrapper = ({ children, id, className = "" }: { children: React.ReactNode, id?: string, className?: string }) => (
-  <section id={id} className={`relative py-24 ${className}`}>
+  <section id={id} className={`relative ${className}`}>
     {children}
   </section>
 );
 
 export const LandingPage: React.FC = () => {
   return (
-    <div className="light relative min-h-screen bg-stone-50 text-zinc-800 selection:bg-indigo-500/30 overflow-x-hidden scroll-smooth transition-colors duration-500">
+    <div className="relative min-h-screen bg-zinc-950 text-white selection:bg-indigo-500/30 overflow-x-hidden scroll-smooth">
 
       <Navbar />
-      
+
       <main className="relative z-10">
+        {/* Hero - Full viewport with particles and dynamic headlines */}
         <Hero />
 
-        <div className="border-b border-zinc-200 bg-white/10 backdrop-blur-sm transition-colors duration-500">
-            <LogoMarquee />
+        {/* Social Proof - Logo strip */}
+        <div className="border-b border-white/5 bg-black/50 backdrop-blur-sm">
+          <LogoMarquee />
         </div>
 
-        <SectionWrapper id="workflow" className="bg-white transition-colors duration-500">
-            <div className="text-center mb-16 px-6">
-              <h2 className="text-4xl md:text-5xl font-bold tracking-tighter text-zinc-900 mb-6">
-                From Prompt to <span className="text-indigo-500">Production</span>
-              </h2>
-              <p className="text-zinc-500 max-w-2xl mx-auto">
-                Our industry-tuned models understand lighting, composition, and motion better than generic AI.
-              </p>
-            </div>
+        {/* Before/After Showcase - Interactive comparison */}
+        <BeforeAfterShowcase />
+
+        {/* Workflow Demo - How it works */}
+        <SectionWrapper id="workflow" className="py-24 bg-zinc-950">
+          <div className="text-center mb-16 px-6">
+            <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-zinc-400 text-xs font-bold uppercase tracking-widest mb-6">
+              How It Works
+            </span>
+            <h2 className="text-4xl md:text-5xl font-bold tracking-tighter text-white mb-6">
+              From Prompt to <span className="bg-gradient-to-r from-indigo-400 to-violet-400 bg-clip-text text-transparent">Production</span>
+            </h2>
+            <p className="text-zinc-400 max-w-2xl mx-auto">
+              Our industry-tuned models understand lighting, composition, and motion better than generic AI.
+            </p>
+          </div>
           <WorkflowDemo />
         </SectionWrapper>
 
+        {/* Feature Grid - Bento-style capabilities */}
+        <FeatureGrid />
+
+        {/* Mosaic Slideshow - Visual showcase */}
         <SectionWrapper id="mosaic" className="p-0 bg-black">
-            <MosaicSlideshow />
+          <MosaicSlideshow />
         </SectionWrapper>
 
-        <SectionWrapper id="use-cases" className="bg-white/5 border-y border-zinc-200/20 backdrop-blur-sm transition-colors duration-500">
+        {/* Use Cases Section */}
+        <SectionWrapper id="use-cases" className="py-24 bg-zinc-950">
           <UseCasesSection />
         </SectionWrapper>
 
-        <SectionWrapper id="templates" className="p-0">
+        {/* Template Packs */}
+        <SectionWrapper id="templates" className="py-24 bg-black">
           <TemplatePacks />
         </SectionWrapper>
 
-        <SectionWrapper id="presets" className="p-0">
-          <CreatorPresets />
-        </SectionWrapper>
+        {/* Kinetic Showcase Wall - Dynamic gallery */}
+        <KineticShowcaseWall />
 
-        <SectionWrapper id="showcase" className="p-0">
-          <KineticShowcaseWall />
-        </SectionWrapper>
+        {/* Testimonials - Social proof */}
+        <TestimonialsCarousel />
 
-        <SectionWrapper id="pricing" className="bg-zinc-100 border-t border-zinc-200 transition-colors duration-500">
+        {/* Pricing Section */}
+        <SectionWrapper id="pricing">
           <PricingSection />
         </SectionWrapper>
 
+        {/* FAQ and Final CTA */}
         <FaqAndFinalCtaSection />
       </main>
 
       <Footer />
-      
+
     </div>
   );
 };

@@ -12,9 +12,11 @@ import {
   Sun,
   HelpCircle,
   MoreHorizontal,
+  Zap,
 } from 'lucide-react';
 import { cn } from '../../../lib/utils';
 import { useTheme } from '../../common/ThemeProvider';
+import { CreditDisplay } from './CreditDisplay';
 
 export type FlyoutType = 'image' | 'video' | 'edit' | null;
 
@@ -202,8 +204,13 @@ export function NavigationRail({ activeFlyout, onFlyoutChange }: NavigationRailP
           </nav>
         </div>
 
-        {/* Bottom Section: Utility Items */}
+        {/* Bottom Section: Credits + Utility Items */}
         <div className="flex flex-col items-center w-full py-4 px-2 space-y-1 border-t border-zinc-200 dark:border-zinc-800">
+          {/* Credits Display */}
+          <div className="w-full px-1 mb-2">
+            <CreditDisplay compact />
+          </div>
+
           {utilityItems.map((item) => {
             const Icon = item.icon;
             const active = isItemActive(item);
