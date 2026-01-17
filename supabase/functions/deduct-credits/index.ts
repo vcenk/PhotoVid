@@ -90,7 +90,7 @@ serve(async (req) => {
           .from('user_credits')
           .insert({
             user_id: userId,
-            balance: 100, // Default starting credits
+            balance: 10, // Trial credits
             lifetime_used: 0,
             lifetime_purchased: 0
           })
@@ -128,7 +128,7 @@ serve(async (req) => {
       }
     }
 
-    const currentBalance = credits?.balance ?? 100
+    const currentBalance = credits?.balance ?? 10
     const currentLifetimeUsed = credits?.lifetime_used ?? 0
 
     // 7. Check if user has enough credits

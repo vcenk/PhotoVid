@@ -65,7 +65,7 @@ serve(async (req) => {
         .from('user_credits')
         .insert({
           user_id: userId,
-          balance: 100,
+          balance: 10, // Trial credits
           lifetime_used: 0,
           lifetime_purchased: 0
         })
@@ -102,7 +102,7 @@ serve(async (req) => {
     return new Response(
       JSON.stringify({
         credits: {
-          balance: credits?.balance ?? 100,
+          balance: credits?.balance ?? 10,
           lifetimeUsed: credits?.lifetime_used ?? 0,
           lifetimePurchased: credits?.lifetime_purchased ?? 0,
           updatedAt: credits?.updated_at

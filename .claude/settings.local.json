@@ -32,7 +32,9 @@
       "Bash(export SUPABASE_ACCESS_TOKEN=sbp_d2adf48f1b751d5a13b43a0e81d603450aaaaa00)",
       "Bash(git commit -m \"$\\(cat <<''EOF''\nchore\\(db\\): add initial schema migration\n\nCreates base tables \\(projects, assets\\) with RLS enabled.\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
       "Bash(npx vercel:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(set:*)",
+      "Bash($env:SUPABASE_ACCESS_TOKEN='sbp_d2adf48f1b751d5a13b43a0e81d603450aaaaa00')"
     ]
   }
 }
