@@ -54,6 +54,8 @@ import { RealEstatePageV2 } from './components/pages/RealEstatePageV2';
 import { AuthPage } from './components/pages/AuthPage';
 import { AuthCallbackPage } from './components/pages/AuthCallbackPage';
 import { ResetPasswordPage } from './components/pages/ResetPasswordPage';
+import { PrivacyPolicyPage } from './components/pages/PrivacyPolicyPage';
+import { TermsOfServicePage } from './components/pages/TermsOfServicePage';
 import { AuthProvider } from './lib/store/contexts/AuthContext';
 
 // Simple Error Boundary to catch crashes
@@ -158,6 +160,8 @@ const App: React.FC = () => {
             <Route path="/auth/callback" element={<AuthCallbackPage />} />
             <Route path="/auth/reset-password" element={<ResetPasswordPage />} />
             <Route path="/login" element={<AuthPage />} />
+            <Route path="/privacy" element={<PrivacyPolicyPage />} />
+            <Route path="/terms" element={<TermsOfServicePage />} />
             </Routes>
             </Router>
           </CreditsProvider>
