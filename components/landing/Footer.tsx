@@ -35,12 +35,11 @@ const FOOTER_LINKS = [
     ]
   },
   {
-    title: "Company",
+    title: "Legal",
     links: [
-      { label: "About Us", href: "#" },
-      { label: "Careers", href: "#" },
+      { label: "Privacy Policy", href: "/privacy" },
+      { label: "Terms of Service", href: "/terms" },
       { label: "Contact", href: "#" },
-      { label: "Legal", href: "#" },
     ]
   }
 ];
@@ -111,8 +110,8 @@ export const Footer = () => {
           <div className="w-full flex flex-col md:flex-row justify-between items-center gap-4 text-[10px] font-bold uppercase tracking-widest text-zinc-400 mb-12">
             <p>&copy; 2024 Photovid Inc.</p>
             <div className="flex gap-8">
-              <a href="#" className="hover:text-zinc-900">Privacy Policy</a>
-              <a href="#" className="hover:text-zinc-900">Terms of Service</a>
+              <Link to="/privacy" className="hover:text-zinc-900">Privacy Policy</Link>
+              <Link to="/terms" className="hover:text-zinc-900">Terms of Service</Link>
               <a href="#" className="hover:text-zinc-900">Cookies</a>
             </div>
           </div>
