@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Zap, Plus, ChevronDown, Clock, Gift, CreditCard, X, Sparkles } from 'lucide-react';
 import { useCredits } from '@/lib/store/contexts/CreditsContext';
@@ -9,8 +10,14 @@ interface CreditDisplayProps {
 }
 
 export const CreditDisplay: React.FC<CreditDisplayProps> = ({ compact = false }) => {
+  const navigate = useNavigate();
   const { balance, loading, transactions } = useCredits();
   const [showPanel, setShowPanel] = useState(false);
+
+  const handleBuyCredits = (packageId?: string) => {
+    setShowPanel(false);
+    navigate(packageId ? `/studio/credits?package=${packageId}` : '/studio/credits');
+  };
 
   // Determine balance status for color coding
   const getBalanceStatus = () => {
@@ -171,6 +178,7 @@ export const CreditDisplay: React.FC<CreditDisplayProps> = ({ compact = false })
                   {CREDIT_PACKAGES.slice(0, 3).map((pkg) => (
                     <button
                       key={pkg.id}
+                      onClick={() => handleBuyCredits(pkg.id)}
                       className={`
                         w-full flex items-center justify-between p-3 rounded-xl transition-all
                         ${pkg.popular
@@ -202,7 +210,10 @@ export const CreditDisplay: React.FC<CreditDisplayProps> = ({ compact = false })
                   ))}
                 </div>
 
-                <button className="w-full mt-3 py-2 text-xs text-zinc-400 hover:text-white transition-colors">
+                <button
+                  onClick={() => handleBuyCredits()}
+                  className="w-full mt-3 py-2 text-xs text-zinc-400 hover:text-white transition-colors"
+                >
                   View all packages
                 </button>
               </div>

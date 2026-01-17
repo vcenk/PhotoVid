@@ -56,6 +56,7 @@ import { AuthCallbackPage } from './components/pages/AuthCallbackPage';
 import { ResetPasswordPage } from './components/pages/ResetPasswordPage';
 import { PrivacyPolicyPage } from './components/pages/PrivacyPolicyPage';
 import { TermsOfServicePage } from './components/pages/TermsOfServicePage';
+import { CreditsPage } from './components/pages/CreditsPage';
 import { AuthProvider } from './lib/store/contexts/AuthContext';
 
 // Simple Error Boundary to catch crashes
@@ -152,6 +153,7 @@ const App: React.FC = () => {
             <Route path="/studio/lipsync" element={<LipsyncPage />} />
             <Route path="/studio/image" element={<ImagePage />} />
             <Route path="/studio/workflow" element={<WorkflowPage />} />
+            <Route path="/studio/credits" element={<CreditsPage />} />
             {/* Redirect old dashboard routes to studio */}
             <Route path="/dashboard" element={<Navigate to="/studio" replace />} />
             <Route path="/dashboard/lipsync" element={<Navigate to="/studio/lipsync" replace />} />

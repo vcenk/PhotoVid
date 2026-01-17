@@ -15,11 +15,14 @@ import {
     Trash2,
     ZoomIn,
     Image as ImageIcon,
-    AlertCircle
+    AlertCircle,
+    Zap
 } from 'lucide-react';
 import { NavigationRail, FlyoutType } from '../../dashboard/navigation/NavigationRail';
 import { FlyoutPanels } from '../../dashboard/navigation/FlyoutPanels';
 import { generateVirtualStaging, isFalConfigured } from '@/lib/api/toolGeneration';
+import { useCredits } from '@/lib/store/contexts/CreditsContext';
+import { CREDIT_COSTS } from '@/lib/types/credits';
 import type { VirtualStagingOptions } from '@/lib/types/generation';
 
 // Room types
@@ -72,9 +75,14 @@ const STAGING_STYLES = [
     },
 ];
 
+const TOOL_ID = 'virtual-staging';
+const CREDIT_COST = CREDIT_COSTS[TOOL_ID] || 2;
+
 export const VirtualStagingTool: React.FC = () => {
     const navigate = useNavigate();
+    const { balance, deductCredits, hasEnoughCredits } = useCredits();
     const [activeFlyout, setActiveFlyout] = useState<FlyoutType>(null);
+    const hasCredits = hasEnoughCredits(TOOL_ID as any);
 
     // Upload state
     const [uploadedImage, setUploadedImage] = useState<File | null>(null);
@@ -142,9 +150,23 @@ export const VirtualStagingTool: React.FC = () => {
     const handleGenerate = async () => {
         if (!uploadedImage) return;
 
+        // Check credits first
+        if (!hasCredits) {
+            setError(`Insufficient credits. This tool requires ${CREDIT_COST} credits. You have ${balance} credits.`);
+            return;
+        }
+
         setIsGenerating(true);
         setGenerationProgress(0);
         setError(null);
+
+        // Deduct credits before starting generation
+        const deducted = await deductCredits(TOOL_ID as any);
+        if (!deducted) {
+            setError('Failed to deduct credits. Please try again.');
+            setIsGenerating(false);
+            return;
+        }
 
         // Check if FAL API is configured
         if (!isFalConfigured()) {
@@ -357,12 +379,35 @@ export const VirtualStagingTool: React.FC = () => {
                     </div>
 
                     {/* Generate Button */}
-                    <div className="p-4 border-t border-white/5">
+                    <div className="p-4 border-t border-white/5 space-y-3">
+                        {/* Credit Info */}
+                        <div className="flex items-center justify-between text-xs">
+                            <span className="text-zinc-500">Cost</span>
+                            <span className={`flex items-center gap-1 ${hasCredits ? 'text-violet-400' : 'text-red-400'}`}>
+                                <Zap size={12} className="fill-current" />
+                                {CREDIT_COST} credits
+                            </span>
+                        </div>
+
+                        {!hasCredits && (
+                            <div className="p-2 bg-red-500/10 border border-red-500/20 rounded-lg">
+                                <p className="text-xs text-red-400 text-center">
+                                    Insufficient credits ({balance} available)
+                                </p>
+                                <button
+                                    onClick={() => navigate('/studio/credits')}
+                                    className="w-full mt-2 py-1.5 text-xs font-medium text-white bg-red-600 hover:bg-red-500 rounded-lg transition-colors"
+                                >
+                                    Get More Credits
+                                </button>
+                            </div>
+                        )}
+
                         <button
                             onClick={handleGenerate}
-                            disabled={!uploadedImage || isGenerating}
+                            disabled={!uploadedImage || isGenerating || !hasCredits}
                             className={`w-full py-3 rounded-xl font-semibold text-sm transition-all flex items-center justify-center gap-2 ${
-                                uploadedImage && !isGenerating
+                                uploadedImage && !isGenerating && hasCredits
                                     ? 'bg-indigo-600 hover:bg-indigo-500 text-white'
                                     : 'bg-white/5 text-zinc-600 cursor-not-allowed'
                             }`}
