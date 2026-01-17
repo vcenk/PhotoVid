@@ -14,7 +14,25 @@
       "Bash(do sed -i \"s|from ''../../lib/data/workflows''|from ''../../../lib/data/workflows''|g\" \"$file\")",
       "Bash(do sed -i \"s|from ''../../lib/types/studio''|from ''../../types/studio''|g\" \"$file\")",
       "WebSearch",
-      "WebFetch(domain:fal.ai)"
+      "WebFetch(domain:fal.ai)",
+      "WebFetch(domain:www.virtualstagingai.app)",
+      "WebFetch(domain:aihomedesign.com)",
+      "Bash(npm run build:*)",
+      "WebFetch(domain:www.boxbrownie.com)",
+      "WebFetch(domain:collov.ai)",
+      "WebFetch(domain:www.applydesign.io)",
+      "WebFetch(domain:stagerai.com)",
+      "WebFetch(domain:www.spyne.ai)",
+      "Bash(git add:*)",
+      "Bash(git reset:*)",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nfeat\\(security\\): implement backend-first security architecture with Edge Functions\n\n- Add 7 secure Edge Functions for all write operations:\n  - deduct-credits: Secure credit deduction with JWT validation\n  - get-credits: Read-only credits fetch\n  - save-project: Secure project save with ownership verification\n  - delete-project: Secure project delete with ownership verification\n  - save-storyboard: Secure storyboard save\n  - save-asset: Secure asset save with URL validation\n  - delete-asset: Secure asset delete with ownership verification\n\n- Add RLS migration to lock down all tables to read-only from frontend:\n  - user_credits, credit_transactions, projects, assets, storyboards, generations\n\n- Update all contexts to use Edge Functions instead of direct DB access:\n  - CreditsContext, ProjectContext, StoryboardContext, AssetContext\n\n- Add authentication system:\n  - AuthContext for auth state management\n  - AuthPage \\(signin/signup/forgot-password\\)\n  - AuthCallbackPage for OAuth redirects\n  - ResetPasswordPage for password reset\n\n- Add industry tools and pages:\n  - Real Estate tools \\(VirtualStaging, ItemRemoval, etc.\\)\n  - Auto Dealership tools \\(SpotRemoval, PaintColor, etc.\\)\n  - Storyboard editor components\n\n- Add credits system with types and context\n\nSecurity follows @burakeregar''s backend-first architecture:\n- Frontend can only READ via RLS\n- All writes go through Edge Functions with service role\n- JWT validated server-side, user_id extracted from token\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(git push:*)",
+      "Bash(supabase --version:*)",
+      "Bash(npx supabase:*)",
+      "Bash(export SUPABASE_ACCESS_TOKEN=sbp_d2adf48f1b751d5a13b43a0e81d603450aaaaa00)",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nchore\\(db\\): add initial schema migration\n\nCreates base tables \\(projects, assets\\) with RLS enabled.\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(npx vercel:*)",
+      "Bash(git commit:*)"
     ]
   }
 }
