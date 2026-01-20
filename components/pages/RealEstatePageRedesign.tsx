@@ -326,7 +326,7 @@ export const RealEstatePageRedesign: React.FC = () => {
       <NavigationRail activeFlyout={activeFlyout} onFlyoutChange={setActiveFlyout} />
       <FlyoutPanels activeFlyout={activeFlyout} onClose={() => setActiveFlyout(null)} />
 
-      <div className="flex-1 ml-[72px] overflow-y-auto">
+      <div className="flex-1 ml-56 overflow-y-auto">
         {/* Hero Section */}
         <div className="relative overflow-hidden">
           {/* Background gradient */}

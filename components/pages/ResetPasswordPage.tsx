@@ -82,10 +82,7 @@ export const ResetPasswordPage: React.FC = () => {
 
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-12 h-12 rounded-2xl bg-violet-500/20 flex items-center justify-center">
-              <Sparkles size={24} className="text-violet-400" />
-            </div>
-            <span className="text-xl font-bold text-white">Photovid</span>
+            <img src="/photovid.svg" alt="Photovid" className="h-10 w-auto" />
           </div>
           <h2 className="text-2xl font-bold text-white mb-2">Set new password</h2>
           <p className="text-zinc-400 text-sm">

@@ -34,7 +34,10 @@
       "Bash(npx vercel:*)",
       "Bash(git commit:*)",
       "Bash(set:*)",
-      "Bash($env:SUPABASE_ACCESS_TOKEN='sbp_d2adf48f1b751d5a13b43a0e81d603450aaaaa00')"
+      "Bash($env:SUPABASE_ACCESS_TOKEN='sbp_d2adf48f1b751d5a13b43a0e81d603450aaaaa00')",
+      "Bash(SUPABASE_ACCESS_TOKEN=sbp_d2adf48f1b751d5a13b43a0e81d603450aaaaa00 npx supabase:*)",
+      "Bash(while read file)",
+      "Bash(do sed -i 's/ml-\\\\[72px\\\\]/ml-52/g' \"$file\")"
     ]
   }
 }

@@ -52,7 +52,16 @@ serve(async (req) => {
 
     const userId = user.id
 
-    // 4. Fetch credits
+    // 4. Check if user is admin
+    const { data: profile } = await supabaseAdmin
+      .from('profiles')
+      .select('is_admin')
+      .eq('id', userId)
+      .single()
+
+    const isAdmin = profile?.is_admin === true
+
+    // 5. Fetch credits
     let { data: credits, error: creditsError } = await supabaseAdmin
       .from('user_credits')
       .select('*')
@@ -98,16 +107,18 @@ serve(async (req) => {
       console.error('Failed to fetch transactions:', txError)
     }
 
-    // 6. Return credits and transactions
+    // 7. Return credits, transactions, and admin status
     return new Response(
       JSON.stringify({
         credits: {
-          balance: credits?.balance ?? 10,
+          balance: isAdmin ? 999999 : (credits?.balance ?? 10), // Admins show unlimited
           lifetimeUsed: credits?.lifetime_used ?? 0,
           lifetimePurchased: credits?.lifetime_purchased ?? 0,
-          updatedAt: credits?.updated_at
+          updatedAt: credits?.updated_at,
+          isAdmin: isAdmin
         },
-        transactions: transactions || []
+        transactions: transactions || [],
+        isAdmin: isAdmin
       }),
       { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )

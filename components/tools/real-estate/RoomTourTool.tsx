@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
     ArrowLeft,
@@ -51,6 +51,23 @@ export const RoomTourTool: React.FC = () => {
     const [generationProgress, setGenerationProgress] = useState(0);
     const [resultVideo, setResultVideo] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
+
+    // Check for pre-selected asset from library
+    useEffect(() => {
+        const selectedAssetUrl = sessionStorage.getItem('selectedAssetUrl');
+        if (selectedAssetUrl) {
+            sessionStorage.removeItem('selectedAssetUrl');
+            setImagePreview(selectedAssetUrl);
+            fetch(selectedAssetUrl)
+                .then(res => res.blob())
+                .then(blob => {
+                    const fileName = selectedAssetUrl.split('/').pop() || 'image.jpg';
+                    const file = new File([blob], fileName, { type: blob.type || 'image/jpeg' });
+                    setUploadedImage(file);
+                })
+                .catch(err => console.error('Failed to load pre-selected image:', err));
+        }
+    }, []);
 
     const handleDrag = useCallback((e: React.DragEvent) => {
         e.preventDefault();
@@ -137,7 +154,7 @@ export const RoomTourTool: React.FC = () => {
             <NavigationRail activeFlyout={activeFlyout} onFlyoutChange={setActiveFlyout} />
             <FlyoutPanels activeFlyout={activeFlyout} onClose={() => setActiveFlyout(null)} />
 
-            <div className="flex-1 flex ml-[72px]">
+            <div className="flex-1 flex ml-56">
                 {/* Sidebar */}
                 <div className="w-[320px] flex-shrink-0 bg-[#111113] border-r border-white/5 flex flex-col">
                     <div className="p-4 border-b border-white/5">

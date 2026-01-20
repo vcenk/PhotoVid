@@ -136,9 +136,11 @@ export const Navbar: React.FC = () => {
           className="flex items-center gap-2 cursor-pointer group"
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
         >
-          <div className={`text-2xl md:text-4xl font-black tracking-tighter transition-colors duration-500 ${isScrolled ? 'text-zinc-900' : 'text-white'}`}>
-            PHOTOVID<span className="text-indigo-500 transition-transform group-hover:scale-125 inline-block">.</span>
-          </div>
+          <img
+            src="/photovid.svg"
+            alt="Photovid"
+            className={`h-8 md:h-10 w-auto transition-all duration-500 ${isScrolled ? '' : 'brightness-0 invert'}`}
+          />
         </div>
 
         <div className="hidden lg:flex items-center space-x-10">

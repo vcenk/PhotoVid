@@ -36,7 +36,7 @@ export function FlyoutPanels({ activeFlyout, onClose }: FlyoutPanelsProps) {
       />
 
       {/* Flyout Panel */}
-      <div className="fixed left-[72px] top-0 bottom-0 w-[320px] bg-white dark:bg-zinc-950 border-r border-zinc-200 dark:border-zinc-800 z-50 shadow-2xl overflow-y-auto">
+      <div className="fixed left-56 top-0 bottom-0 w-[320px] bg-white dark:bg-zinc-950 border-r border-zinc-200 dark:border-zinc-800 z-50 shadow-2xl overflow-y-auto">
         {/* Header */}
         <div className="sticky top-0 bg-white dark:bg-zinc-950 border-b border-zinc-200 dark:border-zinc-800 px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">

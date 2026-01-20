@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { Bell, Crown, Users, User, Settings, LogOut, Menu } from 'lucide-react';
-import { cn } from '../../lib/utils';
+import { Bell, Crown, User, Settings, LogOut } from 'lucide-react';
 
 interface DashboardTopbarProps {
   onMenuClick?: () => void;
@@ -21,12 +20,6 @@ export function DashboardTopbar({ onMenuClick }: DashboardTopbarProps) {
         <button className="hidden sm:flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-violet-600 to-indigo-600 text-white rounded-xl text-sm font-bold hover:from-violet-700 hover:to-indigo-700 transition-all shadow-lg shadow-violet-500/20">
           <Crown size={16} />
           <span>Upgrade to Pro</span>
-        </button>
-
-        {/* Invite Team */}
-        <button className="hidden sm:flex items-center gap-2 px-4 py-2 border border-zinc-200 dark:border-zinc-800 rounded-xl text-sm font-medium hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-colors">
-          <Users size={16} />
-          <span>Invite Team</span>
         </button>
 
         {/* Notifications */}

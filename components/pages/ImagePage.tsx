@@ -15,7 +15,7 @@ export const ImagePage: React.FC = () => {
             <FlyoutPanels activeFlyout={activeFlyout} onClose={() => setActiveFlyout(null)} />
 
             {/* Main Content - Image Studio (Full Height) */}
-            <div className="flex-1 overflow-hidden ml-[72px]">
+            <div className="flex-1 overflow-hidden ml-56">
                 <ImageStudio />
             </div>
         </div>

@@ -14,33 +14,38 @@ interface ComparisonExample {
   afterLabel: string;
 }
 
+// Base URL for showcase images - use R2 for production, local for dev
+const SHOWCASE_BASE_URL = import.meta.env.PROD
+  ? 'https://pub-de07eb6b4fff417798674246b03f5ee4.r2.dev/showcase'
+  : '/showcase';
+
 const EXAMPLES: ComparisonExample[] = [
   {
-    id: 'realestate',
-    category: 'Real Estate',
+    id: 'virtual-staging',
+    category: 'Virtual Staging',
     icon: Home,
-    before: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?q=80&w=1000&auto=format&fit=crop',
-    after: 'https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?q=80&w=1000&auto=format&fit=crop',
+    before: `${SHOWCASE_BASE_URL}/real-estate/before/empty-living-room.jpg`,
+    after: `${SHOWCASE_BASE_URL}/real-estate/after/staged-living-room.jpg`,
     beforeLabel: 'Empty Room',
     afterLabel: 'AI Staged',
   },
   {
-    id: 'product',
-    category: 'Product',
-    icon: ShoppingBag,
-    before: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=1000&auto=format&fit=crop',
-    after: 'https://images.unsplash.com/photo-1546868871-7041f2a55e12?q=80&w=1000&auto=format&fit=crop',
-    beforeLabel: 'Static Photo',
-    afterLabel: 'Cinematic Motion',
+    id: 'twilight',
+    category: 'Twilight',
+    icon: Home,
+    before: `${SHOWCASE_BASE_URL}/real-estate/before/house-day.jpg`,
+    after: `${SHOWCASE_BASE_URL}/real-estate/after/house-twilight.jpg`,
+    beforeLabel: 'Daytime',
+    afterLabel: 'Twilight',
   },
   {
-    id: 'portrait',
-    category: 'Portrait',
+    id: 'sky-replacement',
+    category: 'Sky Replace',
     icon: Camera,
-    before: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=1000&auto=format&fit=crop',
-    after: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=1000&auto=format&fit=crop',
-    beforeLabel: 'Raw Photo',
-    afterLabel: 'AI Enhanced',
+    before: `${SHOWCASE_BASE_URL}/real-estate/before/house-cloudy.jpg`,
+    after: `${SHOWCASE_BASE_URL}/real-estate/after/house-blue-sky.jpg`,
+    beforeLabel: 'Cloudy Sky',
+    afterLabel: 'Blue Sky',
   },
 ];
 

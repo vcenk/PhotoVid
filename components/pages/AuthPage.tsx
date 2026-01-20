@@ -136,10 +136,7 @@ export const AuthPage: React.FC = () => {
 
         <div className="relative z-10 space-y-6">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur flex items-center justify-center">
-              <Sparkles size={24} className="text-white" />
-            </div>
-            <span className="text-2xl font-bold text-white">Photovid</span>
+            <img src="/photovid.svg" alt="Photovid" className="h-10 w-auto brightness-0 invert" />
           </div>
           <h1 className="text-4xl font-bold text-white leading-tight">
             Transform your media<br />with AI-powered tools

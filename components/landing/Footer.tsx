@@ -3,7 +3,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { Twitter, Instagram, Linkedin, Github, Hexagon } from 'lucide-react';
+import { Twitter, Instagram, Linkedin, Github } from 'lucide-react';
 
 const FOOTER_LINKS = [
   {
@@ -54,8 +54,8 @@ export const Footer = () => {
           
           {/* Brand Column */}
           <div className="flex-shrink-0 w-64 space-y-6">
-            <div className="flex items-center gap-2 text-zinc-900">
-              <Hexagon className="fill-zinc-900" size={32} strokeWidth={0} />
+            <div className="flex items-center gap-2">
+              <img src="/photovid.svg" alt="Photovid" className="h-8 w-auto" />
             </div>
             <p className="text-zinc-500 text-sm leading-relaxed font-sans">
               The next generation of cinematic AI. <br />

@@ -118,7 +118,7 @@ export const Staging360Tool: React.FC = () => {
             <NavigationRail activeFlyout={activeFlyout} onFlyoutChange={setActiveFlyout} />
             <FlyoutPanels activeFlyout={activeFlyout} onClose={() => setActiveFlyout(null)} />
 
-            <div className="flex-1 flex ml-[72px]">
+            <div className="flex-1 flex ml-56">
                 <div className="w-[320px] flex-shrink-0 bg-[#111113] border-r border-white/5 flex flex-col">
                     <div className="p-4 border-b border-white/5">
                         <div className="flex items-center gap-3">

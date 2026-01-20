@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { createClient } from '@/lib/database/client';
 import { Loader2, CheckCircle, AlertCircle } from 'lucide-react';
@@ -8,8 +8,13 @@ export const AuthCallbackPage: React.FC = () => {
   const [searchParams] = useSearchParams();
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
   const [message, setMessage] = useState('Processing authentication...');
+  const hasRun = useRef(false);
 
   useEffect(() => {
+    // Prevent double execution in React Strict Mode
+    if (hasRun.current) return;
+    hasRun.current = true;
+
     const handleCallback = async () => {
       const supabase = createClient();
 
@@ -20,8 +25,7 @@ export const AuthCallbackPage: React.FC = () => {
       }
 
       try {
-        // Get the code from the URL (for OAuth or magic link)
-        const code = searchParams.get('code');
+        // Check URL for errors first
         const error = searchParams.get('error');
         const errorDescription = searchParams.get('error_description');
 
@@ -31,18 +35,48 @@ export const AuthCallbackPage: React.FC = () => {
           return;
         }
 
+        // First, check if we already have a valid session
+        // (Supabase's onAuthStateChange may have already processed the callback)
+        const { data: { session: existingSession } } = await supabase.auth.getSession();
+
+        if (existingSession) {
+          // Already authenticated - redirect immediately
+          setStatus('success');
+          setMessage('Authentication successful! Redirecting...');
+          setTimeout(() => navigate('/studio'), 1000);
+          return;
+        }
+
+        // If no session, try to exchange the code
+        const code = searchParams.get('code');
+
         if (code) {
-          // Exchange the code for a session
           const { error: sessionError } = await supabase.auth.exchangeCodeForSession(code);
 
           if (sessionError) {
+            // PKCE error often means the session was already exchanged
+            // Check again for an existing session
+            if (sessionError.message.includes('PKCE') || sessionError.message.includes('code verifier')) {
+              // Wait a bit for auth state to propagate
+              await new Promise(resolve => setTimeout(resolve, 500));
+
+              const { data: { session: retrySession } } = await supabase.auth.getSession();
+
+              if (retrySession) {
+                setStatus('success');
+                setMessage('Authentication successful! Redirecting...');
+                setTimeout(() => navigate('/studio'), 1000);
+                return;
+              }
+            }
+
             setStatus('error');
             setMessage(sessionError.message);
             return;
           }
         }
 
-        // Check if we have a valid session
+        // Final check for session
         const { data: { session }, error: getSessionError } = await supabase.auth.getSession();
 
         if (getSessionError) {
@@ -54,16 +88,27 @@ export const AuthCallbackPage: React.FC = () => {
         if (session) {
           setStatus('success');
           setMessage('Authentication successful! Redirecting...');
-
-          // Redirect to studio after a short delay
-          setTimeout(() => {
-            navigate('/studio');
-          }, 1500);
+          setTimeout(() => navigate('/studio'), 1000);
         } else {
           setStatus('error');
           setMessage('No session found. Please try signing in again.');
         }
-      } catch (err) {
+      } catch (err: any) {
+        // Handle PKCE errors gracefully
+        if (err?.message?.includes('PKCE') || err?.message?.includes('code verifier')) {
+          // Check for session one more time
+          const supabase = createClient();
+          if (supabase) {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (session) {
+              setStatus('success');
+              setMessage('Authentication successful! Redirecting...');
+              setTimeout(() => navigate('/studio'), 1000);
+              return;
+            }
+          }
+        }
+
         setStatus('error');
         setMessage('An unexpected error occurred during authentication');
         console.error('Auth callback error:', err);
@@ -102,7 +147,18 @@ export const AuthCallbackPage: React.FC = () => {
             <h1 className="text-xl font-semibold text-white mb-2">Authentication Failed</h1>
             <p className="text-zinc-400 text-sm mb-6">{message}</p>
             <button
-              onClick={() => navigate('/auth')}
+              onClick={async () => {
+                // Check if session actually exists despite the error
+                const supabase = createClient();
+                if (supabase) {
+                  const { data: { session } } = await supabase.auth.getSession();
+                  if (session) {
+                    navigate('/studio');
+                    return;
+                  }
+                }
+                navigate('/auth');
+              }}
               className="px-6 py-2 rounded-xl bg-violet-600 hover:bg-violet-500 text-white font-medium text-sm transition-colors"
             >
               Try Again

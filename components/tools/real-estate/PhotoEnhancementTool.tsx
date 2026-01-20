@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
     ArrowLeft,
@@ -18,15 +18,45 @@ import {
 } from 'lucide-react';
 import { NavigationRail, FlyoutType } from '../../dashboard/navigation/NavigationRail';
 import { FlyoutPanels } from '../../dashboard/navigation/FlyoutPanels';
+import { BeforeAfterSlider } from '../../common/BeforeAfterSlider';
 import { generatePhotoEnhancement, isFalConfigured } from '@/lib/api/toolGeneration';
 import type { PhotoEnhancementOptions } from '@/lib/types/generation';
 
-// Enhancement presets
+// Enhancement presets with MLS safety indicators
+// Based on production-ready mapping for real estate photography
 const ENHANCEMENT_PRESETS = [
-    { id: 'auto', name: 'Auto Enhance', description: 'AI picks the best settings', icon: Zap },
-    { id: 'bright', name: 'Bright & Airy', description: 'Light and welcoming feel', icon: Sun },
-    { id: 'vivid', name: 'Vivid Colors', description: 'Pop colors and contrast', icon: Palette },
-    { id: 'hdr', name: 'HDR Effect', description: 'Balanced shadows & highlights', icon: Contrast },
+    {
+        id: 'auto',
+        name: 'Auto (MLS Safe)',
+        description: 'Safe enhancement, no lighting changes',
+        icon: Zap,
+        badge: 'Recommended',
+        badgeColor: 'bg-green-500/20 text-green-400',
+    },
+    {
+        id: 'bright',
+        name: 'Bright & Airy',
+        description: 'Interior boost with natural relighting',
+        icon: Sun,
+        badge: 'MLS Safe',
+        badgeColor: 'bg-green-500/20 text-green-400',
+    },
+    {
+        id: 'vivid',
+        name: 'Vivid (Marketing)',
+        description: 'Enhanced colors for brochures & social',
+        icon: Palette,
+        badge: 'Marketing Use',
+        badgeColor: 'bg-yellow-500/20 text-yellow-400',
+    },
+    {
+        id: 'hdr',
+        name: 'HDR-Style',
+        description: 'Balanced shadows & highlights',
+        icon: Contrast,
+        badge: 'Use Carefully',
+        badgeColor: 'bg-yellow-500/20 text-yellow-400',
+    },
 ];
 
 export const PhotoEnhancementTool: React.FC = () => {
@@ -42,6 +72,23 @@ export const PhotoEnhancementTool: React.FC = () => {
     const [generationProgress, setGenerationProgress] = useState(0);
     const [resultImage, setResultImage] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
+
+    // Check for pre-selected asset from library
+    useEffect(() => {
+        const selectedAssetUrl = sessionStorage.getItem('selectedAssetUrl');
+        if (selectedAssetUrl) {
+            sessionStorage.removeItem('selectedAssetUrl');
+            setImagePreview(selectedAssetUrl);
+            fetch(selectedAssetUrl)
+                .then(res => res.blob())
+                .then(blob => {
+                    const fileName = selectedAssetUrl.split('/').pop() || 'image.jpg';
+                    const file = new File([blob], fileName, { type: blob.type || 'image/jpeg' });
+                    setUploadedImage(file);
+                })
+                .catch(err => console.error('Failed to load pre-selected image:', err));
+        }
+    }, []);
 
     const handleDrag = useCallback((e: React.DragEvent) => {
         e.preventDefault();
@@ -126,7 +173,7 @@ export const PhotoEnhancementTool: React.FC = () => {
             <NavigationRail activeFlyout={activeFlyout} onFlyoutChange={setActiveFlyout} />
             <FlyoutPanels activeFlyout={activeFlyout} onClose={() => setActiveFlyout(null)} />
 
-            <div className="flex-1 flex ml-[72px]">
+            <div className="flex-1 flex ml-56">
                 {/* Sidebar */}
                 <div className="w-[320px] flex-shrink-0 bg-[#111113] border-r border-white/5 flex flex-col">
                     <div className="p-4 border-b border-white/5">
@@ -175,8 +222,13 @@ export const PhotoEnhancementTool: React.FC = () => {
                                         className={`w-full p-3 rounded-xl text-left transition-all flex items-center gap-3 ${selectedPreset === preset.id ? 'bg-amber-600/20 border border-amber-500/50' : 'bg-white/[0.02] border border-transparent hover:bg-white/[0.05]'}`}
                                     >
                                         <preset.icon size={18} className={selectedPreset === preset.id ? 'text-amber-400' : 'text-zinc-500'} />
-                                        <div>
-                                            <p className={`text-sm font-medium ${selectedPreset === preset.id ? 'text-amber-300' : 'text-zinc-300'}`}>{preset.name}</p>
+                                        <div className="flex-1">
+                                            <div className="flex items-center gap-2">
+                                                <p className={`text-sm font-medium ${selectedPreset === preset.id ? 'text-amber-300' : 'text-zinc-300'}`}>{preset.name}</p>
+                                                <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${preset.badgeColor}`}>
+                                                    {preset.badge}
+                                                </span>
+                                            </div>
                                             <p className="text-xs text-zinc-500">{preset.description}</p>
                                         </div>
                                     </button>
@@ -236,11 +288,20 @@ export const PhotoEnhancementTool: React.FC = () => {
                                 </div>
                                 <p className="text-zinc-400 font-medium">Enhancing photo...</p>
                             </div>
+                        ) : resultImage && imagePreview ? (
+                            <div className="w-full max-w-4xl">
+                                <BeforeAfterSlider
+                                    beforeImage={imagePreview}
+                                    afterImage={resultImage}
+                                    beforeLabel="Original"
+                                    afterLabel="Enhanced"
+                                    className="shadow-2xl"
+                                />
+                            </div>
                         ) : (
                             <div className="relative rounded-2xl overflow-hidden shadow-2xl">
-                                <img src={resultImage || imagePreview} alt="Preview" className="max-w-full max-h-[calc(100vh-180px)] object-contain" />
-                                {resultImage && <div className="absolute top-4 right-4 px-3 py-1.5 bg-amber-500/80 backdrop-blur rounded-lg text-xs text-white font-medium">Enhanced</div>}
-                                {!resultImage && <div className="absolute inset-0 flex items-center justify-center bg-black/40"><div className="text-center text-white"><Sparkles size={28} className="mx-auto mb-2 opacity-80" /><p className="text-sm font-medium">Ready to enhance</p></div></div>}
+                                <img src={imagePreview} alt="Preview" className="max-w-full max-h-[calc(100vh-180px)] object-contain" />
+                                <div className="absolute inset-0 flex items-center justify-center bg-black/40"><div className="text-center text-white"><Sparkles size={28} className="mx-auto mb-2 opacity-80" /><p className="text-sm font-medium">Ready to enhance</p></div></div>
                             </div>
                         )}
                     </div>

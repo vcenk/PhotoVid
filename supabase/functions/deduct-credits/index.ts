@@ -58,6 +58,15 @@ serve(async (req) => {
     // 4. Extract user_id from VERIFIED token - NEVER trust client-provided user_id
     const userId = user.id
 
+    // 4.5 Check if user is admin - admins get unlimited access
+    const { data: profile } = await supabaseAdmin
+      .from('profiles')
+      .select('is_admin')
+      .eq('id', userId)
+      .single()
+
+    const isAdmin = profile?.is_admin === true
+
     // 5. Parse and validate request body
     const body = await req.json()
     const { amount, tool, generationId, description } = body
@@ -131,7 +140,36 @@ serve(async (req) => {
     const currentBalance = credits?.balance ?? 10
     const currentLifetimeUsed = credits?.lifetime_used ?? 0
 
-    // 7. Check if user has enough credits
+    // 7. ADMIN BYPASS - Skip credit check for admins
+    if (isAdmin) {
+      // Log transaction for audit trail (0 cost)
+      const { error: txError } = await supabaseAdmin
+        .from('credit_transactions')
+        .insert({
+          user_id: userId,
+          amount: 0,
+          type: 'generation',
+          generation_id: generationId || null,
+          description: `${tool} generation (admin - free)`,
+        })
+
+      if (txError) {
+        console.error('Failed to log admin transaction:', txError)
+      }
+
+      return new Response(
+        JSON.stringify({
+          success: true,
+          newBalance: currentBalance, // Balance unchanged
+          deducted: 0,
+          tool,
+          isAdmin: true
+        }),
+        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+
+    // 8. Check if user has enough credits (non-admin)
     if (currentBalance < amount) {
       return new Response(
         JSON.stringify({
@@ -143,7 +181,7 @@ serve(async (req) => {
       )
     }
 
-    // 8. Deduct credits atomically
+    // 9. Deduct credits atomically
     const newBalance = currentBalance - amount
     const newLifetimeUsed = currentLifetimeUsed + amount
 
@@ -164,7 +202,7 @@ serve(async (req) => {
       )
     }
 
-    // 9. Log transaction for audit trail
+    // 10. Log transaction for audit trail
     const { error: txError } = await supabaseAdmin
       .from('credit_transactions')
       .insert({
@@ -180,7 +218,7 @@ serve(async (req) => {
       // Don't fail the request, just log the error
     }
 
-    // 10. Return success with new balance
+    // 11. Return success with new balance
     return new Response(
       JSON.stringify({
         success: true,

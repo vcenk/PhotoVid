@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Zap, Plus, ChevronDown, Clock, Gift, CreditCard, X, Sparkles } from 'lucide-react';
+import { Zap, Plus, ChevronDown, Clock, Gift, CreditCard, X, Sparkles, Crown } from 'lucide-react';
 import { useCredits } from '@/lib/store/contexts/CreditsContext';
 import { CREDIT_PACKAGES, formatCredits, getTotalCreditsFromPackage } from '@/lib/types/credits';
 
@@ -11,7 +11,7 @@ interface CreditDisplayProps {
 
 export const CreditDisplay: React.FC<CreditDisplayProps> = ({ compact = false }) => {
   const navigate = useNavigate();
-  const { balance, loading, transactions } = useCredits();
+  const { balance, loading, transactions, isAdmin } = useCredits();
   const [showPanel, setShowPanel] = useState(false);
 
   const handleBuyCredits = (packageId?: string) => {
@@ -39,12 +39,12 @@ export const CreditDisplay: React.FC<CreditDisplayProps> = ({ compact = false })
         onClick={() => setShowPanel(!showPanel)}
         className={`
           flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border transition-all
-          ${statusColors[status]}
+          ${isAdmin ? 'text-amber-400 bg-amber-500/10 border-amber-500/30' : statusColors[status]}
           hover:bg-opacity-20
         `}
       >
-        <Zap size={14} className="fill-current" />
-        <span className="text-xs font-semibold">{loading ? '...' : formatCredits(balance)}</span>
+        {isAdmin ? <Crown size={14} className="fill-current" /> : <Zap size={14} className="fill-current" />}
+        <span className="text-xs font-semibold">{loading ? '...' : isAdmin ? 'Admin' : formatCredits(balance)}</span>
       </button>
     );
   }
@@ -111,27 +111,45 @@ export const CreditDisplay: React.FC<CreditDisplayProps> = ({ compact = false })
 
                 {/* Balance Display */}
                 <div className="mt-3 flex items-baseline gap-2">
-                  <span className={`text-3xl font-bold ${
-                    status === 'critical' ? 'text-red-400' :
-                    status === 'low' ? 'text-amber-400' :
-                    'text-violet-400'
-                  }`}>
-                    {formatCredits(balance)}
-                  </span>
-                  <span className="text-sm text-zinc-500">credits remaining</span>
+                  {isAdmin ? (
+                    <>
+                      <Crown size={24} className="text-amber-400" />
+                      <span className="text-3xl font-bold text-amber-400">Unlimited</span>
+                    </>
+                  ) : (
+                    <>
+                      <span className={`text-3xl font-bold ${
+                        status === 'critical' ? 'text-red-400' :
+                        status === 'low' ? 'text-amber-400' :
+                        'text-violet-400'
+                      }`}>
+                        {formatCredits(balance)}
+                      </span>
+                      <span className="text-sm text-zinc-500">credits remaining</span>
+                    </>
+                  )}
                 </div>
 
-                {/* Progress Bar */}
-                <div className="mt-3 h-2 bg-white/10 rounded-full overflow-hidden">
-                  <div
-                    className={`h-full transition-all ${
-                      status === 'critical' ? 'bg-red-500' :
-                      status === 'low' ? 'bg-amber-500' :
-                      'bg-violet-500'
-                    }`}
-                    style={{ width: `${Math.min(100, (balance / 100) * 100)}%` }}
-                  />
-                </div>
+                {/* Progress Bar - Hidden for admins */}
+                {!isAdmin && (
+                  <div className="mt-3 h-2 bg-white/10 rounded-full overflow-hidden">
+                    <div
+                      className={`h-full transition-all ${
+                        status === 'critical' ? 'bg-red-500' :
+                        status === 'low' ? 'bg-amber-500' :
+                        'bg-violet-500'
+                      }`}
+                      style={{ width: `${Math.min(100, (balance / 100) * 100)}%` }}
+                    />
+                  </div>
+                )}
+
+                {/* Admin Badge */}
+                {isAdmin && (
+                  <div className="mt-3 px-3 py-1.5 bg-amber-500/20 border border-amber-500/30 rounded-lg text-xs text-amber-400 font-medium">
+                    Admin account - Free generations
+                  </div>
+                )}
               </div>
 
               {/* Recent Transactions */}
@@ -169,54 +187,56 @@ export const CreditDisplay: React.FC<CreditDisplayProps> = ({ compact = false })
                 </div>
               </div>
 
-              {/* Buy Credits */}
-              <div className="p-4">
-                <h4 className="text-xs font-medium text-zinc-400 uppercase tracking-wide mb-3">
-                  Get More Credits
-                </h4>
-                <div className="space-y-2">
-                  {CREDIT_PACKAGES.slice(0, 3).map((pkg) => (
-                    <button
-                      key={pkg.id}
-                      onClick={() => handleBuyCredits(pkg.id)}
-                      className={`
-                        w-full flex items-center justify-between p-3 rounded-xl transition-all
-                        ${pkg.popular
-                          ? 'bg-violet-600/20 border border-violet-500/30 hover:bg-violet-600/30'
-                          : 'bg-white/5 hover:bg-white/10'
-                        }
-                      `}
-                    >
-                      <div className="text-left">
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm font-medium text-white">{pkg.name}</span>
-                          {pkg.popular && (
-                            <span className="px-1.5 py-0.5 text-[10px] font-medium bg-violet-500 text-white rounded">
-                              Popular
-                            </span>
-                          )}
+              {/* Buy Credits - Hidden for admins */}
+              {!isAdmin && (
+                <div className="p-4">
+                  <h4 className="text-xs font-medium text-zinc-400 uppercase tracking-wide mb-3">
+                    Get More Credits
+                  </h4>
+                  <div className="space-y-2">
+                    {CREDIT_PACKAGES.slice(0, 3).map((pkg) => (
+                      <button
+                        key={pkg.id}
+                        onClick={() => handleBuyCredits(pkg.id)}
+                        className={`
+                          w-full flex items-center justify-between p-3 rounded-xl transition-all
+                          ${pkg.popular
+                            ? 'bg-violet-600/20 border border-violet-500/30 hover:bg-violet-600/30'
+                            : 'bg-white/5 hover:bg-white/10'
+                          }
+                        `}
+                      >
+                        <div className="text-left">
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm font-medium text-white">{pkg.name}</span>
+                            {pkg.popular && (
+                              <span className="px-1.5 py-0.5 text-[10px] font-medium bg-violet-500 text-white rounded">
+                                Popular
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-xs text-zinc-400">
+                            {getTotalCreditsFromPackage(pkg)} credits
+                            {pkg.bonusCredits > 0 && (
+                              <span className="text-green-400"> (+{pkg.bonusCredits} bonus)</span>
+                            )}
+                          </p>
                         </div>
-                        <p className="text-xs text-zinc-400">
-                          {getTotalCreditsFromPackage(pkg)} credits
-                          {pkg.bonusCredits > 0 && (
-                            <span className="text-green-400"> (+{pkg.bonusCredits} bonus)</span>
-                          )}
-                        </p>
-                      </div>
-                      <span className="text-sm font-semibold text-white">
-                        ${pkg.price.toFixed(2)}
-                      </span>
-                    </button>
-                  ))}
-                </div>
+                        <span className="text-sm font-semibold text-white">
+                          ${pkg.price.toFixed(2)}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
 
-                <button
-                  onClick={() => handleBuyCredits()}
-                  className="w-full mt-3 py-2 text-xs text-zinc-400 hover:text-white transition-colors"
-                >
-                  View all packages
-                </button>
-              </div>
+                  <button
+                    onClick={() => handleBuyCredits()}
+                    className="w-full mt-3 py-2 text-xs text-zinc-400 hover:text-white transition-colors"
+                  >
+                    View all packages
+                  </button>
+                </div>
+              )}
             </motion.div>
           </>
         )}

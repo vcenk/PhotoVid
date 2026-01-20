@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
     ArrowLeft,
@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { NavigationRail, FlyoutType } from '../../dashboard/navigation/NavigationRail';
 import { FlyoutPanels } from '../../dashboard/navigation/FlyoutPanels';
+import { BeforeAfterSlider } from '../../common/BeforeAfterSlider';
 import { generateLawnEnhancement, isFalConfigured } from '@/lib/api/toolGeneration';
 import type { LawnEnhancementOptions } from '@/lib/types/generation';
 
@@ -48,6 +49,23 @@ export const LawnEnhancementTool: React.FC = () => {
     const [generationProgress, setGenerationProgress] = useState(0);
     const [resultImage, setResultImage] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
+
+    // Check for pre-selected asset from library
+    useEffect(() => {
+        const selectedAssetUrl = sessionStorage.getItem('selectedAssetUrl');
+        if (selectedAssetUrl) {
+            sessionStorage.removeItem('selectedAssetUrl');
+            setImagePreview(selectedAssetUrl);
+            fetch(selectedAssetUrl)
+                .then(res => res.blob())
+                .then(blob => {
+                    const fileName = selectedAssetUrl.split('/').pop() || 'image.jpg';
+                    const file = new File([blob], fileName, { type: blob.type || 'image/jpeg' });
+                    setUploadedImage(file);
+                })
+                .catch(err => console.error('Failed to load pre-selected image:', err));
+        }
+    }, []);
 
     const handleDrag = useCallback((e: React.DragEvent) => {
         e.preventDefault();
@@ -138,7 +156,7 @@ export const LawnEnhancementTool: React.FC = () => {
             <NavigationRail activeFlyout={activeFlyout} onFlyoutChange={setActiveFlyout} />
             <FlyoutPanels activeFlyout={activeFlyout} onClose={() => setActiveFlyout(null)} />
 
-            <div className="flex-1 flex ml-[72px]">
+            <div className="flex-1 flex ml-56">
                 {/* Sidebar */}
                 <div className="w-[320px] flex-shrink-0 bg-[#111113] border-r border-white/5 flex flex-col">
                     <div className="p-4 border-b border-white/5">
@@ -269,11 +287,20 @@ export const LawnEnhancementTool: React.FC = () => {
                                 </div>
                                 <p className="text-zinc-400 font-medium">Enhancing landscape...</p>
                             </div>
+                        ) : resultImage && imagePreview ? (
+                            <div className="w-full max-w-4xl">
+                                <BeforeAfterSlider
+                                    beforeImage={imagePreview}
+                                    afterImage={resultImage}
+                                    beforeLabel="Original"
+                                    afterLabel="Enhanced"
+                                    className="shadow-2xl"
+                                />
+                            </div>
                         ) : (
                             <div className="relative rounded-2xl overflow-hidden shadow-2xl">
-                                <img src={resultImage || imagePreview} alt="Preview" className="max-w-full max-h-[calc(100vh-180px)] object-contain" />
-                                {resultImage && <div className="absolute top-4 right-4 px-3 py-1.5 bg-green-500/80 backdrop-blur rounded-lg text-xs text-white font-medium flex items-center gap-1.5"><Trees size={12} />Enhanced</div>}
-                                {!resultImage && <div className="absolute inset-0 flex items-center justify-center bg-black/40"><div className="text-center text-white"><Trees size={28} className="mx-auto mb-2 opacity-80" /><p className="text-sm font-medium">Ready to enhance</p></div></div>}
+                                <img src={imagePreview} alt="Preview" className="max-w-full max-h-[calc(100vh-180px)] object-contain" />
+                                <div className="absolute inset-0 flex items-center justify-center bg-black/40"><div className="text-center text-white"><Trees size={28} className="mx-auto mb-2 opacity-80" /><p className="text-sm font-medium">Ready to enhance</p></div></div>
                             </div>
                         )}
                     </div>

@@ -303,7 +303,7 @@ export const RealEstatePageV2: React.FC = () => {
       <NavigationRail activeFlyout={activeFlyout} onFlyoutChange={setActiveFlyout} />
       <FlyoutPanels activeFlyout={activeFlyout} onClose={() => setActiveFlyout(null)} />
 
-      <div className="flex-1 ml-[72px] overflow-y-auto">
+      <div className="flex-1 ml-56 overflow-y-auto">
         {/* ===== HERO SECTION ===== */}
         <section className="relative pt-8 pb-16 px-6">
           {/* Subtle gradient bg */}

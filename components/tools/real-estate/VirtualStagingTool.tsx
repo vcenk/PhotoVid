@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useRef } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -9,8 +9,6 @@ import {
     RefreshCw,
     Check,
     Sofa,
-    ChevronLeft,
-    ChevronRight,
     Loader2,
     Trash2,
     ZoomIn,
@@ -18,9 +16,10 @@ import {
     AlertCircle,
     Zap
 } from 'lucide-react';
+import { BeforeAfterSlider } from '@/components/common/BeforeAfterSlider';
 import { NavigationRail, FlyoutType } from '../../dashboard/navigation/NavigationRail';
 import { FlyoutPanels } from '../../dashboard/navigation/FlyoutPanels';
-import { generateVirtualStaging, isFalConfigured } from '@/lib/api/toolGeneration';
+import { generateVirtualStaging, isFalConfigured, safeImageUrl } from '@/lib/api/toolGeneration';
 import { useCredits } from '@/lib/store/contexts/CreditsContext';
 import { CREDIT_COSTS } from '@/lib/types/credits';
 import type { VirtualStagingOptions } from '@/lib/types/generation';
@@ -78,6 +77,10 @@ const STAGING_STYLES = [
 const TOOL_ID = 'virtual-staging';
 const CREDIT_COST = CREDIT_COSTS[TOOL_ID] || 2;
 
+// Default showcase images
+const DEFAULT_BEFORE_IMAGE = '/showcase/real-estate/before/empty-living-room.jpg';
+const DEFAULT_AFTER_IMAGE = '/showcase/real-estate/after/empty-living-room.jpg';
+
 export const VirtualStagingTool: React.FC = () => {
     const navigate = useNavigate();
     const { balance, deductCredits, hasEnoughCredits } = useCredits();
@@ -99,12 +102,32 @@ export const VirtualStagingTool: React.FC = () => {
     const [generationProgress, setGenerationProgress] = useState(0);
     const [resultImage, setResultImage] = useState<string | null>(null);
 
-    // Before/After slider
-    const [sliderPosition, setSliderPosition] = useState(50);
-    const sliderRef = useRef<HTMLDivElement>(null);
-
     // Error state
     const [error, setError] = useState<string | null>(null);
+
+    // Check for pre-selected asset from library
+    useEffect(() => {
+        const selectedAssetUrl = sessionStorage.getItem('selectedAssetUrl');
+        if (selectedAssetUrl) {
+            // Clear the sessionStorage
+            sessionStorage.removeItem('selectedAssetUrl');
+
+            // Set the preview
+            setImagePreview(selectedAssetUrl);
+
+            // Fetch the image and convert to File for generation
+            fetch(selectedAssetUrl)
+                .then(res => res.blob())
+                .then(blob => {
+                    const fileName = selectedAssetUrl.split('/').pop() || 'image.jpg';
+                    const file = new File([blob], fileName, { type: blob.type || 'image/jpeg' });
+                    setUploadedImage(file);
+                })
+                .catch(err => {
+                    console.error('Failed to load pre-selected image:', err);
+                });
+        }
+    }, []);
 
     // Handle drag events
     const handleDrag = useCallback((e: React.DragEvent) => {
@@ -168,7 +191,7 @@ export const VirtualStagingTool: React.FC = () => {
             return;
         }
 
-        // Check if FAL API is configured
+        // Check if FAL generation is available (Supabase connected)
         if (!isFalConfigured()) {
             // Fallback to mock for demo/development
             const progressInterval = setInterval(() => {
@@ -201,12 +224,17 @@ export const VirtualStagingTool: React.FC = () => {
                 uploadedImage,
                 options,
                 (progress, status) => {
-                    setGenerationProgress(progress);
+                    // Cap progress at 90% until we finish loading the image
+                    setGenerationProgress(Math.min(progress, 90));
                     console.log('Generation status:', status);
                 }
             );
 
-            setResultImage(resultUrl);
+            // Convert to blob URL for reliable display (avoids QUIC protocol errors)
+            setGenerationProgress(95);
+            const safeUrl = await safeImageUrl(resultUrl);
+            setGenerationProgress(100);
+            setResultImage(safeUrl);
         } catch (err) {
             console.error('Virtual staging generation error:', err);
             setError(err instanceof Error ? err.message : 'Generation failed. Please try again.');
@@ -215,14 +243,32 @@ export const VirtualStagingTool: React.FC = () => {
         }
     };
 
-    // Before/After slider handler
-    const handleSliderMove = useCallback((e: React.MouseEvent | React.TouchEvent) => {
-        if (!sliderRef.current) return;
-        const rect = sliderRef.current.getBoundingClientRect();
-        const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
-        const position = ((clientX - rect.left) / rect.width) * 100;
-        setSliderPosition(Math.max(0, Math.min(100, position)));
-    }, []);
+    // Download result image
+    const handleDownload = async () => {
+        if (!resultImage) return;
+
+        try {
+            const response = await fetch(resultImage);
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+
+            // Generate filename with timestamp
+            const timestamp = new Date().toISOString().slice(0, 10);
+            const extension = blob.type.includes('png') ? 'png' : 'jpg';
+            link.download = `staged-${selectedRoom}-${selectedStyle}-${timestamp}.${extension}`;
+
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(url);
+        } catch (err) {
+            console.error('Download failed:', err);
+            // Fallback: open in new tab
+            window.open(resultImage, '_blank');
+        }
+    };
 
     const selectedStyleData = STAGING_STYLES.find(s => s.id === selectedStyle);
 
@@ -233,7 +279,7 @@ export const VirtualStagingTool: React.FC = () => {
             <FlyoutPanels activeFlyout={activeFlyout} onClose={() => setActiveFlyout(null)} />
 
             {/* Main Content */}
-            <div className="flex-1 flex ml-[72px]">
+            <div className="flex-1 flex ml-56">
                 {/* Left Sidebar - Controls */}
                 <div className="w-[340px] flex-shrink-0 bg-[#111113] border-r border-white/5 flex flex-col">
                     {/* Header */}
@@ -438,7 +484,10 @@ export const VirtualStagingTool: React.FC = () => {
                                     <RefreshCw size={14} />
                                     Regenerate
                                 </button>
-                                <button className="px-3 py-1.5 text-xs font-medium text-white bg-indigo-600 hover:bg-indigo-500 rounded-lg transition-colors flex items-center gap-1.5">
+                                <button
+                                    onClick={handleDownload}
+                                    className="px-3 py-1.5 text-xs font-medium text-white bg-indigo-600 hover:bg-indigo-500 rounded-lg transition-colors flex items-center gap-1.5"
+                                >
                                     <Download size={14} />
                                     Download
                                 </button>
@@ -463,63 +512,16 @@ export const VirtualStagingTool: React.FC = () => {
                                     Try Again
                                 </button>
                             </div>
-                        ) : !imagePreview && !resultImage ? (
-                            /* Empty State */
-                            <div className="text-center">
-                                <div className="w-20 h-20 rounded-2xl bg-white/5 flex items-center justify-center mx-auto mb-4">
-                                    <ImageIcon size={32} className="text-zinc-700" />
-                                </div>
-                                <p className="text-zinc-500 text-sm">Upload a room photo to get started</p>
-                            </div>
                         ) : resultImage && imagePreview ? (
                             /* Before/After Comparison */
                             <div className="w-full max-w-5xl">
-                                <div
-                                    ref={sliderRef}
-                                    className="relative rounded-2xl overflow-hidden cursor-ew-resize select-none shadow-2xl"
-                                    onMouseMove={(e) => e.buttons === 1 && handleSliderMove(e)}
-                                    onMouseDown={handleSliderMove}
-                                    onTouchMove={handleSliderMove}
-                                >
-                                    {/* After Image */}
-                                    <img
-                                        src={resultImage}
-                                        alt="After"
-                                        className="w-full h-auto max-h-[calc(100vh-180px)] object-contain"
-                                    />
-
-                                    {/* Before Image (Clipped) */}
-                                    <div
-                                        className="absolute inset-0 overflow-hidden"
-                                        style={{ width: `${sliderPosition}%` }}
-                                    >
-                                        <img
-                                            src={imagePreview}
-                                            alt="Before"
-                                            className="w-full h-auto max-h-[calc(100vh-180px)] object-contain"
-                                            style={{ width: sliderRef.current?.offsetWidth }}
-                                        />
-                                    </div>
-
-                                    {/* Slider Handle */}
-                                    <div
-                                        className="absolute top-0 bottom-0 w-0.5 bg-white"
-                                        style={{ left: `${sliderPosition}%` }}
-                                    >
-                                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center">
-                                            <ChevronLeft size={14} className="text-zinc-800 -mr-1" />
-                                            <ChevronRight size={14} className="text-zinc-800 -ml-1" />
-                                        </div>
-                                    </div>
-
-                                    {/* Labels */}
-                                    <div className="absolute top-4 left-4 px-3 py-1.5 bg-black/60 backdrop-blur rounded-lg text-xs text-white font-medium">
-                                        Before
-                                    </div>
-                                    <div className="absolute top-4 right-4 px-3 py-1.5 bg-black/60 backdrop-blur rounded-lg text-xs text-white font-medium">
-                                        After • {selectedStyleData?.name}
-                                    </div>
-                                </div>
+                                <BeforeAfterSlider
+                                    beforeImage={imagePreview}
+                                    afterImage={resultImage}
+                                    beforeLabel="Before"
+                                    afterLabel={`After • ${selectedStyleData?.name}`}
+                                    className="shadow-2xl"
+                                />
                             </div>
                         ) : isGenerating ? (
                             /* Generating State */
@@ -555,7 +557,7 @@ export const VirtualStagingTool: React.FC = () => {
                                 <p className="text-zinc-400 font-medium">Staging your room...</p>
                                 <p className="text-zinc-600 text-sm mt-1">This takes about 15-30 seconds</p>
                             </div>
-                        ) : (
+                        ) : imagePreview ? (
                             /* Image Uploaded, Ready to Generate */
                             <div className="w-full max-w-5xl">
                                 <div className="relative rounded-2xl overflow-hidden shadow-2xl">
@@ -574,6 +576,20 @@ export const VirtualStagingTool: React.FC = () => {
                                         </div>
                                     </div>
                                 </div>
+                            </div>
+                        ) : (
+                            /* Default Showcase */
+                            <div className="w-full max-w-5xl">
+                                <div className="mb-4 text-center">
+                                    <p className="text-zinc-500 text-sm">Example: See what virtual staging can do</p>
+                                </div>
+                                <BeforeAfterSlider
+                                    beforeImage={DEFAULT_BEFORE_IMAGE}
+                                    afterImage={DEFAULT_AFTER_IMAGE}
+                                    beforeLabel="Before"
+                                    afterLabel="After • Modern"
+                                    className="shadow-2xl"
+                                />
                             </div>
                         )}
                     </div>

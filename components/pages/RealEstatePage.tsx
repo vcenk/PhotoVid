@@ -125,7 +125,7 @@ export const RealEstatePage: React.FC = () => {
             <FlyoutPanels activeFlyout={activeFlyout} onClose={() => setActiveFlyout(null)} />
 
             {/* Main Content */}
-            <div className="flex-1 overflow-y-auto ml-[72px]">
+            <div className="flex-1 overflow-y-auto ml-56">
                 {/* Hero Section */}
                 <div className="relative bg-gradient-to-br from-blue-600 via-indigo-600 to-violet-700 overflow-hidden">
                     {/* Background Pattern */}

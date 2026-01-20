@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import { NavigationRail, FlyoutType } from '../../dashboard/navigation/NavigationRail';
 import { FlyoutPanels } from '../../dashboard/navigation/FlyoutPanels';
+import { BeforeAfterSlider } from '../../common/BeforeAfterSlider';
 import { generateItemRemoval, isFalConfigured } from '@/lib/api/toolGeneration';
 
 export const ItemRemovalTool: React.FC = () => {
@@ -91,6 +92,25 @@ export const ItemRemovalTool: React.FC = () => {
         setImageLoaded(false);
         setMaskHistory([]);
     };
+
+    // Check for pre-selected asset from library
+    useEffect(() => {
+        const selectedAssetUrl = sessionStorage.getItem('selectedAssetUrl');
+        if (selectedAssetUrl) {
+            sessionStorage.removeItem('selectedAssetUrl');
+            setImagePreview(selectedAssetUrl);
+            setImageLoaded(false);
+            setMaskHistory([]);
+            fetch(selectedAssetUrl)
+                .then(res => res.blob())
+                .then(blob => {
+                    const fileName = selectedAssetUrl.split('/').pop() || 'image.jpg';
+                    const file = new File([blob], fileName, { type: blob.type || 'image/jpeg' });
+                    setUploadedImage(file);
+                })
+                .catch(err => console.error('Failed to load pre-selected image:', err));
+        }
+    }, []);
 
     // Initialize canvas when image loads
     useEffect(() => {
@@ -295,7 +315,7 @@ export const ItemRemovalTool: React.FC = () => {
             <FlyoutPanels activeFlyout={activeFlyout} onClose={() => setActiveFlyout(null)} />
 
             {/* Main Content */}
-            <div className="flex-1 flex ml-[72px]">
+            <div className="flex-1 flex ml-56">
                 {/* Left Sidebar - Controls */}
                 <div className="w-[300px] flex-shrink-0 bg-[#111113] border-r border-white/5 flex flex-col">
                     {/* Header */}
@@ -522,17 +542,16 @@ export const ItemRemovalTool: React.FC = () => {
                                 </div>
                                 <p className="text-zinc-500 text-sm">Upload a photo to get started</p>
                             </div>
-                        ) : resultImage ? (
-                            /* Result */
-                            <div className="relative rounded-2xl overflow-hidden shadow-2xl">
-                                <img
-                                    src={resultImage}
-                                    alt="Result"
-                                    className="max-w-full max-h-[calc(100vh-180px)] object-contain"
+                        ) : resultImage && imagePreview ? (
+                            /* Result with Before/After */
+                            <div className="w-full max-w-4xl">
+                                <BeforeAfterSlider
+                                    beforeImage={imagePreview}
+                                    afterImage={resultImage}
+                                    beforeLabel="Original"
+                                    afterLabel="Objects Removed"
+                                    className="shadow-2xl"
                                 />
-                                <div className="absolute top-4 right-4 px-3 py-1.5 bg-green-500/80 backdrop-blur rounded-lg text-xs text-white font-medium">
-                                    Objects Removed
-                                </div>
                             </div>
                         ) : isGenerating ? (
                             /* Generating State */

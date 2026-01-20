@@ -21,16 +21,21 @@ const BUCKET_NAME = import.meta.env.VITE_R2_BUCKET_NAME;
 export const uploadToR2 = async (file: File, path: string): Promise<string> => {
   try {
     const key = `${path}/${Date.now()}-${file.name}`;
-    
+
+    // Convert File to ArrayBuffer for browser compatibility with AWS SDK
+    const arrayBuffer = await file.arrayBuffer();
+    const uint8Array = new Uint8Array(arrayBuffer);
+
     const command = new PutObjectCommand({
       Bucket: BUCKET_NAME,
       Key: key,
-      Body: file,
+      Body: uint8Array,
       ContentType: file.type,
+      ContentLength: file.size,
     });
 
     await r2Client.send(command);
-    
+
     // Construct public URL (assumes you have a public domain/bucket access configured)
     const publicUrl = `${import.meta.env.VITE_R2_PUBLIC_URL}/${key}`;
     return publicUrl;

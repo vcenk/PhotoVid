@@ -18,7 +18,7 @@ export const IndustryPageLayout: React.FC<IndustryPageLayoutProps> = ({ children
             <FlyoutPanels activeFlyout={activeFlyout} onClose={() => setActiveFlyout(null)} />
 
             {/* Main Content */}
-            <div className="flex-1 overflow-y-auto ml-[72px]">
+            <div className="flex-1 overflow-y-auto ml-56">
                 {children}
             </div>
         </div>

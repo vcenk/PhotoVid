@@ -12,6 +12,10 @@ export default defineConfig(({ mode }) => {
       server: {
         port: 3100,
         host: '0.0.0.0',
+        // Fix for 431 Request Header Fields Too Large
+        headers: {
+          'Cache-Control': 'no-store',
+        },
       },
       plugins: [react()],
       define: {

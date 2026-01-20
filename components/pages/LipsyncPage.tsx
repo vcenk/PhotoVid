@@ -15,7 +15,7 @@ export const LipsyncPage: React.FC = () => {
       <FlyoutPanels activeFlyout={activeFlyout} onClose={() => setActiveFlyout(null)} />
 
       {/* Main Content - Lipsync Studio (Full Height) */}
-      <div className="flex-1 overflow-hidden ml-[72px]">
+      <div className="flex-1 overflow-hidden ml-56">
         <LipsyncStudio />
       </div>
     </div>

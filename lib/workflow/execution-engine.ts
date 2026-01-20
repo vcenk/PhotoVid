@@ -1,10 +1,89 @@
 import { Node, Edge } from '@xyflow/react';
-import { fal } from "@fal-ai/client";
+import { createClient } from "@/lib/database/client";
 
-// Configure FAL client
-fal.config({
-  credentials: import.meta.env.VITE_FAL_KEY,
-});
+/**
+ * Workflow Execution Engine (Secure)
+ * All FAL API calls go through Supabase Edge Functions
+ * NEVER exposes API keys to the browser
+ */
+
+// Get authentication token
+async function getAuthToken(): Promise<string | null> {
+  const supabase = createClient();
+  if (!supabase) return null;
+
+  const { data: { session } } = await supabase.auth.getSession();
+  return session?.access_token || null;
+}
+
+// Secure FAL API call via Edge Function
+async function secureFalCall(params: {
+  tool: string;
+  imageUrl?: string;
+  prompt?: string;
+  options?: Record<string, any>;
+}): Promise<any> {
+  const token = await getAuthToken();
+  if (!token) {
+    throw new Error('Authentication required');
+  }
+
+  const supabase = createClient();
+  if (!supabase) {
+    throw new Error('Supabase not configured');
+  }
+
+  const { data, error } = await supabase.functions.invoke('fal-generate', {
+    body: params,
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (error) {
+    throw new Error(error.message || 'FAL API call failed');
+  }
+
+  // If we got immediate result
+  if (data?.data) {
+    return data.data;
+  }
+
+  // Otherwise poll for result
+  const requestId = data?.requestId;
+  if (!requestId) {
+    return data;
+  }
+
+  // Poll for completion
+  for (let i = 0; i < 120; i++) { // 6 minutes max
+    await new Promise(resolve => setTimeout(resolve, 3000));
+
+    const { data: statusData, error: statusError } = await supabase.functions.invoke('fal-status', {
+      body: {
+        requestId,
+        model: params.options?.model_endpoint || 'fal-ai/flux/dev',
+      },
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (statusError) {
+      throw new Error(statusError.message || 'Status check failed');
+    }
+
+    if (statusData.status === 'COMPLETED') {
+      return statusData.data;
+    }
+
+    if (statusData.status === 'FAILED') {
+      throw new Error('FAL generation failed');
+    }
+  }
+
+  throw new Error('FAL generation timed out');
+}
 
 // Topological sort to determine execution order
 export function topologicalSort(nodes: Node[], edges: Edge[]): Node[] {
@@ -219,7 +298,7 @@ export async function executeWorkflow(
   }
 }
 
-// ===== FAL AI Integration Functions =====
+// ===== FAL AI Integration Functions (Secure via Edge Functions) =====
 
 async function executeTextToImage(
   prompt: string,
@@ -228,21 +307,19 @@ async function executeTextToImage(
   console.log('Executing Text-to-Image:', { prompt, parameters });
 
   try {
-    const result: any = await fal.subscribe("fal-ai/flux/dev", {
-      input: {
-        prompt: prompt,
+    const result = await secureFalCall({
+      tool: 'text-to-image',
+      prompt: prompt,
+      options: {
         image_size: parameters.size || "landscape_16_9",
         num_inference_steps: parameters.steps || 28,
         num_images: 1,
-      },
-      logs: true,
-      onQueueUpdate: (update) => {
-        console.log("Text-to-Image queue update:", update);
+        model_endpoint: 'fal-ai/flux/dev',
       },
     });
 
     return {
-      image: result.data?.images?.[0]?.url || result.images?.[0]?.url
+      image: result?.images?.[0]?.url
     };
   } catch (error) {
     console.error('Text-to-Image generation failed:', error);
@@ -258,21 +335,19 @@ async function executeImageToVideo(
   console.log('Executing Image-to-Video:', { imageUrl, motionPrompt, parameters });
 
   try {
-    const result: any = await fal.subscribe("fal-ai/kling-video/v1.5/pro/image-to-video", {
-      input: {
-        image_url: imageUrl,
-        prompt: motionPrompt || "Cinematic motion, high quality, 4k",
+    const result = await secureFalCall({
+      tool: 'image-to-video',
+      imageUrl: imageUrl,
+      prompt: motionPrompt || "Cinematic motion, high quality, 4k",
+      options: {
         duration: parameters.duration || "5",
         aspect_ratio: parameters.aspect_ratio || "16:9",
-      },
-      logs: true,
-      onQueueUpdate: (update) => {
-        console.log("Image-to-Video queue update:", update);
+        model_endpoint: 'fal-ai/kling-video/v1.5/pro/image-to-video',
       },
     });
 
     return {
-      video: result.data?.video?.url || result.video?.url
+      video: result?.video?.url
     };
   } catch (error) {
     console.error('Image-to-Video generation failed:', error);
@@ -291,26 +366,24 @@ async function executeUpscale(
       ? 'fal-ai/creative-upscaler'
       : 'fal-ai/clarity-upscaler';
 
-    const input: any = {
-      image_url: imageUrl,
+    const options: any = {
       scale: parseInt(parameters.scale || '2'),
+      model_endpoint: model,
     };
 
     // Add creativity parameter for creative upscaler
     if (parameters.model === 'creative-upscaler') {
-      input.creativity = parseFloat(parameters.creativity || '5') / 10; // Convert 0-10 to 0-1
+      options.creativity = parseFloat(parameters.creativity || '5') / 10;
     }
 
-    const result: any = await fal.subscribe(model, {
-      input,
-      logs: true,
-      onQueueUpdate: (update) => {
-        console.log("Upscale queue update:", update);
-      },
+    const result = await secureFalCall({
+      tool: 'photo-enhancement',
+      imageUrl: imageUrl,
+      options,
     });
 
     return {
-      image: result.data?.image?.url || result.image?.url
+      image: result?.image?.url
     };
   } catch (error) {
     console.error('Upscale failed:', error);
@@ -326,22 +399,20 @@ async function executeInpaint(
   console.log('Executing Inpaint:', { imageUrl, prompt, parameters });
 
   try {
-    const result: any = await fal.subscribe("fal-ai/flux/dev/inpainting", {
-      input: {
-        image_url: imageUrl,
-        prompt: parameters.inpaint_prompt || prompt,
+    const result = await secureFalCall({
+      tool: 'virtual-renovation',
+      imageUrl: imageUrl,
+      prompt: parameters.inpaint_prompt || prompt,
+      options: {
         strength: parameters.strength || 0.8,
         guidance_scale: parameters.guidance_scale || 7.5,
         num_inference_steps: 28,
-      },
-      logs: true,
-      onQueueUpdate: (update) => {
-        console.log("Inpaint queue update:", update);
+        model_endpoint: 'fal-ai/flux/dev/inpainting',
       },
     });
 
     return {
-      image: result.data?.image?.url || result.image?.url
+      image: result?.image?.url || result?.images?.[0]?.url
     };
   } catch (error) {
     console.error('Inpaint failed:', error);
@@ -362,27 +433,24 @@ async function executeLipsync(
       ? 'fal-ai/kling-video/v1/standard/lipsync'
       : 'fal-ai/sync-labs/2.0';
 
-    const input: any = {
+    const options: any = {
       audio_url: audioUrl,
+      model_endpoint: model,
     };
 
     // Use video OR image
     if (videoUrl) {
-      input.video_url = videoUrl;
-    } else if (imageUrl) {
-      input.image_url = imageUrl;
+      options.video_url = videoUrl;
     }
 
-    const result: any = await fal.subscribe(model, {
-      input,
-      logs: true,
-      onQueueUpdate: (update) => {
-        console.log("Lipsync queue update:", update);
-      },
+    const result = await secureFalCall({
+      tool: 'lipsync',
+      imageUrl: imageUrl || undefined,
+      options,
     });
 
     return {
-      video: result.data?.video?.url || result.video?.url
+      video: result?.video?.url
     };
   } catch (error) {
     console.error('Lipsync failed:', error);

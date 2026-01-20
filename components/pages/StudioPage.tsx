@@ -7,7 +7,6 @@ import { WorkflowGrid } from '../studio/shared/WorkflowGrid';
 import { WizardContainer } from '../studio/wizard/WizardContainer';
 import { AssetLibrary } from '../studio/shared/AssetLibrary';
 import { TemplateGallery } from '../studio/shared/TemplateGallery';
-import { IndustryPortalCards } from '../studio/shared/IndustryPortalCards';
 import { NavigationRail, FlyoutType } from '../dashboard/navigation/NavigationRail';
 import { FlyoutPanels } from '../dashboard/navigation/FlyoutPanels';
 import { DashboardTopbar } from '../dashboard/navigation/DashboardTopbar';
@@ -15,6 +14,9 @@ import { ChevronLeft, Sparkles } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { HeroComposer } from '../dashboard/home/HeroComposer';
+import { RecentActivity } from '../dashboard/home/RecentActivity';
+import { DashboardStats } from '../dashboard/home/DashboardStats';
+import { IndustryFeaturedTools } from '../dashboard/home/IndustryFeaturedTools';
 import { Template } from '../../lib/types/studio';
 
 const StudioContent: React.FC = () => {
@@ -45,7 +47,7 @@ const StudioContent: React.FC = () => {
       {/* Main Content Area */}
       <div
         className="flex-1 flex flex-col min-w-0 overflow-hidden"
-        style={{ marginLeft: '72px' }}
+        style={{ marginLeft: '224px' }}
       >
         {/* Topbar */}
         <DashboardTopbar onMenuClick={() => setMobileMenuOpen(true)} />
@@ -65,9 +67,17 @@ const StudioContent: React.FC = () => {
                 <>
                   <HeroComposer />
 
-                  {/* Enhanced Industry Portal Cards */}
-                  <div className="max-w-7xl mx-auto px-6">
-                    <IndustryPortalCards />
+                  {/* Industry Featured Tools - Main Feature Section */}
+                  <IndustryFeaturedTools />
+
+                  {/* Dashboard Stats */}
+                  <div className="max-w-7xl mx-auto px-6 mb-8">
+                    <DashboardStats />
+                  </div>
+
+                  {/* Recent Activity */}
+                  <div className="max-w-7xl mx-auto px-6 mb-8">
+                    <RecentActivity />
                   </div>
 
                   {/* Template Gallery */}
@@ -77,7 +87,7 @@ const StudioContent: React.FC = () => {
 
                   {/* Workflow Grid */}
                   <div className="max-w-7xl mx-auto px-6 mt-8 pb-16">
-                    <h2 className="text-lg font-bold text-zinc-900 mb-4 flex items-center gap-2">
+                    <h2 className="text-lg font-bold text-zinc-900 dark:text-white mb-4 flex items-center gap-2">
                       <Sparkles size={18} className="text-indigo-500" />
                       Available Workflows
                     </h2>

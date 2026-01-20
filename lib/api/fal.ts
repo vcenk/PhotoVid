@@ -1,73 +1,158 @@
-import { fal } from "@fal-ai/client";
-
 /**
- * FAL AI Service Helper
- * Handles Image-to-Video and Text-to-Image generations
+ * FAL AI Service Helper (Secure)
+ * All FAL API calls go through Supabase Edge Functions
+ * NEVER exposes API keys to the browser
  */
 
-// Configure FAL client (assumes VITE_FAL_KEY is in .env)
-// Note: In a production app, you'd want to handle this via a proxy to protect your key.
-fal.config({
-  credentials: import.meta.env.VITE_FAL_KEY,
-});
+import { createClient } from "@/lib/database/client";
 
-export const falClient = fal;
+// Get authentication token
+async function getAuthToken(): Promise<string | null> {
+  const supabase = createClient();
+  if (!supabase) return null;
 
+  const { data: { session } } = await supabase.auth.getSession();
+  return session?.access_token || null;
+}
+
+/**
+ * Generate Image to Video via secure Edge Function
+ */
 export const generateImageToVideo = async (imageUrl: string, prompt?: string) => {
-  try {
-    const result = await fal.subscribe("fal-ai/kling-video/v1.5/pro/image-to-video", {
-      input: {
-        image_url: imageUrl,
-        prompt: prompt || "Cinematic motion, high quality, 4k",
+  const token = await getAuthToken();
+  if (!token) {
+    throw new Error('Authentication required');
+  }
+
+  const supabase = createClient();
+  if (!supabase) {
+    throw new Error('Supabase not configured');
+  }
+
+  const { data, error } = await supabase.functions.invoke('fal-generate', {
+    body: {
+      tool: 'image-to-video',
+      imageUrl,
+      prompt: prompt || "Cinematic motion, high quality, 4k",
+      options: {
+        duration: '5',
+        aspect_ratio: '16:9',
       },
-      logs: true,
-      onQueueUpdate: (update) => {
-        console.log("FAL Queue Update:", update);
-      },
-    });
-    return result;
-  } catch (error) {
+    },
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (error) {
     console.error("FAL Generation Error:", error);
     throw error;
   }
-};
 
-export const generateTextToImage = async (prompt: string) => {
-  const result = await fal.subscribe("fal-ai/flux/dev", {
-    input: {
-      prompt: prompt,
-    },
-  });
-  return result;
+  return data;
 };
 
 /**
- * Check the status of an async FAL job
+ * Generate Text to Image via secure Edge Function
+ */
+export const generateTextToImage = async (prompt: string) => {
+  const token = await getAuthToken();
+  if (!token) {
+    throw new Error('Authentication required');
+  }
+
+  const supabase = createClient();
+  if (!supabase) {
+    throw new Error('Supabase not configured');
+  }
+
+  const { data, error } = await supabase.functions.invoke('fal-generate', {
+    body: {
+      tool: 'text-to-image',
+      prompt,
+    },
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (error) {
+    console.error("FAL Generation Error:", error);
+    throw error;
+  }
+
+  return data;
+};
+
+/**
+ * Check the status of an async FAL job via secure Edge Function
  */
 export const checkStatus = async (requestId: string) => {
-  try {
-    const result = await fal.queue.status("fal-ai/kling-video/v1.5/pro/image-to-video", {
+  const token = await getAuthToken();
+  if (!token) {
+    throw new Error('Authentication required');
+  }
+
+  const supabase = createClient();
+  if (!supabase) {
+    throw new Error('Supabase not configured');
+  }
+
+  const { data, error } = await supabase.functions.invoke('fal-status', {
+    body: {
       requestId,
-      logs: true,
-    });
-    return result;
-  } catch (error) {
+      model: 'fal-ai/kling-video/v1.5/pro/image-to-video',
+    },
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (error) {
     console.error("FAL Status Check Error:", error);
     throw error;
   }
+
+  return data;
 };
 
 /**
- * Get the result of a completed FAL job
+ * Get the result of a completed FAL job via secure Edge Function
  */
 export const getResult = async (requestId: string) => {
-  try {
-    const result = await fal.queue.result("fal-ai/kling-video/v1.5/pro/image-to-video", {
+  const token = await getAuthToken();
+  if (!token) {
+    throw new Error('Authentication required');
+  }
+
+  const supabase = createClient();
+  if (!supabase) {
+    throw new Error('Supabase not configured');
+  }
+
+  // Use fal-status to get completed result
+  const { data, error } = await supabase.functions.invoke('fal-status', {
+    body: {
       requestId,
-    });
-    return result;
-  } catch (error) {
+      model: 'fal-ai/kling-video/v1.5/pro/image-to-video',
+    },
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (error) {
     console.error("FAL Result Error:", error);
     throw error;
   }
+
+  return data;
+};
+
+/**
+ * Check if FAL service is available (Supabase connected)
+ */
+export const isFalConfigured = (): boolean => {
+  const supabase = createClient();
+  return supabase !== null;
 };

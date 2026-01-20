@@ -57,6 +57,8 @@ import { ResetPasswordPage } from './components/pages/ResetPasswordPage';
 import { PrivacyPolicyPage } from './components/pages/PrivacyPolicyPage';
 import { TermsOfServicePage } from './components/pages/TermsOfServicePage';
 import { CreditsPage } from './components/pages/CreditsPage';
+import { MyLibraryPage } from './components/pages/MyLibraryPage';
+import { PropertiesPage } from './components/pages/PropertiesPage';
 import { AuthProvider } from './lib/store/contexts/AuthContext';
 
 // Simple Error Boundary to catch crashes
@@ -107,6 +109,8 @@ const App: React.FC = () => {
               <Routes>
             <Route path="/" element={<LandingPage />} />
             <Route path="/studio" element={<StudioPage />} />
+            <Route path="/studio/library" element={<MyLibraryPage />} />
+            <Route path="/studio/properties" element={<PropertiesPage />} />
             <Route path="/studio/apps" element={<AppsPage />} />
             <Route path="/studio/apps/real-estate" element={<RealEstatePageV2 />} />
             <Route path="/studio/apps/real-estate/virtual-staging" element={<VirtualStagingTool />} />

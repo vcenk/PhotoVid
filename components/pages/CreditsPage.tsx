@@ -83,7 +83,7 @@ export const CreditsPage: React.FC = () => {
       {/* Main Content */}
       <div
         className="flex-1 flex flex-col min-w-0 overflow-hidden"
-        style={{ marginLeft: '72px' }}
+        style={{ marginLeft: '224px' }}
       >
         {/* Header */}
         <div className="flex-shrink-0 h-16 border-b border-zinc-200 dark:border-zinc-800 flex items-center px-6">

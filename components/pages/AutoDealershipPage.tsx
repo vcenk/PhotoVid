@@ -121,7 +121,7 @@ export const AutoDealershipPage: React.FC = () => {
             <FlyoutPanels activeFlyout={activeFlyout} onClose={() => setActiveFlyout(null)} />
 
             {/* Main Content */}
-            <div className="flex-1 overflow-y-auto ml-[72px]">
+            <div className="flex-1 overflow-y-auto ml-56">
                 {/* Hero Section */}
                 <div className="relative bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900 overflow-hidden">
                     {/* Background Pattern */}

@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   Home,
   LayoutGrid,
@@ -8,25 +9,32 @@ import {
   Wand2,
   Mic2,
   Workflow,
+  FolderOpen,
+  Building2,
   Moon,
   Sun,
   HelpCircle,
-  MoreHorizontal,
+  LogOut,
+  Settings,
+  ChevronRight,
+  Shield,
+  Sparkles,
   Zap,
 } from 'lucide-react';
 import { cn } from '../../../lib/utils';
 import { useTheme } from '../../common/ThemeProvider';
-import { CreditDisplay } from './CreditDisplay';
+import { createClient } from '../../../lib/database/client';
+import { useCredits } from '@/lib/store/contexts/CreditsContext';
 
 export type FlyoutType = 'image' | 'video' | 'edit' | null;
 
 interface NavItem {
   id: string;
   label: string;
-  icon: any;
+  icon: React.ElementType;
   path?: string;
+  children?: NavItem[];
   flyout?: FlyoutType;
-  action?: () => void;
 }
 
 interface NavigationRailProps {
@@ -38,264 +46,272 @@ export function NavigationRail({ activeFlyout, onFlyoutChange }: NavigationRailP
   const navigate = useNavigate();
   const location = useLocation();
   const { theme, toggleTheme } = useTheme();
-  const [showMoreMenu, setShowMoreMenu] = useState(false);
+  const supabase = createClient();
+  const { balance, isAdmin } = useCredits();
+  const [activeSubmenu, setActiveSubmenu] = useState<string | null>(null);
+  const sidebarRef = useRef<HTMLDivElement>(null);
 
-  const mainItems: NavItem[] = [
-    {
-      id: 'home',
-      label: 'Home',
-      icon: Home,
-      path: '/studio',
-    },
-    {
-      id: 'apps',
-      label: 'Apps',
-      icon: LayoutGrid,
-      path: '/studio/apps',
-    },
-    {
-      id: 'image',
-      label: 'Image',
-      icon: ImageIcon,
-      path: '/studio/image',
-    },
-    {
-      id: 'video',
-      label: 'Video',
-      icon: Video,
-      flyout: 'video',
-    },
-    {
-      id: 'edit',
-      label: 'Edit',
-      icon: Wand2,
-      flyout: 'edit',
-    },
-    {
-      id: 'lipsync',
-      label: 'Lipsync',
-      icon: Mic2,
-      path: '/studio/lipsync',
-    },
-    {
-      id: 'workflow',
-      label: 'Workflow',
-      icon: Workflow,
-      path: '/studio/workflow',
-    },
-  ];
+  // Close submenu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (sidebarRef.current && !sidebarRef.current.contains(e.target as Node)) {
+        setActiveSubmenu(null);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
-  const utilityItems: NavItem[] = [
+  const handleSignOut = async () => {
+    if (supabase) {
+      await supabase.auth.signOut();
+    }
+    navigate('/');
+  };
+
+  // Navigation structure with nested items
+  const navItems: NavItem[] = [
+    { id: 'home', label: 'Home', icon: Home, path: '/studio' },
+    { id: 'apps', label: 'Apps', icon: LayoutGrid, path: '/studio/apps' },
     {
-      id: 'theme',
-      label: 'Theme',
-      icon: theme === 'dark' ? Sun : Moon,
-      action: toggleTheme,
+      id: 'create',
+      label: 'Create',
+      icon: Sparkles,
+      children: [
+        { id: 'image', label: 'Image', icon: ImageIcon, path: '/studio/image' },
+        { id: 'video', label: 'Video', icon: Video, flyout: 'video' },
+        { id: 'edit', label: 'Edit', icon: Wand2, flyout: 'edit' },
+        { id: 'lipsync', label: 'Lipsync', icon: Mic2, path: '/studio/lipsync' },
+      ],
     },
     {
-      id: 'help',
-      label: 'Help',
-      icon: HelpCircle,
-      path: '/studio/help',
-    },
-    {
-      id: 'more',
-      label: 'More',
-      icon: MoreHorizontal,
-      action: () => setShowMoreMenu(!showMoreMenu),
+      id: 'manage',
+      label: 'Manage',
+      icon: FolderOpen,
+      children: [
+        { id: 'library', label: 'Library', icon: FolderOpen, path: '/studio/library' },
+        { id: 'properties', label: 'Properties', icon: Building2, path: '/studio/properties' },
+        { id: 'workflow', label: 'Workflow', icon: Workflow, path: '/studio/workflow' },
+      ],
     },
   ];
 
   const handleItemClick = (item: NavItem) => {
-    if (item.flyout) {
-      // Toggle flyout
+    if (item.children) {
+      setActiveSubmenu(activeSubmenu === item.id ? null : item.id);
+    } else if (item.flyout) {
       onFlyoutChange(activeFlyout === item.flyout ? null : item.flyout);
-    } else if (item.action) {
-      item.action();
+      setActiveSubmenu(null);
     } else if (item.path) {
       navigate(item.path);
-      onFlyoutChange(null); // Close flyouts when navigating
+      setActiveSubmenu(null);
+      onFlyoutChange(null);
     }
   };
 
-  const isItemActive = (item: NavItem) => {
-    if (item.flyout) {
-      return activeFlyout === item.flyout;
-    }
-    if (item.path) {
-      return location.pathname === item.path;
+  const isItemActive = (item: NavItem): boolean => {
+    if (item.flyout) return activeFlyout === item.flyout;
+    if (item.path) return location.pathname === item.path;
+    if (item.children) {
+      return item.children.some(child =>
+        child.path === location.pathname ||
+        (child.flyout && activeFlyout === child.flyout)
+      );
     }
     return false;
   };
 
-  return (
-    <>
-      <div className="fixed left-0 top-0 bottom-0 w-[72px] bg-white dark:bg-zinc-950 border-r border-zinc-200 dark:border-zinc-800 flex flex-col justify-between z-50">
-        {/* Top Section: Logo + Main Nav */}
-        <div className="flex flex-col items-center">
-          {/* Logo */}
-          <div className="w-full flex items-center justify-center py-4 border-b border-zinc-200 dark:border-zinc-800">
-            <button
-              onClick={() => {
-                navigate('/studio');
-                onFlyoutChange(null);
-              }}
-              className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-600 to-indigo-600 flex items-center justify-center hover:scale-105 transition-transform"
-            >
-              <span className="text-white font-bold text-sm">PV</span>
-            </button>
-          </div>
+  const isSubmenuItemActive = (item: NavItem): boolean => {
+    if (item.flyout) return activeFlyout === item.flyout;
+    if (item.path) return location.pathname === item.path;
+    return false;
+  };
 
-          {/* Main Navigation Items */}
-          <nav className="w-full py-4 px-2 space-y-1">
-            {mainItems.map((item) => {
+  return (
+    <div ref={sidebarRef} className="fixed left-0 top-0 bottom-0 w-56 bg-zinc-950 border-r border-white/5 flex flex-col z-50">
+      {/* Main Sidebar Content */}
+      <div className="flex-1 flex flex-col">
+        {/* Logo */}
+        <div className="h-14 flex items-center gap-2.5 px-4 border-b border-white/5">
+          <button
+            onClick={() => {
+              navigate('/studio');
+              setActiveSubmenu(null);
+              onFlyoutChange(null);
+            }}
+            className="flex items-center gap-2.5 hover:opacity-80 transition-opacity"
+          >
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center">
+              <img
+                src="/photovid.svg"
+                alt="Photovid"
+                className="w-5 h-5 object-contain"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).style.display = 'none';
+                }}
+              />
+            </div>
+            <span className="text-sm font-semibold tracking-wide text-white">PHOTOVID</span>
+          </button>
+        </div>
+
+        {/* Navigation */}
+        <div className="flex-1 flex flex-col py-3 px-3 overflow-y-auto">
+          {/* Main Nav Items */}
+          <div className="space-y-1">
+            {navItems.map((item) => {
               const Icon = item.icon;
               const active = isItemActive(item);
+              const hasChildren = !!item.children;
+              const isOpen = activeSubmenu === item.id;
 
               return (
                 <button
                   key={item.id}
                   onClick={() => handleItemClick(item)}
                   className={cn(
-                    'w-full flex flex-col items-center gap-1 py-2.5 group relative',
-                    'transition-all duration-200'
+                    'w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200',
+                    active
+                      ? 'bg-violet-500/15 text-violet-400'
+                      : 'text-zinc-400 hover:text-white hover:bg-white/5',
+                    isOpen && 'bg-white/5 text-white'
                   )}
                 >
-                  {/* Icon Container with Squircle Background */}
-                  <div
-                    className={cn(
-                      'w-10 h-10 rounded-2xl flex items-center justify-center transition-all duration-200',
-                      active
-                        ? 'bg-indigo-100 dark:bg-indigo-950/50'
-                        : 'group-hover:bg-zinc-100 dark:group-hover:bg-zinc-800'
-                    )}
-                  >
-                    <Icon
-                      size={24}
-                      className={cn(
-                        'transition-colors',
-                        active
-                          ? 'text-indigo-600 dark:text-indigo-400'
-                          : 'text-zinc-600 dark:text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-zinc-100'
-                      )}
-                      strokeWidth={2}
-                    />
+                  <div className="flex items-center gap-3">
+                    <Icon size={18} strokeWidth={1.75} />
+                    <span>{item.label}</span>
                   </div>
-
-                  {/* Text Label */}
-                  <span
-                    className={cn(
-                      'text-[10px] font-medium transition-colors',
-                      active
-                        ? 'text-indigo-600 dark:text-indigo-400'
-                        : 'text-zinc-600 dark:text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-zinc-100'
-                    )}
-                  >
-                    {item.label}
-                  </span>
-
-                  {/* Active Indicator */}
-                  {active && (
-                    <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-indigo-600 dark:bg-indigo-400 rounded-r-full" />
+                  {hasChildren && (
+                    <ChevronRight
+                      size={16}
+                      className={cn(
+                        'text-zinc-500 transition-transform duration-200',
+                        isOpen && 'rotate-90 text-zinc-300'
+                      )}
+                    />
                   )}
                 </button>
               );
             })}
-          </nav>
-        </div>
-
-        {/* Bottom Section: Credits + Utility Items */}
-        <div className="flex flex-col items-center w-full py-4 px-2 space-y-1 border-t border-zinc-200 dark:border-zinc-800">
-          {/* Credits Display */}
-          <div className="w-full px-1 mb-2">
-            <CreditDisplay compact />
           </div>
 
-          {utilityItems.map((item) => {
-            const Icon = item.icon;
-            const active = isItemActive(item);
+          {/* Spacer */}
+          <div className="flex-1 min-h-8" />
 
-            return (
+          {/* Bottom Section */}
+          <div className="space-y-1 pt-3 border-t border-white/5">
+            {/* Admin */}
+            {isAdmin && (
               <button
-                key={item.id}
-                onClick={() => handleItemClick(item)}
-                className={cn(
-                  'w-full flex flex-col items-center gap-1 py-2.5 group relative',
-                  'transition-all duration-200'
-                )}
+                onClick={() => navigate('/studio/admin')}
+                className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-amber-400/80 hover:text-amber-400 hover:bg-amber-500/10 transition-all duration-200"
               >
-                {/* Icon Container */}
-                <div
-                  className={cn(
-                    'w-10 h-10 rounded-2xl flex items-center justify-center transition-all duration-200',
-                    active
-                      ? 'bg-indigo-100 dark:bg-indigo-950/50'
-                      : 'group-hover:bg-zinc-100 dark:group-hover:bg-zinc-800'
-                  )}
-                >
-                  <Icon
-                    size={24}
-                    className={cn(
-                      'transition-colors',
-                      active
-                        ? 'text-indigo-600 dark:text-indigo-400'
-                        : 'text-zinc-600 dark:text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-zinc-100'
-                    )}
-                    strokeWidth={2}
-                  />
-                </div>
-
-                {/* Text Label */}
-                <span
-                  className={cn(
-                    'text-[10px] font-medium transition-colors',
-                    active
-                      ? 'text-indigo-600 dark:text-indigo-400'
-                      : 'text-zinc-600 dark:text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-zinc-100'
-                  )}
-                >
-                  {item.label}
-                </span>
+                <Shield size={18} strokeWidth={1.75} />
+                <span>Admin</span>
               </button>
-            );
-          })}
+            )}
+
+            {/* Credits */}
+            <button
+              onClick={() => navigate('/studio/credits')}
+              className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium text-zinc-400 hover:text-white hover:bg-white/5 transition-all duration-200"
+            >
+              <div className="flex items-center gap-3">
+                <Zap size={18} strokeWidth={1.75} className="text-yellow-500" />
+                <span>Credits</span>
+              </div>
+              <span className="px-2 py-0.5 rounded-full bg-violet-500/20 text-violet-400 text-xs font-semibold">
+                {balance}
+              </span>
+            </button>
+
+            {/* Settings */}
+            <button
+              onClick={() => navigate('/studio/settings')}
+              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-zinc-400 hover:text-white hover:bg-white/5 transition-all duration-200"
+            >
+              <Settings size={18} strokeWidth={1.75} />
+              <span>Settings</span>
+            </button>
+          </div>
+
+          {/* Footer */}
+          <div className="flex items-center justify-between pt-3 mt-3 border-t border-white/5">
+            <button
+              onClick={toggleTheme}
+              className="p-2.5 rounded-xl text-zinc-500 hover:text-white hover:bg-white/5 transition-all"
+              title={theme === 'dark' ? 'Light mode' : 'Dark mode'}
+            >
+              {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+            </button>
+            <button
+              onClick={() => navigate('/studio/help')}
+              className="p-2.5 rounded-xl text-zinc-500 hover:text-white hover:bg-white/5 transition-all"
+              title="Help"
+            >
+              <HelpCircle size={18} />
+            </button>
+            <button
+              onClick={handleSignOut}
+              className="p-2.5 rounded-xl text-zinc-500 hover:text-red-400 hover:bg-red-500/10 transition-all"
+              title="Sign Out"
+            >
+              <LogOut size={18} />
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* More Menu Popup */}
-      {showMoreMenu && (
-        <>
-          <div
-            className="fixed inset-0 z-40"
-            onClick={() => setShowMoreMenu(false)}
-          />
-          <div className="fixed left-[72px] bottom-4 z-50 w-56 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-xl py-2">
-            <button className="w-full flex items-center gap-3 px-4 py-2.5 text-sm hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors text-left text-zinc-700 dark:text-zinc-300">
-              Settings
-            </button>
-            <button className="w-full flex items-center gap-3 px-4 py-2.5 text-sm hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors text-left text-zinc-700 dark:text-zinc-300">
-              Keyboard Shortcuts
-            </button>
-            <button className="w-full flex items-center gap-3 px-4 py-2.5 text-sm hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors text-left text-zinc-700 dark:text-zinc-300">
-              API Documentation
-            </button>
-            <div className="border-t border-zinc-200 dark:border-zinc-800 my-2" />
-            <button className="w-full flex items-center gap-3 px-4 py-2.5 text-sm hover:bg-red-50 dark:hover:bg-red-950/20 transition-colors text-left text-red-600">
-              Sign Out
-            </button>
-          </div>
-        </>
-      )}
+      {/* Flyout Submenu Popover */}
+      <AnimatePresence>
+        {activeSubmenu && (
+          <motion.div
+            initial={{ opacity: 0, x: -8, scale: 0.95 }}
+            animate={{ opacity: 1, x: 0, scale: 1 }}
+            exit={{ opacity: 0, x: -8, scale: 0.95 }}
+            transition={{ duration: 0.15, ease: 'easeOut' }}
+            className="absolute left-56 top-0 z-50"
+            style={{
+              top: (() => {
+                const index = navItems.findIndex(item => item.id === activeSubmenu);
+                // Logo height (56px) + padding (12px) + items above * item height (44px)
+                return 56 + 12 + (index * 44);
+              })(),
+            }}
+          >
+            <div className="bg-zinc-900 border border-white/10 rounded-xl shadow-2xl shadow-black/50 overflow-hidden min-w-[180px]">
+              {/* Submenu Items */}
+              <div className="py-2 px-2">
+                {navItems
+                  .find(item => item.id === activeSubmenu)
+                  ?.children?.map((child, index) => {
+                    const Icon = child.icon;
+                    const active = isSubmenuItemActive(child);
 
-      <style>{`
-        .scrollbar-hide::-webkit-scrollbar {
-          display: none;
-        }
-        .scrollbar-hide {
-          -ms-overflow-style: none;
-          scrollbar-width: none;
-        }
-      `}</style>
-    </>
+                    return (
+                      <motion.button
+                        key={child.id}
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: index * 0.03 }}
+                        onClick={() => handleItemClick(child)}
+                        className={cn(
+                          'w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150',
+                          active
+                            ? 'bg-violet-500/15 text-violet-400'
+                            : 'text-zinc-400 hover:text-white hover:bg-white/10'
+                        )}
+                      >
+                        <Icon size={16} strokeWidth={1.75} />
+                        <span>{child.label}</span>
+                      </motion.button>
+                    );
+                  })}
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
   );
 }

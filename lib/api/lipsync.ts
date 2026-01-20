@@ -1,18 +1,27 @@
-import * as fal from '@fal-ai/client';
+/**
+ * Lipsync Generation API (Secure)
+ * All FAL API calls go through Supabase Edge Functions
+ * NEVER exposes API keys to the browser
+ */
+
+import { createClient } from "@/lib/database/client";
 import { LipsyncModelConfig } from '../data/lipsync-models';
 
-// Initialize FAL client with your API key
-// Set this in your environment variables: VITE_FAL_KEY
-export function initializeFalClient() {
-  const apiKey = import.meta.env.VITE_FAL_KEY;
-  if (!apiKey) {
-    console.warn('FAL API key not found. Set VITE_FAL_KEY in your .env file');
-    return false;
-  }
-  fal.config({
-    credentials: apiKey,
-  });
-  return true;
+// Get authentication token
+async function getAuthToken(): Promise<string | null> {
+  const supabase = createClient();
+  if (!supabase) return null;
+
+  const { data: { session } } = await supabase.auth.getSession();
+  return session?.access_token || null;
+}
+
+/**
+ * Check if FAL client is available (Supabase connected)
+ */
+export function initializeFalClient(): boolean {
+  const supabase = createClient();
+  return supabase !== null;
 }
 
 // Generic lipsync generation function
@@ -36,7 +45,7 @@ export interface LipsyncResult {
 }
 
 /**
- * Generate a lipsync video using FAL AI
+ * Generate a lipsync video using FAL AI via secure Edge Function
  *
  * @param model - The lipsync model configuration
  * @param input - The input parameters based on the model requirements
@@ -47,12 +56,22 @@ export async function generateLipsync(
   input: LipsyncInput
 ): Promise<LipsyncResult> {
   if (!initializeFalClient()) {
-    throw new Error('FAL client not initialized. Missing API key.');
+    throw new Error('FAL client not initialized. Supabase not configured.');
+  }
+
+  const token = await getAuthToken();
+  if (!token) {
+    throw new Error('Authentication required');
+  }
+
+  const supabase = createClient();
+  if (!supabase) {
+    throw new Error('Supabase not configured');
   }
 
   try {
     // Build the request based on model requirements
-    const request: any = {};
+    const request: Record<string, any> = {};
 
     if (model.requiredFields.video_url && input.video_url) {
       request.video_url = input.video_url;
@@ -78,18 +97,68 @@ export async function generateLipsync(
       request.sync_mode = input.sync_mode;
     }
 
-    // Submit to FAL
     console.log(`Submitting to ${model.endpoint}:`, request);
 
-    const result = await fal.subscribe(model.endpoint, {
-      input: request,
-      logs: true,
-      onQueueUpdate: (update) => {
-        console.log('Queue update:', update);
+    // Call secure Edge Function
+    const { data, error } = await supabase.functions.invoke('fal-generate', {
+      body: {
+        tool: 'lipsync',
+        imageUrl: request.image_url,
+        options: {
+          ...request,
+          model_endpoint: model.endpoint,
+        },
+      },
+      headers: {
+        Authorization: `Bearer ${token}`,
       },
     });
 
-    return result as LipsyncResult;
+    if (error) {
+      throw new Error(error.message || 'Lipsync generation failed');
+    }
+
+    // If we got immediate result
+    if (data?.data?.video) {
+      return data.data as LipsyncResult;
+    }
+
+    // Otherwise poll for result
+    const requestId = data?.requestId;
+    if (!requestId) {
+      throw new Error('No request ID returned');
+    }
+
+    // Poll for completion
+    for (let i = 0; i < 120; i++) { // 6 minutes max
+      await new Promise(resolve => setTimeout(resolve, 3000));
+
+      const { data: statusData, error: statusError } = await supabase.functions.invoke('fal-status', {
+        body: {
+          requestId,
+          model: model.endpoint,
+        },
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (statusError) {
+        throw new Error(statusError.message || 'Status check failed');
+      }
+
+      console.log('Queue update:', statusData);
+
+      if (statusData.status === 'COMPLETED') {
+        return statusData.data as LipsyncResult;
+      }
+
+      if (statusData.status === 'FAILED') {
+        throw new Error('Lipsync generation failed');
+      }
+    }
+
+    throw new Error('Lipsync generation timed out');
   } catch (error: any) {
     console.error('Lipsync generation failed:', error);
     throw new Error(error.message || 'Failed to generate lipsync video');
@@ -100,31 +169,50 @@ export async function generateLipsync(
  * Upload a file to a temporary URL for use with FAL
  * FAL requires URLs, not file uploads
  *
- * You'll need to implement this based on your storage solution (R2, S3, etc.)
+ * Use uploadToR2 from r2.ts for actual implementation
  */
 export async function uploadFileForFal(
   file: File,
   type: 'image' | 'video' | 'audio'
 ): Promise<string> {
-  // TODO: Implement file upload to your R2/S3 storage
-  // For now, return a placeholder
   console.log(`Upload ${type} file:`, file.name);
 
-  // Example using your existing R2 upload function
-  // import { uploadToR2 } from './r2';
-  // const url = await uploadToR2(file, 'lipsync-inputs');
-  // return url;
-
-  throw new Error('File upload not implemented. Please upload to R2 and get URL.');
+  // Import and use R2 upload
+  const { uploadToR2 } = await import('./r2');
+  const url = await uploadToR2(file, `lipsync-inputs/${type}`);
+  return url;
 }
 
 /**
- * Check the status of a lipsync generation
+ * Check the status of a lipsync generation via secure Edge Function
  */
-export async function checkLipsyncStatus(requestId: string): Promise<any> {
+export async function checkLipsyncStatus(requestId: string, model: string = 'fal-ai/sync-lipsync/v2'): Promise<any> {
+  const token = await getAuthToken();
+  if (!token) {
+    throw new Error('Authentication required');
+  }
+
+  const supabase = createClient();
+  if (!supabase) {
+    throw new Error('Supabase not configured');
+  }
+
   try {
-    const status = await fal.queue.status(requestId, { logs: true });
-    return status;
+    const { data, error } = await supabase.functions.invoke('fal-status', {
+      body: {
+        requestId,
+        model,
+      },
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (error) {
+      throw new Error(error.message || 'Status check failed');
+    }
+
+    return data;
   } catch (error: any) {
     console.error('Failed to check status:', error);
     throw error;
@@ -132,12 +220,39 @@ export async function checkLipsyncStatus(requestId: string): Promise<any> {
 }
 
 /**
- * Get the result of a completed lipsync generation
+ * Get the result of a completed lipsync generation via secure Edge Function
  */
-export async function getLipsyncResult(requestId: string): Promise<LipsyncResult> {
+export async function getLipsyncResult(requestId: string, model: string = 'fal-ai/sync-lipsync/v2'): Promise<LipsyncResult> {
+  const token = await getAuthToken();
+  if (!token) {
+    throw new Error('Authentication required');
+  }
+
+  const supabase = createClient();
+  if (!supabase) {
+    throw new Error('Supabase not configured');
+  }
+
   try {
-    const result = await fal.queue.result(requestId);
-    return result as LipsyncResult;
+    const { data, error } = await supabase.functions.invoke('fal-status', {
+      body: {
+        requestId,
+        model,
+      },
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (error) {
+      throw new Error(error.message || 'Failed to get result');
+    }
+
+    if (data.status === 'COMPLETED') {
+      return data.data as LipsyncResult;
+    }
+
+    throw new Error('Result not ready yet');
   } catch (error: any) {
     console.error('Failed to get result:', error);
     throw error;

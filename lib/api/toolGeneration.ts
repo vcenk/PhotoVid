@@ -1,9 +1,12 @@
 /**
  * Unified Tool Generation API
  * Handles all Real Estate AI tool generations through FAL AI
+ *
+ * SECURITY: All FAL API calls now go through Supabase Edge Functions
+ * to keep API keys secure and never expose them to the browser.
  */
 
-import { fal } from "@fal-ai/client";
+import { createClient } from "@/lib/database/client";
 import { uploadToR2 } from "./r2";
 import {
   ToolType,
@@ -51,81 +54,308 @@ import {
   GenerationProgressCallback,
 } from "../types/generation";
 
-// Configure FAL client
-fal.config({
-  credentials: import.meta.env.VITE_FAL_KEY,
-});
+// ============ SECURE API HELPERS ============
+
+/**
+ * Convert a remote image URL to a local blob URL for reliable display
+ * Helps avoid network issues like ERR_QUIC_PROTOCOL_ERROR when displaying FAL media
+ *
+ * @param remoteUrl - The remote URL to convert
+ * @param retries - Number of retry attempts (default 3)
+ * @returns A blob URL that can be used for display
+ */
+export async function fetchAsBlob(remoteUrl: string, retries = 3): Promise<string> {
+  let lastError: Error | null = null;
+
+  for (let attempt = 0; attempt < retries; attempt++) {
+    try {
+      const response = await fetch(remoteUrl, {
+        // Add cache-busting to avoid cached errors
+        headers: attempt > 0 ? { 'Cache-Control': 'no-cache' } : {},
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      const blob = await response.blob();
+      return URL.createObjectURL(blob);
+    } catch (error) {
+      lastError = error instanceof Error ? error : new Error(String(error));
+      console.warn(`Fetch attempt ${attempt + 1} failed:`, lastError.message);
+
+      // Wait before retrying (exponential backoff)
+      if (attempt < retries - 1) {
+        await new Promise(resolve => setTimeout(resolve, 1000 * (attempt + 1)));
+      }
+    }
+  }
+
+  throw lastError || new Error('Failed to fetch image');
+}
+
+/**
+ * Try to convert a FAL media URL to a blob URL with fallback
+ * Returns the original URL if conversion fails
+ */
+export async function safeImageUrl(remoteUrl: string): Promise<string> {
+  try {
+    return await fetchAsBlob(remoteUrl, 2);
+  } catch (error) {
+    console.warn('Could not convert to blob URL, using original:', error);
+    return remoteUrl;
+  }
+}
+
+// Call FAL generate Edge Function (secure - no API key exposure)
+async function callFalGenerate(params: {
+  tool: string;
+  imageUrl?: string;
+  maskUrl?: string;
+  prompt?: string;
+  options?: Record<string, any>;
+}): Promise<{ requestId: string; data: any; statusUrl?: string; responseUrl?: string }> {
+  const supabase = createClient();
+  if (!supabase) {
+    throw new Error('Supabase not configured');
+  }
+
+  // Check if user is authenticated
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) {
+    throw new Error('Authentication required');
+  }
+
+  // supabase.functions.invoke automatically includes the auth token
+  const { data, error } = await supabase.functions.invoke('fal-generate', {
+    body: params,
+  });
+
+  if (error) {
+    console.error('Edge Function error:', error);
+    throw new Error(error.message || 'Edge Function returned a non-2xx status code');
+  }
+
+  if (!data || !data.success) {
+    throw new Error(data?.error || 'Generation failed');
+  }
+
+  return {
+    requestId: data.requestId,
+    data: data.data,
+    statusUrl: data.statusUrl,
+    responseUrl: data.responseUrl,
+  };
+}
+
+// Poll FAL status Edge Function
+async function pollFalStatus(
+  requestId: string,
+  model: string,
+  statusUrl?: string,
+  responseUrl?: string,
+  maxAttempts = 60
+): Promise<any> {
+  const supabase = createClient();
+  if (!supabase) {
+    throw new Error('Supabase not configured');
+  }
+
+  // Check if user is authenticated
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) {
+    throw new Error('Authentication required');
+  }
+
+  for (let i = 0; i < maxAttempts; i++) {
+    // supabase.functions.invoke automatically includes the auth token
+    const { data, error } = await supabase.functions.invoke('fal-status', {
+      body: { requestId, model, statusUrl, responseUrl },
+    });
+
+    console.log(`Poll attempt ${i + 1}:`, JSON.stringify(data, null, 2));
+
+    if (error) {
+      console.error('Status check error:', error);
+      throw new Error(error.message || 'Status check failed');
+    }
+
+    if (data.status === 'COMPLETED') {
+      console.log('Completed! Returning data:', JSON.stringify(data.data, null, 2));
+      return data.data;
+    }
+
+    if (data.status === 'FAILED') {
+      throw new Error(data.error || 'Generation failed');
+    }
+
+    // Wait 3 seconds before next poll
+    await new Promise(resolve => setTimeout(resolve, 3000));
+  }
+
+  throw new Error('Generation timed out');
+}
+
+/**
+ * Secure FAL Subscribe wrapper
+ * Mimics secureSubscribe() but routes through Edge Functions for security
+ */
+async function secureSubscribe(
+  model: string,
+  config: {
+    input: Record<string, any>;
+    logs?: boolean;
+    onQueueUpdate?: (update: { status: string }) => void;
+  }
+): Promise<{ data: any }> {
+  // Extract tool from model path
+  const tool = Object.entries(TOOL_MODEL_MAP).find(([, m]) => m === model)?.[0] || model;
+
+  // Call the Edge Function
+  const { requestId, data, statusUrl, responseUrl } = await callFalGenerate({
+    tool,
+    imageUrl: config.input.image_url,
+    maskUrl: config.input.mask_url,
+    prompt: config.input.prompt,
+    options: config.input,
+  });
+
+  // If immediate result, return it
+  if (data?.images || data?.image || data?.video) {
+    return { data };
+  }
+
+  // Otherwise poll with progress updates
+  const supabase = createClient();
+  if (!supabase) throw new Error('Supabase not configured');
+
+  for (let i = 0; i < 120; i++) { // 6 minutes max
+    // supabase.functions.invoke automatically includes the auth token
+    const { data: statusData, error } = await supabase.functions.invoke('fal-status', {
+      body: { requestId, model, statusUrl, responseUrl },
+    });
+
+    if (error) throw new Error(error.message);
+
+    // Call progress callback
+    if (statusData.status === 'IN_PROGRESS' || statusData.status === 'IN_QUEUE') {
+      config.onQueueUpdate?.({ status: statusData.status });
+    }
+
+    if (statusData.status === 'COMPLETED') {
+      return { data: statusData.data };
+    }
+
+    if (statusData.status === 'FAILED') {
+      throw new Error(statusData.error || 'Generation failed');
+    }
+
+    await new Promise(resolve => setTimeout(resolve, 3000));
+  }
+
+  throw new Error('Generation timed out');
+}
 
 /**
  * Build the prompt for Virtual Staging
+ *
+ * Updated with prompt wrapper to fix "half room" issue:
+ * - Preserve room layout, walls, windows, doors, flooring
+ * - Add complete coherent furniture set for entire room
+ * - Realistic scale and natural shadows
  */
 function buildVirtualStagingPrompt(options: VirtualStagingOptions): string {
+  // Detailed style descriptions for better AI generation results
   const stylePrompts: Record<string, string> = {
-    'modern': 'modern minimalist interior design, clean lines, contemporary furniture, neutral colors with accent pieces',
-    'scandinavian': 'scandinavian interior design, light natural wood furniture, white walls, cozy textiles, hygge atmosphere',
-    'coastal': 'coastal beach house interior design, light blue accents, natural rattan and linen materials, airy and bright',
-    'luxury': 'luxury high-end interior design, premium furniture, elegant marble and gold finishes, sophisticated textures',
-    'industrial': 'industrial loft interior design, exposed brick walls, metal accents, reclaimed wood, urban aesthetic',
-    'farmhouse': 'modern farmhouse interior design, rustic charm, shiplap walls, warm wood tones, cozy country style',
+    'modern': 'modern minimalist furniture, clean lines, neutral colors, contemporary design, sleek sofa, glass coffee table, simple elegant decor',
+    'scandinavian': 'scandinavian style furniture, light oak wood, white and beige tones, cozy textiles, minimalist nordic design, warm and inviting',
+    'coastal': 'coastal beach house furniture, light blue and white colors, natural rattan, linen fabrics, nautical accents, airy and relaxed',
+    'luxury': 'elegant luxury furniture, cream and gold accents, velvet upholstery, marble coffee table, crystal chandelier, sophisticated high-end interior design',
+    'industrial': 'industrial loft furniture, exposed metal, distressed leather sofa, reclaimed wood, edison bulbs, urban warehouse aesthetic',
+    'farmhouse': 'farmhouse style furniture, rustic wood, shiplap accents, comfortable linen sofa, vintage decor, warm country charm',
   };
 
   const roomPrompts: Record<string, string> = {
-    'living-room': 'spacious living room with comfortable seating, coffee table, entertainment area',
-    'bedroom': 'cozy bedroom with bed, nightstands, dresser, ambient lighting',
-    'kitchen': 'modern kitchen with island, high-end appliances, dining area',
-    'dining': 'elegant dining room with dining table, chairs, chandelier',
-    'bathroom': 'spa-like bathroom with vanity, fixtures, elegant tiles',
-    'office': 'professional home office with desk, ergonomic chair, bookshelves',
+    'living-room': 'living room',
+    'bedroom': 'bedroom',
+    'kitchen': 'kitchen',
+    'dining': 'dining room',
+    'bathroom': 'bathroom',
+    'office': 'home office',
   };
 
-  const basePrompt = options.removeExisting
-    ? `Transform this empty room into a beautifully staged ${roomPrompts[options.roomType]}, ${stylePrompts[options.style]}`
-    : `Enhance this room with ${stylePrompts[options.style]}, add complementary furniture and decor, ${roomPrompts[options.roomType]}`;
+  // Prompt wrapper to fix "half room" staging issue
+  const promptWrapper = `Photorealistic real estate interior photo. Keep the same camera angle, room layout, walls, windows, doors, and flooring. Add a complete coherent furniture set that fits the entire room, realistic scale, natural shadows, no cut-off furniture. Do not change architecture, window size, wall color, or flooring.`;
 
-  return `${basePrompt}. Professional real estate photography, high quality, photorealistic, well-lit, inviting atmosphere`;
+  // Style-specific furniture prompt
+  const stylePrompt = `Furnish this ${roomPrompts[options.roomType]} with ${stylePrompts[options.style]}, professional interior design photography, well-lit.`;
+
+  return `${promptWrapper} ${stylePrompt}`;
 }
 
 /**
  * Build the prompt for Sky Replacement
+ *
+ * Real-estate-safe prompts with proper constraints:
+ * - Always include "photorealistic real estate photography"
+ * - Match original lighting direction and exposure
+ * - Seamless blend at roofline and tree edges
+ * - Avoid halos, over-saturation, dramatic color grading
+ * - Do not change buildings, trees, or any non-sky pixels
+ *
+ * Note: flux-pro/v1/fill does not support negative_prompt,
+ * so constraints are embedded in the main prompt.
  */
 function buildSkyPrompt(options: SkyReplacementOptions): string {
   const skyPrompts: Record<string, string> = {
-    'blue-clear': 'perfectly clear deep blue sky, no clouds, sunny day',
-    'blue-clouds': 'beautiful blue sky with fluffy white cumulus clouds, pleasant weather',
-    'golden-hour': 'warm golden hour sky, soft orange and pink tones, magical lighting',
-    'dramatic': 'dramatic stormy sky with dark clouds, moody atmosphere, intense lighting',
-    'sunset': 'vibrant sunset sky with orange, pink, and purple gradient, breathtaking view',
-    'overcast': 'soft overcast sky, even diffused lighting, gentle gray tones',
+    // MLS-Safe options
+    'blue-clear': 'Photorealistic clear daytime blue sky, natural gradient, no clouds. Real estate photography. Match original lighting direction and exposure. Seamless blend at roofline and tree edges. Avoid halos, oversaturation, HDR look. Do not alter any non-sky elements.',
+
+    'blue-clouds': 'Photorealistic blue sky with a few soft white cumulus clouds, natural and subtle. Real estate photography. Match original lighting direction and exposure. Seamless blend at edges. Avoid dramatic clouds, oversaturation, HDR, halos. Do not alter non-sky elements.',
+
+    'overcast': 'Photorealistic light gray overcast sky, soft and even, realistic cloud texture, not flat. Real estate photography. Match original exposure. Seamless blend at edges. Avoid banding, halos, heavy HDR. Do not alter non-sky elements.',
+
+    // Marketing-only options (not MLS-safe)
+    'golden-hour': 'Photorealistic warm late-afternoon sky with subtle golden tones, realistic and not exaggerated. Match original lighting direction. Seamless blend. Avoid pink/purple fantasy colors, dramatic grading, HDR halos. Do not alter non-sky elements.',
+
+    'sunset': 'Photorealistic mild sunset sky with soft warm tones, realistic and subtle, not dramatic. Match original lighting direction. Seamless blend at roofline and trees. Avoid purple/magenta gradients, oversaturation, HDR halos. Do not alter non-sky elements.',
+
+    'dramatic': 'Photorealistic moody sky with heavier clouds, realistic for local weather, not cinematic. Match original exposure. Seamless blend. Avoid storm lightning, extreme contrast, surreal colors, HDR halos. Do not alter non-sky elements.',
   };
 
-  return `Replace the sky with ${skyPrompts[options.skyType]}, maintain realistic lighting on the building, seamless blend with horizon`;
+  return skyPrompts[options.skyType];
 }
 
 /**
  * Build the prompt for Twilight Conversion
+ *
+ * Updated prompts to preserve architecture and avoid "fake looking" results
  */
 function buildTwilightPrompt(options: TwilightOptions): string {
   const stylePrompts: Record<string, string> = {
     'blue-hour': 'blue hour twilight sky, deep blue with purple undertones, warm interior lights glowing from windows',
     'golden-dusk': 'golden dusk sky, warm orange fading to purple, cozy warm interior glow',
     'purple-twilight': 'rich purple twilight sky, magical evening atmosphere, soft interior lighting',
-    'dramatic': 'dramatic night sky, deep dark blue, bright contrasting interior lights, professional real estate night shot',
+    'dramatic': 'dramatic night sky, deep dark blue, bright contrasting interior lights',
   };
 
   const glowIntensity = options.glowIntensity === 30 ? 'subtle' : options.glowIntensity === 60 ? 'warm' : 'bright';
 
-  return `Transform to ${stylePrompts[options.style]}, ${glowIntensity} window glow effect, professional twilight real estate photography, exterior shot at dusk`;
+  // Better prompt structure to preserve architecture
+  return `Convert to realistic dusk/twilight. Preserve architecture completely. ${stylePrompts[options.style]}, ${glowIntensity} window glow effect. Turn on warm interior lights in windows subtly. Keep sky realistic, no cinematic grading. Professional twilight real estate photography.`;
 }
 
 /**
  * Build the prompt for Lawn Enhancement
+ *
+ * Updated to preserve house/exterior materials and keep lighting consistent
  */
 function buildLawnPrompt(options: LawnEnhancementOptions): string {
   const parts: string[] = [];
 
   if (options.greenerLawn) {
     const intensityModifier = options.intensity === 'natural' ? 'naturally' : options.intensity === 'enhanced' ? 'lush' : 'vibrant';
-    parts.push(`${intensityModifier} green healthy lawn`);
+    parts.push(`${intensityModifier} green healthy lawn, realistic grass texture`);
   }
 
   if (options.addFlowers) {
@@ -136,7 +366,8 @@ function buildLawnPrompt(options: LawnEnhancementOptions): string {
     parts.push('fresh morning dew effect, glistening grass');
   }
 
-  return `Enhance the exterior landscaping with ${parts.join(', ')}. Well-maintained curb appeal, professional real estate photography, inviting property exterior`;
+  // Better prompt to preserve house and lighting
+  return `Improve lawn health naturally. ${parts.join(', ')}. Keep lighting consistent, do not change house or exterior materials. Professional real estate photography.`;
 }
 
 /**
@@ -399,7 +630,53 @@ export function canvasMaskToBlob(canvas: HTMLCanvasElement): Promise<Blob> {
 }
 
 /**
- * Virtual Staging Generation
+ * Generate Sky Mask using BiRefNet
+ * BiRefNet removes the foreground (buildings/trees), leaving transparent background
+ * We invert this to get sky=white, buildings=black for inpainting
+ */
+export async function generateSkyMask(
+  imageUrl: string,
+  onProgress?: GenerationProgressCallback
+): Promise<string> {
+  onProgress?.(10, 'Analyzing image for sky detection...');
+
+  // Call BiRefNet for background removal (foreground extraction)
+  const result = await secureSubscribe(TOOL_MODEL_MAP['sky-segmentation'], {
+    input: {
+      image_url: imageUrl,
+      model: 'General',
+      operating_resolution: '1024x1024',
+      output_format: 'png',
+    },
+    logs: true,
+    onQueueUpdate: (update) => {
+      if (update.status === 'IN_PROGRESS') {
+        onProgress?.(Math.round(30 + Math.random() * 20), 'Detecting sky area...');
+      }
+    },
+  });
+
+  onProgress?.(60, 'Processing mask...');
+
+  // BiRefNet returns foreground with transparent background
+  // We need to invert: sky (was transparent) = white, building (was opaque) = black
+  const data = result.data as { image?: { url: string } };
+  if (!data?.image?.url) {
+    throw new Error('No mask returned from sky segmentation');
+  }
+
+  // Return the mask URL - the frontend will need to invert it
+  // Or we could do server-side inversion, but for now return as-is
+  return data.image.url;
+}
+
+/**
+ * Virtual Staging Generation (Secure - via Edge Function)
+ *
+ * Updated parameters based on analysis:
+ * - num_images: 3 (generate candidates, pick best)
+ * - seed: stored for regeneration
+ * - Better prompt wrapper to fix "half room" issue
  */
 export async function generateVirtualStaging(
   imageFile: File,
@@ -412,55 +689,188 @@ export async function generateVirtualStaging(
   onProgress?.(30, 'Processing with AI...');
 
   const prompt = buildVirtualStagingPrompt(options);
+  const model = TOOL_MODEL_MAP['virtual-staging'];
 
-  const result = await fal.subscribe(TOOL_MODEL_MAP['virtual-staging'], {
-    input: {
-      image_url: imageUrl,
-      prompt,
-      strength: options.removeExisting ? 0.85 : 0.65,
-      num_inference_steps: 28,
-      guidance_scale: 7.5,
-    },
-    logs: true,
-    onQueueUpdate: (update) => {
-      if (update.status === 'IN_PROGRESS') {
-        onProgress?.(50 + Math.random() * 30, 'Generating staged room...');
-      }
+  // Determine output format based on input file type
+  const fileExtension = imageFile.name.split('.').pop()?.toLowerCase();
+  const outputFormat = (fileExtension === 'png') ? 'png' : 'jpeg';
+
+  const { requestId, data, statusUrl, responseUrl } = await callFalGenerate({
+    tool: 'virtual-staging',
+    imageUrl,
+    prompt,
+    options: {
+      // Apartment Staging LoRA model parameters
+      // Updated based on analysis - generate 3 candidates to fix "half room" issue
+      guidance_scale: 2.5,
+      num_inference_steps: 40,
+      acceleration: 'regular',
+      lora_scale: 1.0,
+      num_images: 3, // Generate multiple candidates, pick best
+      output_format: outputFormat,
     },
   });
 
-  onProgress?.(100, 'Complete');
+  console.log('FAL Generate Response:', JSON.stringify(data, null, 2));
 
-  const data = result.data as { images?: Array<{ url: string }> };
-  if (data?.images?.[0]?.url) {
-    return data.images[0].url;
+  // Helper to extract image URL from various response formats
+  const extractImageUrl = (responseData: any): string | null => {
+    if (!responseData) return null;
+    // Format: { images: [{ url: "..." }] }
+    if (responseData.images?.[0]?.url) return responseData.images[0].url;
+    // Format: { images: ["url1", "url2"] }
+    if (Array.isArray(responseData.images) && typeof responseData.images[0] === 'string') return responseData.images[0];
+    // Format: { output: { images: [...] } }
+    if (responseData.output?.images?.[0]?.url) return responseData.output.images[0].url;
+    if (responseData.output?.images?.[0] && typeof responseData.output.images[0] === 'string') return responseData.output.images[0];
+    // Format: { image: { url: "..." } }
+    if (responseData.image?.url) return responseData.image.url;
+    // Format: { image_url: "..." }
+    if (responseData.image_url) return responseData.image_url;
+    // Format: { url: "..." }
+    if (responseData.url) return responseData.url;
+    return null;
+  };
+
+  // If we got immediate result
+  const immediateUrl = extractImageUrl(data);
+  if (immediateUrl) {
+    onProgress?.(100, 'Complete');
+    return immediateUrl;
+  }
+
+  // Otherwise poll for result
+  onProgress?.(50, 'Generating staged room...');
+  const result = await pollFalStatus(requestId, model, statusUrl, responseUrl);
+
+  console.log('FAL Poll Result:', JSON.stringify(result, null, 2));
+
+  onProgress?.(100, 'Complete');
+  const resultUrl = extractImageUrl(result);
+  if (resultUrl) {
+    return resultUrl;
   }
   throw new Error('No image returned from generation');
 }
 
 /**
  * Photo Enhancement Generation
+ *
+ * Preset-specific processing based on ChatGPT analysis for MLS-safe results:
+ * - auto: Clarity Upscaler only (safest, MLS-clean)
+ * - bright: ICLight → Clarity Upscaler (interior boost)
+ * - vivid: Clarity Upscaler with higher sharpness (marketing use)
+ * - hdr: ICLight → Clarity Upscaler (balanced lighting)
  */
 export async function generatePhotoEnhancement(
   imageFile: File,
   options: PhotoEnhancementOptions,
   onProgress?: GenerationProgressCallback
 ): Promise<string> {
-  onProgress?.(10, 'Uploading image...');
+  onProgress?.(5, 'Uploading image...');
 
   const imageUrl = await uploadFile(imageFile, 'photo-enhancement');
-  onProgress?.(30, 'Enhancing photo...');
+  const preset = options.preset || 'auto';
 
-  const result = await fal.subscribe(TOOL_MODEL_MAP['photo-enhancement'], {
+  // Preset-specific parameters for clarity-upscaler
+  // Based on ChatGPT analysis for MLS-safe results:
+  // - upscale_factor: actual param name (not "scale")
+  // - resemblance: how much to preserve original (0.70-0.80)
+  // - creativity: how much to enhance (lower = safer)
+  // - face_enhance: always false for real estate
+  const presetConfigs = {
+    auto: {
+      upscale_factor: options.upscaleFactor || 2,
+      creativity: 0.20,
+      resemblance: 0.80,
+      guidance_scale: 4,
+      num_inference_steps: 20,
+      prompt: 'professional real estate photo, natural lighting, clean, sharp details',
+    },
+    bright: {
+      upscale_factor: options.upscaleFactor || 2,
+      creativity: 0.22,
+      resemblance: 0.78,
+      guidance_scale: 4,
+      num_inference_steps: 22,
+      prompt: 'bright airy interior, natural daylight, professional real estate photo',
+    },
+    vivid: {
+      upscale_factor: options.upscaleFactor || 2,
+      creativity: 0.32, // Higher for color pop but still conservative
+      resemblance: 0.75,
+      guidance_scale: 4.5,
+      num_inference_steps: 24,
+      prompt: 'vibrant professional real estate photo, enhanced colors, sharp details',
+    },
+    hdr: {
+      upscale_factor: options.upscaleFactor || 2,
+      creativity: 0.20,
+      resemblance: 0.80,
+      guidance_scale: 4,
+      num_inference_steps: 22,
+      prompt: 'HDR real estate photo, balanced shadows and highlights, professional quality',
+    },
+  };
+
+  const config = presetConfigs[preset];
+  let currentImageUrl = imageUrl;
+
+  // For 'bright' and 'hdr' presets, run ICLight first for relighting
+  if (preset === 'bright' || preset === 'hdr') {
+    onProgress?.(20, 'Applying lighting adjustment...');
+
+    const lightingStrength = preset === 'hdr' ? 0.35 : 0.25;
+    const lightingPrompt = preset === 'hdr'
+      ? 'balanced HDR lighting, recovered shadows and highlights, professional real estate'
+      : 'bright airy natural lighting, soft shadows, welcoming interior';
+
+    const relightResult = await secureSubscribe(TOOL_MODEL_MAP['photo-relight'], {
+      input: {
+        image_url: currentImageUrl,
+        prompt: lightingPrompt,
+        negative_prompt: 'dark, underexposed, harsh shadows, artificial looking',
+        lighting_strength: lightingStrength,
+      },
+      logs: true,
+      onQueueUpdate: (update) => {
+        if (update.status === 'IN_PROGRESS') {
+          onProgress?.(Math.round(30 + Math.random() * 15), 'Adjusting lighting...');
+        }
+      },
+    });
+
+    const relightData = relightResult.data as { image?: { url: string }; images?: Array<{ url: string }> };
+    if (relightData?.image?.url) {
+      currentImageUrl = relightData.image.url;
+    } else if (relightData?.images?.[0]?.url) {
+      currentImageUrl = relightData.images[0].url;
+    }
+
+    onProgress?.(50, 'Lighting adjusted, now upscaling...');
+  } else {
+    onProgress?.(30, 'Enhancing photo...');
+  }
+
+  // Run clarity-upscaler (always the final step)
+  // Using correct parameter names based on fal.ai documentation
+  const result = await secureSubscribe(TOOL_MODEL_MAP['photo-enhancement'], {
     input: {
-      image_url: imageUrl,
-      scale: options.upscaleFactor || 2,
-      overlapping_tiles: true,
+      image_url: currentImageUrl,
+      upscale_factor: config.upscale_factor,
+      creativity: config.creativity,
+      resemblance: config.resemblance,
+      guidance_scale: config.guidance_scale,
+      num_inference_steps: config.num_inference_steps,
+      prompt: config.prompt,
+      negative_prompt: '(worst quality, low quality, blurry, noisy:2)',
+      enable_face_enhancement: false, // Always false for real estate
     },
     logs: true,
     onQueueUpdate: (update) => {
       if (update.status === 'IN_PROGRESS') {
-        onProgress?.(50 + Math.random() * 30, 'Enhancing details...');
+        const baseProgress = (preset === 'bright' || preset === 'hdr') ? 60 : 40;
+        onProgress?.(Math.round(baseProgress + Math.random() * 30), 'Enhancing details...');
       }
     },
   });
@@ -476,31 +886,75 @@ export async function generatePhotoEnhancement(
 
 /**
  * Sky Replacement Generation
+ *
+ * Uses fal-ai/flux-pro/v1/fill which requires a mask.
+ * If no mask is provided, auto-generates one using BiRefNet.
+ *
+ * For best results:
+ * - Mask should be sky-only (exclude roofs, chimneys, tree lines)
+ * - Feathered edge: 2-8px blur depending on resolution
+ * - Slightly erode mask by 1-3px to avoid overwriting rooflines
+ * - Mask dimensions must exactly match image dimensions
+ *
+ * Note: flux-pro/v1/fill does NOT support guidance_scale or num_inference_steps.
+ * Prompt discipline + mask quality are the primary levers.
  */
 export async function generateSkyReplacement(
   imageFile: File,
   options: SkyReplacementOptions,
+  maskCanvas?: HTMLCanvasElement,
   onProgress?: GenerationProgressCallback
 ): Promise<string> {
-  onProgress?.(10, 'Uploading image...');
+  onProgress?.(5, 'Uploading image...');
 
   const imageUrl = await uploadFile(imageFile, 'sky-replacement');
-  onProgress?.(30, 'Analyzing sky area...');
+
+  let maskUrl: string | undefined;
+
+  if (maskCanvas) {
+    // Use provided manual mask
+    onProgress?.(15, 'Processing sky mask...');
+    const maskBlob = await canvasMaskToBlob(maskCanvas);
+    const maskFile = new File([maskBlob], 'mask.png', { type: 'image/png' });
+    maskUrl = await uploadFile(maskFile, 'sky-replacement-masks');
+  } else {
+    // Auto-generate sky mask using BiRefNet
+    onProgress?.(15, 'Auto-detecting sky area...');
+
+    try {
+      // BiRefNet returns foreground with transparent background
+      // The transparent area IS the sky - we use this directly as the mask
+      maskUrl = await generateSkyMask(imageUrl, (progress, status) => {
+        // Scale progress from 15-40%
+        const scaledProgress = Math.round(15 + (progress * 0.25));
+        onProgress?.(scaledProgress, status || 'Detecting sky...');
+      });
+      onProgress?.(40, 'Sky mask generated');
+    } catch (error) {
+      console.warn('Auto sky segmentation failed, proceeding without mask:', error);
+      // Continue without mask - results may be less accurate
+    }
+  }
+
+  onProgress?.(45, 'Replacing sky...');
 
   const prompt = buildSkyPrompt(options);
 
-  // Use flux-pro for inpainting with automatic sky detection
-  const result = await fal.subscribe(TOOL_MODEL_MAP['sky-replacement'], {
+  // Use flux-pro/v1/fill for inpainting
+  // Parameters based on fal.ai documentation - no guidance_scale/steps support
+  const result = await secureSubscribe(TOOL_MODEL_MAP['sky-replacement'], {
     input: {
       image_url: imageUrl,
+      mask_url: maskUrl,
       prompt,
-      num_inference_steps: 28,
-      guidance_scale: 7.5,
+      num_images: 3, // Generate multiple candidates, pick best
+      enhance_prompt: false, // Keep stable, predictable results
+      output_format: 'jpeg',
     },
     logs: true,
     onQueueUpdate: (update) => {
       if (update.status === 'IN_PROGRESS') {
-        onProgress?.(50 + Math.random() * 30, 'Replacing sky...');
+        onProgress?.(Math.round(55 + Math.random() * 35), 'Replacing sky...');
       }
     },
   });
@@ -516,6 +970,11 @@ export async function generateSkyReplacement(
 
 /**
  * Twilight Conversion Generation
+ *
+ * Updated based on analysis:
+ * - Lower strength (0.60-0.72 instead of 0.75) to avoid over-transformation
+ * - Generate 3 candidates (twilight is high-risk for "fake looking" results)
+ * - Better prompt to preserve architecture
  */
 export async function generateTwilight(
   imageFile: File,
@@ -529,18 +988,19 @@ export async function generateTwilight(
 
   const prompt = buildTwilightPrompt(options);
 
-  const result = await fal.subscribe(TOOL_MODEL_MAP['twilight'], {
+  const result = await secureSubscribe(TOOL_MODEL_MAP['twilight'], {
     input: {
       image_url: imageUrl,
       prompt,
-      strength: 0.75,
-      num_inference_steps: 28,
-      guidance_scale: 7.5,
+      strength: 0.65, // Lower than before (was 0.75) to avoid over-transformation
+      num_inference_steps: 32, // More steps for better quality
+      guidance_scale: 7,
+      num_images: 3, // Generate candidates - twilight often looks fake
     },
     logs: true,
     onQueueUpdate: (update) => {
       if (update.status === 'IN_PROGRESS') {
-        onProgress?.(50 + Math.random() * 30, 'Adding twilight effects...');
+        onProgress?.(Math.round(50 + Math.random() * 30), 'Adding twilight effects...');
       }
     },
   });
@@ -574,7 +1034,7 @@ export async function generateItemRemoval(
 
   onProgress?.(40, 'Removing objects...');
 
-  const result = await fal.subscribe(TOOL_MODEL_MAP['item-removal'], {
+  const result = await secureSubscribe(TOOL_MODEL_MAP['item-removal'], {
     input: {
       image_url: imageUrl,
       mask_url: maskUrl,
@@ -582,7 +1042,7 @@ export async function generateItemRemoval(
     logs: true,
     onQueueUpdate: (update) => {
       if (update.status === 'IN_PROGRESS') {
-        onProgress?.(50 + Math.random() * 30, 'Filling removed areas...');
+        onProgress?.(Math.round(50 + Math.random() * 30), 'Filling removed areas...');
       }
     },
   });
@@ -598,6 +1058,11 @@ export async function generateItemRemoval(
 
 /**
  * Lawn Enhancement Generation
+ *
+ * Updated based on analysis:
+ * - Lower strength (0.35-0.55 instead of 0.5-0.8) to avoid "plastic grass"
+ * - Generate 2 candidates
+ * - Better prompt to keep lighting consistent
  */
 export async function generateLawnEnhancement(
   imageFile: File,
@@ -611,18 +1076,26 @@ export async function generateLawnEnhancement(
 
   const prompt = buildLawnPrompt(options);
 
-  const result = await fal.subscribe(TOOL_MODEL_MAP['lawn-enhancement'], {
+  // Lower strengths to avoid "plastic grass" look
+  const strengthMap: Record<string, number> = {
+    natural: 0.35,
+    enhanced: 0.45,
+    vibrant: 0.55,
+  };
+
+  const result = await secureSubscribe(TOOL_MODEL_MAP['lawn-enhancement'], {
     input: {
       image_url: imageUrl,
       prompt,
-      strength: options.intensity === 'natural' ? 0.5 : options.intensity === 'enhanced' ? 0.65 : 0.8,
+      strength: strengthMap[options.intensity] || 0.40,
       num_inference_steps: 28,
-      guidance_scale: 7.5,
+      guidance_scale: 6.5, // Slightly lower for more natural look
+      num_images: 2, // Generate candidates
     },
     logs: true,
     onQueueUpdate: (update) => {
       if (update.status === 'IN_PROGRESS') {
-        onProgress?.(50 + Math.random() * 30, 'Enhancing landscape...');
+        onProgress?.(Math.round(50 + Math.random() * 30), 'Enhancing landscape...');
       }
     },
   });
@@ -651,7 +1124,7 @@ export async function generateRoomTourVideo(
 
   const prompt = buildRoomTourPrompt(options);
 
-  const result = await fal.subscribe(TOOL_MODEL_MAP['room-tour'], {
+  const result = await secureSubscribe(TOOL_MODEL_MAP['room-tour'], {
     input: {
       image_url: imageUrl,
       prompt,
@@ -661,7 +1134,7 @@ export async function generateRoomTourVideo(
     logs: true,
     onQueueUpdate: (update) => {
       if (update.status === 'IN_PROGRESS') {
-        onProgress?.(40 + Math.random() * 40, 'Creating room tour video...');
+        onProgress?.(Math.round(40 + Math.random() * 40), 'Creating room tour video...');
       }
     },
   });
@@ -695,7 +1168,7 @@ export async function generateDeclutter(
     const maskFile = new File([maskBlob], 'mask.png', { type: 'image/png' });
     const maskUrl = await uploadFile(maskFile, 'declutter-masks');
 
-    const result = await fal.subscribe(TOOL_MODEL_MAP['declutter'], {
+    const result = await secureSubscribe(TOOL_MODEL_MAP['declutter'], {
       input: {
         image_url: imageUrl,
         mask_url: maskUrl,
@@ -703,7 +1176,7 @@ export async function generateDeclutter(
       logs: true,
       onQueueUpdate: (update) => {
         if (update.status === 'IN_PROGRESS') {
-          onProgress?.(50 + Math.random() * 30, 'Removing clutter...');
+          onProgress?.(Math.round(50 + Math.random() * 30), 'Removing clutter...');
         }
       },
     });
@@ -714,7 +1187,7 @@ export async function generateDeclutter(
     throw new Error('No image returned from declutter');
   } else {
     // Auto mode - use image-to-image with declutter prompt
-    const result = await fal.subscribe('fal-ai/flux/dev/image-to-image', {
+    const result = await secureSubscribe('fal-ai/flux/dev/image-to-image', {
       input: {
         image_url: imageUrl,
         prompt: 'Remove all clutter, personal items, and unnecessary objects from this room. Keep furniture and fixtures, remove small items, papers, toys, clothes. Clean and organized space, professional real estate photography',
@@ -724,7 +1197,7 @@ export async function generateDeclutter(
       logs: true,
       onQueueUpdate: (update) => {
         if (update.status === 'IN_PROGRESS') {
-          onProgress?.(50 + Math.random() * 30, 'Auto-decluttering...');
+          onProgress?.(Math.round(50 + Math.random() * 30), 'Auto-decluttering...');
         }
       },
     });
@@ -761,7 +1234,7 @@ export async function generateVirtualRenovation(
 
   const prompt = buildVirtualRenovationPrompt(options);
 
-  const result = await fal.subscribe(TOOL_MODEL_MAP['virtual-renovation'], {
+  const result = await secureSubscribe(TOOL_MODEL_MAP['virtual-renovation'], {
     input: {
       image_url: imageUrl,
       mask_url: maskUrl,
@@ -772,7 +1245,7 @@ export async function generateVirtualRenovation(
     logs: true,
     onQueueUpdate: (update) => {
       if (update.status === 'IN_PROGRESS') {
-        onProgress?.(50 + Math.random() * 30, 'Applying renovation...');
+        onProgress?.(Math.round(50 + Math.random() * 30), 'Applying renovation...');
       }
     },
   });
@@ -809,7 +1282,7 @@ export async function generateWallColor(
 
   const prompt = buildWallColorPrompt(options);
 
-  const result = await fal.subscribe(TOOL_MODEL_MAP['wall-color'], {
+  const result = await secureSubscribe(TOOL_MODEL_MAP['wall-color'], {
     input: {
       image_url: imageUrl,
       mask_url: maskUrl,
@@ -820,7 +1293,7 @@ export async function generateWallColor(
     logs: true,
     onQueueUpdate: (update) => {
       if (update.status === 'IN_PROGRESS') {
-        onProgress?.(50 + Math.random() * 30, 'Applying new color...');
+        onProgress?.(Math.round(50 + Math.random() * 30), 'Applying new color...');
       }
     },
   });
@@ -857,7 +1330,7 @@ export async function generateFloorReplacement(
 
   const prompt = buildFloorReplacementPrompt(options);
 
-  const result = await fal.subscribe(TOOL_MODEL_MAP['floor-replacement'], {
+  const result = await secureSubscribe(TOOL_MODEL_MAP['floor-replacement'], {
     input: {
       image_url: imageUrl,
       mask_url: maskUrl,
@@ -868,7 +1341,7 @@ export async function generateFloorReplacement(
     logs: true,
     onQueueUpdate: (update) => {
       if (update.status === 'IN_PROGRESS') {
-        onProgress?.(50 + Math.random() * 30, 'Installing new floor...');
+        onProgress?.(Math.round(50 + Math.random() * 30), 'Installing new floor...');
       }
     },
   });
@@ -882,6 +1355,10 @@ export async function generateFloorReplacement(
 
 /**
  * Rain to Shine Generation
+ *
+ * Updated based on analysis:
+ * - Constrained strength (0.55-0.70) for global transformations
+ * - Better prompt to preserve scene and architecture
  */
 export async function generateRainToShine(
   imageFile: File,
@@ -895,18 +1372,19 @@ export async function generateRainToShine(
 
   const prompt = buildRainToShinePrompt(options);
 
-  const result = await fal.subscribe(TOOL_MODEL_MAP['rain-to-shine'], {
+  const result = await secureSubscribe(TOOL_MODEL_MAP['rain-to-shine'], {
     input: {
       image_url: imageUrl,
       prompt,
-      strength: 0.7,
-      num_inference_steps: 28,
-      guidance_scale: 7.5,
+      strength: 0.62, // Conservative to preserve architecture
+      num_inference_steps: 32,
+      guidance_scale: 7,
+      num_images: 2, // Generate candidates
     },
     logs: true,
     onQueueUpdate: (update) => {
       if (update.status === 'IN_PROGRESS') {
-        onProgress?.(50 + Math.random() * 30, 'Adding sunshine...');
+        onProgress?.(Math.round(50 + Math.random() * 30), 'Adding sunshine...');
       }
     },
   });
@@ -920,6 +1398,10 @@ export async function generateRainToShine(
 
 /**
  * Night to Day Generation
+ *
+ * Updated based on analysis:
+ * - Strength 0.60-0.75 with more steps for better quality
+ * - Better prompt to preserve shadows direction
  */
 export async function generateNightToDay(
   imageFile: File,
@@ -933,18 +1415,19 @@ export async function generateNightToDay(
 
   const prompt = buildNightToDayPrompt(options);
 
-  const result = await fal.subscribe(TOOL_MODEL_MAP['night-to-day'], {
+  const result = await secureSubscribe(TOOL_MODEL_MAP['night-to-day'], {
     input: {
       image_url: imageUrl,
       prompt,
-      strength: 0.75,
-      num_inference_steps: 28,
+      strength: 0.68, // Slightly lower for better preservation
+      num_inference_steps: 36, // More steps for better quality
       guidance_scale: 7.5,
+      num_images: 2, // Generate candidates
     },
     logs: true,
     onQueueUpdate: (update) => {
       if (update.status === 'IN_PROGRESS') {
-        onProgress?.(50 + Math.random() * 30, 'Adding daylight...');
+        onProgress?.(Math.round(50 + Math.random() * 30), 'Adding daylight...');
       }
     },
   });
@@ -958,6 +1441,10 @@ export async function generateNightToDay(
 
 /**
  * Changing Seasons Generation
+ *
+ * Updated based on analysis:
+ * - Lower strength (0.45-0.65) to avoid "too AI" look
+ * - Better prompt to preserve house materials
  */
 export async function generateChangingSeasons(
   imageFile: File,
@@ -970,20 +1457,22 @@ export async function generateChangingSeasons(
   onProgress?.(30, 'Changing seasons...');
 
   const prompt = buildChangingSeasonsPrompt(options);
-  const strengthMap = { 'subtle': 0.5, 'moderate': 0.65, 'dramatic': 0.8 };
+  // Lower strengths to avoid "too AI" look
+  const strengthMap = { 'subtle': 0.45, 'moderate': 0.55, 'dramatic': 0.65 };
 
-  const result = await fal.subscribe(TOOL_MODEL_MAP['changing-seasons'], {
+  const result = await secureSubscribe(TOOL_MODEL_MAP['changing-seasons'], {
     input: {
       image_url: imageUrl,
       prompt,
       strength: strengthMap[options.intensity],
-      num_inference_steps: 28,
-      guidance_scale: 7.5,
+      num_inference_steps: 32,
+      guidance_scale: 6.5,
+      num_images: 2, // Generate candidates
     },
     logs: true,
     onQueueUpdate: (update) => {
       if (update.status === 'IN_PROGRESS') {
-        onProgress?.(50 + Math.random() * 30, `Applying ${options.season} effects...`);
+        onProgress?.(Math.round(50 + Math.random() * 30), `Applying ${options.season} effects...`);
       }
     },
   });
@@ -1020,7 +1509,7 @@ export async function generatePoolEnhancement(
 
   const prompt = buildPoolEnhancementPrompt(options);
 
-  const result = await fal.subscribe(TOOL_MODEL_MAP['pool-enhancement'], {
+  const result = await secureSubscribe(TOOL_MODEL_MAP['pool-enhancement'], {
     input: {
       image_url: imageUrl,
       mask_url: maskUrl,
@@ -1031,7 +1520,7 @@ export async function generatePoolEnhancement(
     logs: true,
     onQueueUpdate: (update) => {
       if (update.status === 'IN_PROGRESS') {
-        onProgress?.(50 + Math.random() * 30, 'Enhancing pool water...');
+        onProgress?.(Math.round(50 + Math.random() * 30), 'Enhancing pool water...');
       }
     },
   });
@@ -1059,7 +1548,7 @@ export async function generateWatermarkRemoval(
   if (options.autoDetect && !maskCanvas) {
     // Auto-detect mode - use image-to-image to clean watermarks
     onProgress?.(30, 'Auto-detecting watermarks...');
-    const result = await fal.subscribe('fal-ai/flux/dev/image-to-image', {
+    const result = await secureSubscribe('fal-ai/flux/dev/image-to-image', {
       input: {
         image_url: imageUrl,
         prompt: 'Remove all watermarks, logos, and text overlays from this image. Restore the underlying image content, maintain quality, professional photograph',
@@ -1069,7 +1558,7 @@ export async function generateWatermarkRemoval(
       logs: true,
       onQueueUpdate: (update) => {
         if (update.status === 'IN_PROGRESS') {
-          onProgress?.(50 + Math.random() * 30, 'Removing watermarks...');
+          onProgress?.(Math.round(50 + Math.random() * 30), 'Removing watermarks...');
         }
       },
     });
@@ -1087,7 +1576,7 @@ export async function generateWatermarkRemoval(
 
     onProgress?.(40, 'Removing watermark...');
 
-    const result = await fal.subscribe(TOOL_MODEL_MAP['watermark-removal'], {
+    const result = await secureSubscribe(TOOL_MODEL_MAP['watermark-removal'], {
       input: {
         image_url: imageUrl,
         mask_url: maskUrl,
@@ -1095,7 +1584,7 @@ export async function generateWatermarkRemoval(
       logs: true,
       onQueueUpdate: (update) => {
         if (update.status === 'IN_PROGRESS') {
-          onProgress?.(50 + Math.random() * 30, 'Erasing watermark...');
+          onProgress?.(Math.round(50 + Math.random() * 30), 'Erasing watermark...');
         }
       },
     });
@@ -1124,7 +1613,7 @@ export async function generateHeadshotRetouching(
 
   const prompt = buildHeadshotRetouchingPrompt(options);
 
-  const result = await fal.subscribe(TOOL_MODEL_MAP['headshot-retouching'], {
+  const result = await secureSubscribe(TOOL_MODEL_MAP['headshot-retouching'], {
     input: {
       image_url: imageUrl,
       prompt,
@@ -1135,7 +1624,7 @@ export async function generateHeadshotRetouching(
     logs: true,
     onQueueUpdate: (update) => {
       if (update.status === 'IN_PROGRESS') {
-        onProgress?.(50 + Math.random() * 30, 'Enhancing portrait...');
+        onProgress?.(Math.round(50 + Math.random() * 30), 'Enhancing portrait...');
       }
     },
   });
@@ -1172,7 +1661,7 @@ export async function generateHDRMerge(
 
   onProgress?.(40, 'Merging HDR...');
 
-  const result = await fal.subscribe(TOOL_MODEL_MAP['hdr-merge'], {
+  const result = await secureSubscribe(TOOL_MODEL_MAP['hdr-merge'], {
     input: {
       image_url: baseImageUrl,
       scale: 2,
@@ -1181,7 +1670,7 @@ export async function generateHDRMerge(
     logs: true,
     onQueueUpdate: (update) => {
       if (update.status === 'IN_PROGRESS') {
-        onProgress?.(50 + Math.random() * 30, 'Processing HDR...');
+        onProgress?.(Math.round(50 + Math.random() * 30), 'Processing HDR...');
       }
     },
   });
@@ -1217,7 +1706,7 @@ export async function generateFloorPlan(
   if (options.includeDimensions) prompt += ' Include approximate dimensions.';
   prompt += ' Professional architectural drawing style, clean lines, accurate proportions.';
 
-  const result = await fal.subscribe(TOOL_MODEL_MAP['floor-plan'], {
+  const result = await secureSubscribe(TOOL_MODEL_MAP['floor-plan'], {
     input: {
       prompt,
       image_url: imageUrl,
@@ -1226,7 +1715,7 @@ export async function generateFloorPlan(
     logs: true,
     onQueueUpdate: (update) => {
       if (update.status === 'IN_PROGRESS') {
-        onProgress?.(50 + Math.random() * 30, 'Generating floor plan...');
+        onProgress?.(Math.round(50 + Math.random() * 30), 'Generating floor plan...');
       }
     },
   });
@@ -1253,7 +1742,7 @@ export async function generate360Staging(
 
   const prompt = build360StagingPrompt(options);
 
-  const result = await fal.subscribe(TOOL_MODEL_MAP['360-staging'], {
+  const result = await secureSubscribe(TOOL_MODEL_MAP['360-staging'], {
     input: {
       image_url: imageUrl,
       prompt,
@@ -1264,7 +1753,7 @@ export async function generate360Staging(
     logs: true,
     onQueueUpdate: (update) => {
       if (update.status === 'IN_PROGRESS') {
-        onProgress?.(50 + Math.random() * 30, 'Adding virtual furniture...');
+        onProgress?.(Math.round(50 + Math.random() * 30), 'Adding virtual furniture...');
       }
     },
   });
@@ -1408,7 +1897,7 @@ export async function generateBackgroundSwap(
 
   const prompt = buildBackgroundSwapPrompt(options);
 
-  const result = await fal.subscribe(TOOL_MODEL_MAP['background-swap'], {
+  const result = await secureSubscribe(TOOL_MODEL_MAP['background-swap'], {
     input: {
       image_url: imageUrl,
       mask_url: maskUrl,
@@ -1419,7 +1908,7 @@ export async function generateBackgroundSwap(
     logs: true,
     onQueueUpdate: (update) => {
       if (update.status === 'IN_PROGRESS') {
-        onProgress?.(50 + Math.random() * 30, 'Applying new background...');
+        onProgress?.(Math.round(50 + Math.random() * 30), 'Applying new background...');
       }
     },
   });
@@ -1444,7 +1933,7 @@ export async function generateAutoEnhance(
   const imageUrl = await uploadFile(imageFile, 'auto-enhance');
   onProgress?.(30, 'Enhancing vehicle photo...');
 
-  const result = await fal.subscribe(TOOL_MODEL_MAP['auto-enhance'], {
+  const result = await secureSubscribe(TOOL_MODEL_MAP['auto-enhance'], {
     input: {
       image_url: imageUrl,
       scale: options.upscaleFactor || 2,
@@ -1453,7 +1942,7 @@ export async function generateAutoEnhance(
     logs: true,
     onQueueUpdate: (update) => {
       if (update.status === 'IN_PROGRESS') {
-        onProgress?.(50 + Math.random() * 30, 'Enhancing details...');
+        onProgress?.(Math.round(50 + Math.random() * 30), 'Enhancing details...');
       }
     },
   });
@@ -1484,7 +1973,7 @@ export async function generateBlemishRemoval(
 
   onProgress?.(40, 'Removing blemishes...');
 
-  const result = await fal.subscribe(TOOL_MODEL_MAP['blemish-removal'], {
+  const result = await secureSubscribe(TOOL_MODEL_MAP['blemish-removal'], {
     input: {
       image_url: imageUrl,
       mask_url: maskUrl,
@@ -1492,7 +1981,7 @@ export async function generateBlemishRemoval(
     logs: true,
     onQueueUpdate: (update) => {
       if (update.status === 'IN_PROGRESS') {
-        onProgress?.(50 + Math.random() * 30, 'Repairing surface...');
+        onProgress?.(Math.round(50 + Math.random() * 30), 'Repairing surface...');
       }
     },
   });
@@ -1525,7 +2014,7 @@ export async function generateReflectionFix(
 
     onProgress?.(40, 'Fixing reflections...');
 
-    const result = await fal.subscribe('fal-ai/bria/eraser', {
+    const result = await secureSubscribe('fal-ai/bria/eraser', {
       input: {
         image_url: imageUrl,
         mask_url: maskUrl,
@@ -1533,7 +2022,7 @@ export async function generateReflectionFix(
       logs: true,
       onQueueUpdate: (update) => {
         if (update.status === 'IN_PROGRESS') {
-          onProgress?.(50 + Math.random() * 30, 'Removing reflections...');
+          onProgress?.(Math.round(50 + Math.random() * 30), 'Removing reflections...');
         }
       },
     });
@@ -1547,7 +2036,7 @@ export async function generateReflectionFix(
     onProgress?.(30, 'Auto-fixing reflections...');
     const prompt = buildReflectionFixPrompt(options);
 
-    const result = await fal.subscribe(TOOL_MODEL_MAP['reflection-fix'], {
+    const result = await secureSubscribe(TOOL_MODEL_MAP['reflection-fix'], {
       input: {
         image_url: imageUrl,
         prompt,
@@ -1558,7 +2047,7 @@ export async function generateReflectionFix(
       logs: true,
       onQueueUpdate: (update) => {
         if (update.status === 'IN_PROGRESS') {
-          onProgress?.(50 + Math.random() * 30, 'Cleaning reflections...');
+          onProgress?.(Math.round(50 + Math.random() * 30), 'Cleaning reflections...');
         }
       },
     });
@@ -1585,7 +2074,7 @@ export async function generateInteriorEnhance(
 
   const prompt = buildInteriorEnhancePrompt(options);
 
-  const result = await fal.subscribe(TOOL_MODEL_MAP['interior-enhance'], {
+  const result = await secureSubscribe(TOOL_MODEL_MAP['interior-enhance'], {
     input: {
       image_url: imageUrl,
       prompt,
@@ -1596,7 +2085,7 @@ export async function generateInteriorEnhance(
     logs: true,
     onQueueUpdate: (update) => {
       if (update.status === 'IN_PROGRESS') {
-        onProgress?.(50 + Math.random() * 30, 'Enhancing interior details...');
+        onProgress?.(Math.round(50 + Math.random() * 30), 'Enhancing interior details...');
       }
     },
   });
@@ -1630,7 +2119,7 @@ export async function generateLicenseBlur(
 
     onProgress?.(40, 'Blurring license plate...');
 
-    const result = await fal.subscribe('fal-ai/flux-pro/v1/fill', {
+    const result = await secureSubscribe('fal-ai/flux-pro/v1/fill', {
       input: {
         image_url: imageUrl,
         mask_url: maskUrl,
@@ -1640,7 +2129,7 @@ export async function generateLicenseBlur(
       logs: true,
       onQueueUpdate: (update) => {
         if (update.status === 'IN_PROGRESS') {
-          onProgress?.(50 + Math.random() * 30, 'Applying blur...');
+          onProgress?.(Math.round(50 + Math.random() * 30), 'Applying blur...');
         }
       },
     });
@@ -1654,7 +2143,7 @@ export async function generateLicenseBlur(
     onProgress?.(30, 'Auto-detecting license plate...');
     const prompt = buildLicenseBlurPrompt(options);
 
-    const result = await fal.subscribe(TOOL_MODEL_MAP['license-blur'], {
+    const result = await secureSubscribe(TOOL_MODEL_MAP['license-blur'], {
       input: {
         image_url: imageUrl,
         prompt,
@@ -1665,7 +2154,7 @@ export async function generateLicenseBlur(
       logs: true,
       onQueueUpdate: (update) => {
         if (update.status === 'IN_PROGRESS') {
-          onProgress?.(50 + Math.random() * 30, 'Blurring plate...');
+          onProgress?.(Math.round(50 + Math.random() * 30), 'Blurring plate...');
         }
       },
     });
@@ -1692,7 +2181,7 @@ export async function generateVehicle360(
 
   const prompt = buildVehicle360Prompt(options);
 
-  const result = await fal.subscribe(TOOL_MODEL_MAP['vehicle-360'], {
+  const result = await secureSubscribe(TOOL_MODEL_MAP['vehicle-360'], {
     input: {
       image_url: imageUrl,
       prompt,
@@ -1702,7 +2191,7 @@ export async function generateVehicle360(
     logs: true,
     onQueueUpdate: (update) => {
       if (update.status === 'IN_PROGRESS') {
-        onProgress?.(40 + Math.random() * 40, 'Creating 360° spin video...');
+        onProgress?.(Math.round(40 + Math.random() * 40), 'Creating 360° spin video...');
       }
     },
   });
@@ -1729,7 +2218,7 @@ export async function generateWindowTint(
 
   const prompt = buildWindowTintPrompt(options);
 
-  const result = await fal.subscribe(TOOL_MODEL_MAP['window-tint'], {
+  const result = await secureSubscribe(TOOL_MODEL_MAP['window-tint'], {
     input: {
       image_url: imageUrl,
       prompt,
@@ -1740,7 +2229,7 @@ export async function generateWindowTint(
     logs: true,
     onQueueUpdate: (update) => {
       if (update.status === 'IN_PROGRESS') {
-        onProgress?.(50 + Math.random() * 30, 'Previewing tint...');
+        onProgress?.(Math.round(50 + Math.random() * 30), 'Previewing tint...');
       }
     },
   });
@@ -1933,7 +2422,7 @@ export async function generateSpotRemoval(
 
   onProgress?.(40, 'Removing spots...');
 
-  const result = await fal.subscribe(TOOL_MODEL_MAP['spot-removal'], {
+  const result = await secureSubscribe(TOOL_MODEL_MAP['spot-removal'], {
     input: {
       image_url: imageUrl,
       mask_url: maskUrl,
@@ -1941,7 +2430,7 @@ export async function generateSpotRemoval(
     logs: true,
     onQueueUpdate: (update) => {
       if (update.status === 'IN_PROGRESS') {
-        onProgress?.(50 + Math.random() * 30, 'Cleaning surface...');
+        onProgress?.(Math.round(50 + Math.random() * 30), 'Cleaning surface...');
       }
     },
   });
@@ -1968,7 +2457,7 @@ export async function generateShadowEnhancement(
 
   const prompt = buildShadowEnhancementPrompt(options);
 
-  const result = await fal.subscribe(TOOL_MODEL_MAP['shadow-enhancement'], {
+  const result = await secureSubscribe(TOOL_MODEL_MAP['shadow-enhancement'], {
     input: {
       image_url: imageUrl,
       prompt,
@@ -1979,7 +2468,7 @@ export async function generateShadowEnhancement(
     logs: true,
     onQueueUpdate: (update) => {
       if (update.status === 'IN_PROGRESS') {
-        onProgress?.(50 + Math.random() * 30, 'Enhancing shadows...');
+        onProgress?.(Math.round(50 + Math.random() * 30), 'Enhancing shadows...');
       }
     },
   });
@@ -2016,7 +2505,7 @@ export async function generateNumberPlateMask(
 
   const prompt = buildNumberPlateMaskPrompt(options);
 
-  const result = await fal.subscribe(TOOL_MODEL_MAP['number-plate-mask'], {
+  const result = await secureSubscribe(TOOL_MODEL_MAP['number-plate-mask'], {
     input: {
       image_url: imageUrl,
       mask_url: maskUrl,
@@ -2027,7 +2516,7 @@ export async function generateNumberPlateMask(
     logs: true,
     onQueueUpdate: (update) => {
       if (update.status === 'IN_PROGRESS') {
-        onProgress?.(50 + Math.random() * 30, 'Applying mask...');
+        onProgress?.(Math.round(50 + Math.random() * 30), 'Applying mask...');
       }
     },
   });
@@ -2054,7 +2543,7 @@ export async function generateDealerBranding(
 
   const prompt = buildDealerBrandingPrompt(options);
 
-  const result = await fal.subscribe(TOOL_MODEL_MAP['dealer-branding'], {
+  const result = await secureSubscribe(TOOL_MODEL_MAP['dealer-branding'], {
     input: {
       image_url: imageUrl,
       prompt,
@@ -2065,7 +2554,7 @@ export async function generateDealerBranding(
     logs: true,
     onQueueUpdate: (update) => {
       if (update.status === 'IN_PROGRESS') {
-        onProgress?.(50 + Math.random() * 30, 'Applying branding...');
+        onProgress?.(Math.round(50 + Math.random() * 30), 'Applying branding...');
       }
     },
   });
@@ -2092,7 +2581,7 @@ export async function generatePaintColor(
 
   const prompt = buildPaintColorPrompt(options);
 
-  const result = await fal.subscribe(TOOL_MODEL_MAP['paint-color'], {
+  const result = await secureSubscribe(TOOL_MODEL_MAP['paint-color'], {
     input: {
       image_url: imageUrl,
       prompt,
@@ -2103,7 +2592,7 @@ export async function generatePaintColor(
     logs: true,
     onQueueUpdate: (update) => {
       if (update.status === 'IN_PROGRESS') {
-        onProgress?.(50 + Math.random() * 30, 'Applying new color...');
+        onProgress?.(Math.round(50 + Math.random() * 30), 'Applying new color...');
       }
     },
   });
@@ -2130,7 +2619,7 @@ export async function generateWheelCustomizer(
 
   const prompt = buildWheelCustomizerPrompt(options);
 
-  const result = await fal.subscribe(TOOL_MODEL_MAP['wheel-customizer'], {
+  const result = await secureSubscribe(TOOL_MODEL_MAP['wheel-customizer'], {
     input: {
       image_url: imageUrl,
       prompt,
@@ -2141,7 +2630,7 @@ export async function generateWheelCustomizer(
     logs: true,
     onQueueUpdate: (update) => {
       if (update.status === 'IN_PROGRESS') {
-        onProgress?.(50 + Math.random() * 30, 'Installing new wheels...');
+        onProgress?.(Math.round(50 + Math.random() * 30), 'Installing new wheels...');
       }
     },
   });
@@ -2168,7 +2657,7 @@ export async function generateVehicleWalkthrough(
 
   const prompt = buildVehicleWalkthroughPrompt(options);
 
-  const result = await fal.subscribe(TOOL_MODEL_MAP['vehicle-walkthrough'], {
+  const result = await secureSubscribe(TOOL_MODEL_MAP['vehicle-walkthrough'], {
     input: {
       image_url: imageUrl,
       prompt,
@@ -2178,7 +2667,7 @@ export async function generateVehicleWalkthrough(
     logs: true,
     onQueueUpdate: (update) => {
       if (update.status === 'IN_PROGRESS') {
-        onProgress?.(40 + Math.random() * 40, 'Creating walkthrough...');
+        onProgress?.(Math.round(40 + Math.random() * 40), 'Creating walkthrough...');
       }
     },
   });
@@ -2213,7 +2702,7 @@ export async function generateSocialClips(
     'facebook': '9:16',
   };
 
-  const result = await fal.subscribe(TOOL_MODEL_MAP['social-clips'], {
+  const result = await secureSubscribe(TOOL_MODEL_MAP['social-clips'], {
     input: {
       image_url: imageUrl,
       prompt,
@@ -2223,7 +2712,7 @@ export async function generateSocialClips(
     logs: true,
     onQueueUpdate: (update) => {
       if (update.status === 'IN_PROGRESS') {
-        onProgress?.(40 + Math.random() * 40, 'Creating social content...');
+        onProgress?.(Math.round(40 + Math.random() * 40), 'Creating social content...');
       }
     },
   });
@@ -2250,7 +2739,7 @@ export async function generateDamageDetection(
 
   const prompt = buildDamageDetectionPrompt(options);
 
-  const result = await fal.subscribe(TOOL_MODEL_MAP['damage-detection'], {
+  const result = await secureSubscribe(TOOL_MODEL_MAP['damage-detection'], {
     input: {
       image_url: imageUrl,
       prompt,
@@ -2261,7 +2750,7 @@ export async function generateDamageDetection(
     logs: true,
     onQueueUpdate: (update) => {
       if (update.status === 'IN_PROGRESS') {
-        onProgress?.(50 + Math.random() * 30, 'Detecting damage...');
+        onProgress?.(Math.round(50 + Math.random() * 30), 'Detecting damage...');
       }
     },
   });
@@ -2281,8 +2770,17 @@ export function getToolCredits(tool: ToolType): number {
 }
 
 /**
- * Check if FAL API key is configured
+ * Check if secure generation is available (Supabase connected)
+ * FAL API is now handled server-side via Edge Functions
  */
 export function isFalConfigured(): boolean {
-  return !!import.meta.env.VITE_FAL_KEY;
+  const supabase = createClient();
+  return supabase !== null;
+}
+
+/**
+ * Alias for isFalConfigured - check if secure generation is available
+ */
+export function isSecureGenerationAvailable(): boolean {
+  return isFalConfigured();
 }

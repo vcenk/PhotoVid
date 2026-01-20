@@ -29,7 +29,7 @@ export function DashboardPage() {
       {/* Main Content Area */}
       <div
         className="flex-1 flex flex-col min-w-0 overflow-hidden"
-        style={{ marginLeft: '72px' }}
+        style={{ marginLeft: '224px' }}
       >
         {/* Topbar */}
         <DashboardTopbar onMenuClick={() => setMobileMenuOpen(true)} />

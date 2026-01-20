@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
     ArrowLeft,
@@ -19,17 +19,70 @@ import {
 } from 'lucide-react';
 import { NavigationRail, FlyoutType } from '../../dashboard/navigation/NavigationRail';
 import { FlyoutPanels } from '../../dashboard/navigation/FlyoutPanels';
+import { BeforeAfterSlider } from '../../common/BeforeAfterSlider';
 import { generateSkyReplacement, isFalConfigured } from '@/lib/api/toolGeneration';
 import type { SkyReplacementOptions } from '@/lib/types/generation';
 
-// Sky options
+// Sky options with MLS safety indicators
+// MLS-safe: blue-clear, blue-clouds, overcast
+// Marketing-only: golden-hour, sunset, dramatic
 const SKY_OPTIONS = [
-    { id: 'blue-clear', name: 'Clear Blue', image: 'https://images.unsplash.com/photo-1517483000871-1dbf64a6e1c6?w=200&h=120&fit=crop', icon: Sun },
-    { id: 'blue-clouds', name: 'Blue & Clouds', image: 'https://images.unsplash.com/photo-1534088568595-a066f410bcda?w=200&h=120&fit=crop', icon: CloudSun },
-    { id: 'golden-hour', name: 'Golden Hour', image: 'https://images.unsplash.com/photo-1495616811223-4d98c6e9c869?w=200&h=120&fit=crop', icon: Sunset },
-    { id: 'dramatic', name: 'Dramatic', image: 'https://images.unsplash.com/photo-1534274988757-a28bf1a57c17?w=200&h=120&fit=crop', icon: Cloud },
-    { id: 'sunset', name: 'Sunset', image: 'https://images.unsplash.com/photo-1507400492013-162706c8c05e?w=200&h=120&fit=crop', icon: Sunset },
-    { id: 'overcast', name: 'Soft Overcast', image: 'https://images.unsplash.com/photo-1501630834273-4b5604d2ee31?w=200&h=120&fit=crop', icon: CloudRain },
+    // MLS-Safe options (shown first)
+    {
+        id: 'blue-clear',
+        name: 'Clear Blue',
+        image: 'https://images.unsplash.com/photo-1517483000871-1dbf64a6e1c6?w=200&h=120&fit=crop',
+        icon: Sun,
+        badge: 'MLS Safe',
+        badgeColor: 'bg-green-500/80',
+        category: 'mls-safe',
+    },
+    {
+        id: 'blue-clouds',
+        name: 'Blue & Clouds',
+        image: 'https://images.unsplash.com/photo-1534088568595-a066f410bcda?w=200&h=120&fit=crop',
+        icon: CloudSun,
+        badge: 'MLS Safe',
+        badgeColor: 'bg-green-500/80',
+        category: 'mls-safe',
+    },
+    {
+        id: 'overcast',
+        name: 'Soft Overcast',
+        image: 'https://images.unsplash.com/photo-1501630834273-4b5604d2ee31?w=200&h=120&fit=crop',
+        icon: CloudRain,
+        badge: 'MLS Safe',
+        badgeColor: 'bg-green-500/80',
+        category: 'mls-safe',
+    },
+    // Marketing-only options
+    {
+        id: 'golden-hour',
+        name: 'Golden Hour',
+        image: 'https://images.unsplash.com/photo-1495616811223-4d98c6e9c869?w=200&h=120&fit=crop',
+        icon: Sunset,
+        badge: 'Marketing',
+        badgeColor: 'bg-yellow-500/80',
+        category: 'marketing',
+    },
+    {
+        id: 'sunset',
+        name: 'Sunset',
+        image: 'https://images.unsplash.com/photo-1507400492013-162706c8c05e?w=200&h=120&fit=crop',
+        icon: Sunset,
+        badge: 'Marketing',
+        badgeColor: 'bg-yellow-500/80',
+        category: 'marketing',
+    },
+    {
+        id: 'dramatic',
+        name: 'Dramatic',
+        image: 'https://images.unsplash.com/photo-1534274988757-a28bf1a57c17?w=200&h=120&fit=crop',
+        icon: Cloud,
+        badge: 'Use Carefully',
+        badgeColor: 'bg-orange-500/80',
+        category: 'marketing',
+    },
 ];
 
 export const SkyReplacementTool: React.FC = () => {
@@ -45,6 +98,23 @@ export const SkyReplacementTool: React.FC = () => {
     const [generationProgress, setGenerationProgress] = useState(0);
     const [resultImage, setResultImage] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
+
+    // Check for pre-selected asset from library
+    useEffect(() => {
+        const selectedAssetUrl = sessionStorage.getItem('selectedAssetUrl');
+        if (selectedAssetUrl) {
+            sessionStorage.removeItem('selectedAssetUrl');
+            setImagePreview(selectedAssetUrl);
+            fetch(selectedAssetUrl)
+                .then(res => res.blob())
+                .then(blob => {
+                    const fileName = selectedAssetUrl.split('/').pop() || 'image.jpg';
+                    const file = new File([blob], fileName, { type: blob.type || 'image/jpeg' });
+                    setUploadedImage(file);
+                })
+                .catch(err => console.error('Failed to load pre-selected image:', err));
+        }
+    }, []);
 
     const handleDrag = useCallback((e: React.DragEvent) => {
         e.preventDefault();
@@ -105,9 +175,12 @@ export const SkyReplacementTool: React.FC = () => {
                 skyType: selectedSky as SkyReplacementOptions['skyType'],
             };
 
+            // Note: For better results, a sky mask should be provided
+            // Currently using auto-detection (no mask)
             const resultUrl = await generateSkyReplacement(
                 uploadedImage,
                 options,
+                undefined, // maskCanvas - TODO: add sky masking tool
                 (progress, status) => {
                     setGenerationProgress(progress);
                     console.log('Sky replacement status:', status);
@@ -130,7 +203,7 @@ export const SkyReplacementTool: React.FC = () => {
             <NavigationRail activeFlyout={activeFlyout} onFlyoutChange={setActiveFlyout} />
             <FlyoutPanels activeFlyout={activeFlyout} onClose={() => setActiveFlyout(null)} />
 
-            <div className="flex-1 flex ml-[72px]">
+            <div className="flex-1 flex ml-56">
                 {/* Sidebar */}
                 <div className="w-[320px] flex-shrink-0 bg-[#111113] border-r border-white/5 flex flex-col">
                     <div className="p-4 border-b border-white/5">
@@ -168,11 +241,13 @@ export const SkyReplacementTool: React.FC = () => {
                             )}
                         </div>
 
-                        {/* Sky Selection */}
+                        {/* Sky Selection - MLS Safe */}
                         <div>
-                            <label className="text-xs font-medium text-zinc-400 uppercase tracking-wide mb-3 block">Choose Sky</label>
-                            <div className="grid grid-cols-2 gap-2">
-                                {SKY_OPTIONS.map((sky) => (
+                            <label className="text-xs font-medium text-zinc-400 uppercase tracking-wide mb-3 block">
+                                MLS-Safe Skies
+                            </label>
+                            <div className="grid grid-cols-2 gap-2 mb-4">
+                                {SKY_OPTIONS.filter(s => s.category === 'mls-safe').map((sky) => (
                                     <button
                                         key={sky.id}
                                         onClick={() => setSelectedSky(sky.id)}
@@ -181,6 +256,34 @@ export const SkyReplacementTool: React.FC = () => {
                                         <img src={sky.image} alt={sky.name} className="w-full h-20 object-cover" />
                                         <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
                                         <span className="absolute bottom-1.5 left-2 text-[11px] font-medium text-white">{sky.name}</span>
+                                        <span className={`absolute top-1.5 left-1.5 text-[9px] px-1.5 py-0.5 rounded-full text-white ${sky.badgeColor}`}>
+                                            {sky.badge}
+                                        </span>
+                                        {selectedSky === sky.id && (
+                                            <div className="absolute top-1.5 right-1.5 w-5 h-5 bg-cyan-500 rounded-full flex items-center justify-center">
+                                                <Check size={12} className="text-white" />
+                                            </div>
+                                        )}
+                                    </button>
+                                ))}
+                            </div>
+
+                            <label className="text-xs font-medium text-zinc-400 uppercase tracking-wide mb-3 block">
+                                Marketing Use Only
+                            </label>
+                            <div className="grid grid-cols-2 gap-2">
+                                {SKY_OPTIONS.filter(s => s.category === 'marketing').map((sky) => (
+                                    <button
+                                        key={sky.id}
+                                        onClick={() => setSelectedSky(sky.id)}
+                                        className={`relative rounded-xl overflow-hidden transition-all ${selectedSky === sky.id ? 'ring-2 ring-cyan-500 ring-offset-2 ring-offset-[#111113]' : 'hover:ring-1 hover:ring-white/20'}`}
+                                    >
+                                        <img src={sky.image} alt={sky.name} className="w-full h-20 object-cover" />
+                                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
+                                        <span className="absolute bottom-1.5 left-2 text-[11px] font-medium text-white">{sky.name}</span>
+                                        <span className={`absolute top-1.5 left-1.5 text-[9px] px-1.5 py-0.5 rounded-full text-white ${sky.badgeColor}`}>
+                                            {sky.badge}
+                                        </span>
                                         {selectedSky === sky.id && (
                                             <div className="absolute top-1.5 right-1.5 w-5 h-5 bg-cyan-500 rounded-full flex items-center justify-center">
                                                 <Check size={12} className="text-white" />
@@ -194,7 +297,7 @@ export const SkyReplacementTool: React.FC = () => {
                         {/* Info */}
                         <div className="p-3 rounded-xl bg-cyan-500/5 border border-cyan-500/10">
                             <p className="text-xs text-cyan-300/80 leading-relaxed">
-                                <strong className="text-cyan-300">Auto-detection:</strong> AI automatically detects the sky area and replaces it seamlessly.
+                                <strong className="text-cyan-300">Tip:</strong> For best results, use exterior photos with clear sky visibility. MLS-safe options maintain natural, realistic appearance.
                             </p>
                         </div>
                     </div>
@@ -250,11 +353,20 @@ export const SkyReplacementTool: React.FC = () => {
                                 </div>
                                 <p className="text-zinc-400 font-medium">Replacing sky...</p>
                             </div>
+                        ) : resultImage && imagePreview ? (
+                            <div className="w-full max-w-4xl">
+                                <BeforeAfterSlider
+                                    beforeImage={imagePreview}
+                                    afterImage={resultImage}
+                                    beforeLabel="Original"
+                                    afterLabel={selectedSkyData?.name || 'New Sky'}
+                                    className="shadow-2xl"
+                                />
+                            </div>
                         ) : (
                             <div className="relative rounded-2xl overflow-hidden shadow-2xl">
-                                <img src={resultImage || imagePreview} alt="Preview" className="max-w-full max-h-[calc(100vh-180px)] object-contain" />
-                                {resultImage && <div className="absolute top-4 right-4 px-3 py-1.5 bg-cyan-500/80 backdrop-blur rounded-lg text-xs text-white font-medium flex items-center gap-1.5"><Cloud size={12} />{selectedSkyData?.name}</div>}
-                                {!resultImage && <div className="absolute inset-0 flex items-center justify-center bg-black/40"><div className="text-center text-white"><Cloud size={28} className="mx-auto mb-2 opacity-80" /><p className="text-sm font-medium">Ready to replace sky</p></div></div>}
+                                <img src={imagePreview} alt="Preview" className="max-w-full max-h-[calc(100vh-180px)] object-contain" />
+                                <div className="absolute inset-0 flex items-center justify-center bg-black/40"><div className="text-center text-white"><Cloud size={28} className="mx-auto mb-2 opacity-80" /><p className="text-sm font-medium">Ready to replace sky</p></div></div>
                             </div>
                         )}
                     </div>

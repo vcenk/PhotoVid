@@ -12,6 +12,7 @@ interface CreditsContextType {
   balance: number;
   loading: boolean;
   transactions: CreditTransaction[];
+  isAdmin: boolean;
   fetchCredits: () => Promise<void>;
   deductCredits: (tool: CreditCostKey, generationId?: string, description?: string) => Promise<boolean>;
   addCredits: (amount: number, type: CreditTransaction['type'], description?: string) => Promise<boolean>;
@@ -58,6 +59,7 @@ export function CreditsProvider({ children }: { children: ReactNode }) {
   const [balance, setBalance] = useState(DEFAULT_STARTING_CREDITS);
   const [loading, setLoading] = useState(false);
   const [transactions, setTransactions] = useState<CreditTransaction[]>([]);
+  const [isAdmin, setIsAdmin] = useState(false);
   const supabase = createClient();
 
   // ============================================
@@ -102,6 +104,7 @@ export function CreditsProvider({ children }: { children: ReactNode }) {
       if (data) {
         setBalance(data.credits?.balance ?? DEFAULT_STARTING_CREDITS);
         setTransactions(data.transactions || []);
+        setIsAdmin(data.isAdmin === true || data.credits?.isAdmin === true);
       }
     } catch (error) {
       console.error('Error fetching credits:', error);
@@ -280,8 +283,9 @@ export function CreditsProvider({ children }: { children: ReactNode }) {
   }, [balance, supabase]);
 
   const hasEnoughCredits = useCallback((tool: CreditCostKey): boolean => {
+    if (isAdmin) return true; // Admins always have enough credits
     return balance >= getCreditCost(tool);
-  }, [balance]);
+  }, [balance, isAdmin]);
 
   const getCostForTool = useCallback((tool: CreditCostKey): number => {
     return getCreditCost(tool);
@@ -297,6 +301,7 @@ export function CreditsProvider({ children }: { children: ReactNode }) {
         balance,
         loading,
         transactions,
+        isAdmin,
         fetchCredits,
         deductCredits,
         addCredits,

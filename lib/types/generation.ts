@@ -15,6 +15,8 @@ export type RealEstateToolType =
   // Photo Enhancement
   | 'virtual-staging'
   | 'photo-enhancement'
+  | 'photo-relight' // ICLight for bright/hdr presets
+  | 'sky-segmentation' // Auto sky mask generation
   | 'sky-replacement'
   | 'twilight'
   | 'item-removal'
@@ -71,8 +73,10 @@ export type ToolType = RealEstateToolType | AutoToolType;
 export const TOOL_MODEL_MAP: Record<ToolType, string> = {
   // ============ REAL ESTATE TOOLS ============
   // Photo Enhancement Tools
-  'virtual-staging': 'fal-ai/flux/dev/image-to-image',
+  'virtual-staging': 'fal-ai/flux-2-lora-gallery/apartment-staging',
   'photo-enhancement': 'fal-ai/clarity-upscaler',
+  'photo-relight': 'fal-ai/iclight-v2', // ICLight for bright/hdr presets
+  'sky-segmentation': 'fal-ai/birefnet', // Background removal for sky mask
   'sky-replacement': 'fal-ai/flux-pro/v1/fill',
   'twilight': 'fal-ai/flux/dev/image-to-image',
   'item-removal': 'fal-ai/bria/eraser',
@@ -133,6 +137,8 @@ export const TOOL_CREDITS_MAP: Record<ToolType, number> = {
   // Photo Enhancement
   'virtual-staging': 2,
   'photo-enhancement': 1,
+  'photo-relight': 1, // ICLight step for bright/hdr presets
+  'sky-segmentation': 1, // Auto sky mask generation
   'sky-replacement': 2,
   'twilight': 2,
   'item-removal': 2,

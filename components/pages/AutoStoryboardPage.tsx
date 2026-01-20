@@ -784,7 +784,7 @@ export const AutoStoryboardPage: React.FC = () => {
             <NavigationRail activeFlyout={activeFlyout} onFlyoutChange={setActiveFlyout} />
             <FlyoutPanels activeFlyout={activeFlyout} onClose={() => setActiveFlyout(null)} />
 
-            <div className="flex-1 flex flex-col ml-[72px]">
+            <div className="flex-1 flex flex-col ml-56">
                 {storyboard ? (
                     <StoryboardEditorView
                         vehicleData={storyboard.vehicleData}
