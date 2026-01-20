@@ -14,18 +14,13 @@ interface ComparisonExample {
   afterLabel: string;
 }
 
-// Base URL for showcase images - use R2 for production, local for dev
-const SHOWCASE_BASE_URL = import.meta.env.PROD
-  ? 'https://pub-de07eb6b4fff417798674246b03f5ee4.r2.dev/showcase'
-  : '/showcase';
-
 const EXAMPLES: ComparisonExample[] = [
   {
     id: 'virtual-staging',
     category: 'Virtual Staging',
     icon: Home,
-    before: `${SHOWCASE_BASE_URL}/real-estate/before/empty-living-room.jpg`,
-    after: `${SHOWCASE_BASE_URL}/real-estate/after/empty-living-room.jpg`,
+    before: '/showcase/real-estate/before/empty-living-room.jpg',
+    after: '/showcase/real-estate/after/empty-living-room.jpg',
     beforeLabel: 'Empty Room',
     afterLabel: 'AI Staged',
   },
