@@ -25,27 +25,9 @@ const EXAMPLES: ComparisonExample[] = [
     category: 'Virtual Staging',
     icon: Home,
     before: `${SHOWCASE_BASE_URL}/real-estate/before/empty-living-room.jpg`,
-    after: `${SHOWCASE_BASE_URL}/real-estate/after/staged-living-room.jpg`,
+    after: `${SHOWCASE_BASE_URL}/real-estate/after/empty-living-room.jpg`,
     beforeLabel: 'Empty Room',
     afterLabel: 'AI Staged',
-  },
-  {
-    id: 'twilight',
-    category: 'Twilight',
-    icon: Home,
-    before: `${SHOWCASE_BASE_URL}/real-estate/before/house-day.jpg`,
-    after: `${SHOWCASE_BASE_URL}/real-estate/after/house-twilight.jpg`,
-    beforeLabel: 'Daytime',
-    afterLabel: 'Twilight',
-  },
-  {
-    id: 'sky-replacement',
-    category: 'Sky Replace',
-    icon: Camera,
-    before: `${SHOWCASE_BASE_URL}/real-estate/before/house-cloudy.jpg`,
-    after: `${SHOWCASE_BASE_URL}/real-estate/after/house-blue-sky.jpg`,
-    beforeLabel: 'Cloudy Sky',
-    afterLabel: 'Blue Sky',
   },
 ];
 
@@ -193,35 +175,37 @@ export const BeforeAfterShowcase: React.FC = () => {
           </p>
         </motion.div>
 
-        {/* Category Tabs */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ delay: 0.2 }}
-          className="flex justify-center gap-2 mb-12"
-        >
-          {EXAMPLES.map((example) => {
-            const Icon = example.icon;
-            const isActive = activeExample.id === example.id;
+        {/* Category Tabs - only show if multiple examples */}
+        {EXAMPLES.length > 1 && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={isInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ delay: 0.2 }}
+            className="flex justify-center gap-2 mb-12"
+          >
+            {EXAMPLES.map((example) => {
+              const Icon = example.icon;
+              const isActive = activeExample.id === example.id;
 
-            return (
-              <motion.button
-                key={example.id}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={() => setActiveExample(example)}
-                className={`flex items-center gap-2 px-6 py-3 rounded-full text-sm font-bold transition-all ${
-                  isActive
-                    ? 'bg-gradient-to-r from-indigo-500 to-violet-500 text-white shadow-lg shadow-indigo-500/30'
-                    : 'bg-zinc-100 dark:bg-white/5 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-white/10'
-                }`}
-              >
-                <Icon size={16} />
-                {example.category}
-              </motion.button>
-            );
-          })}
-        </motion.div>
+              return (
+                <motion.button
+                  key={example.id}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => setActiveExample(example)}
+                  className={`flex items-center gap-2 px-6 py-3 rounded-full text-sm font-bold transition-all ${
+                    isActive
+                      ? 'bg-gradient-to-r from-indigo-500 to-violet-500 text-white shadow-lg shadow-indigo-500/30'
+                      : 'bg-zinc-100 dark:bg-white/5 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-white/10'
+                  }`}
+                >
+                  <Icon size={16} />
+                  {example.category}
+                </motion.button>
+              );
+            })}
+          </motion.div>
+        )}
 
         {/* Comparison Slider */}
         <motion.div
