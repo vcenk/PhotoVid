@@ -1,12 +1,13 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
     ArrowLeft, UploadCloud, Sparkles, Download, RefreshCw, Loader2, Trash2,
-    Image as ImageIcon, Check, AlertCircle, Sun, Moon
+    Image as ImageIcon, Check, AlertCircle, Sun, Moon, ChevronLeft, ChevronRight, BookmarkPlus
 } from 'lucide-react';
-import { NavigationRail, FlyoutType } from '../../dashboard/navigation/NavigationRail';
-import { FlyoutPanels } from '../../dashboard/navigation/FlyoutPanels';
+import { NavigationRail } from '../../dashboard/navigation/NavigationRail';
+import { AssetProvider, useAssets } from '@/lib/store/contexts/AssetContext';
 import { generateNightToDay, isFalConfigured } from '@/lib/api/toolGeneration';
+import { downloadFile } from '@/lib/utils';
 import type { NightToDayOptions } from '@/lib/types/generation';
 
 const TIME_OPTIONS = [
@@ -22,9 +23,47 @@ const SKY_OPTIONS = [
     { id: 'dramatic', name: 'Dramatic' },
 ];
 
-export const NightToDayTool: React.FC = () => {
+const BeforeAfterSlider: React.FC<{ before: string; after: string; label: string }> = ({ before, after, label }) => {
+    const [sliderPosition, setSliderPosition] = useState(50);
+    const containerRef = useRef<HTMLDivElement>(null);
+    const isDraggingSlider = useRef(false);
+
+    const handleMove = (clientX: number) => {
+        if (!containerRef.current) return;
+        const rect = containerRef.current.getBoundingClientRect();
+        const x = Math.max(0, Math.min(clientX - rect.left, rect.width));
+        setSliderPosition((x / rect.width) * 100);
+    };
+
+    return (
+        <div
+            ref={containerRef}
+            className="relative rounded-2xl overflow-hidden shadow-2xl w-full max-w-4xl aspect-[16/10] cursor-ew-resize select-none"
+            onMouseDown={() => { isDraggingSlider.current = true; }}
+            onMouseUp={() => { isDraggingSlider.current = false; }}
+            onMouseLeave={() => { isDraggingSlider.current = false; }}
+            onMouseMove={(e) => { if (isDraggingSlider.current) handleMove(e.clientX); }}
+            onTouchMove={(e) => handleMove(e.touches[0].clientX)}
+        >
+            <img src={after} alt="After" className="absolute inset-0 w-full h-full object-cover" />
+            <div className="absolute inset-0 overflow-hidden" style={{ clipPath: `inset(0 ${100 - sliderPosition}% 0 0)` }}>
+                <img src={before} alt="Before" className="absolute inset-0 w-full h-full object-cover" />
+            </div>
+            <div className="absolute top-0 bottom-0 w-0.5 bg-white shadow-lg" style={{ left: `${sliderPosition}%`, transform: 'translateX(-50%)' }}>
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 bg-white rounded-full shadow-xl flex items-center justify-center">
+                    <ChevronLeft size={14} className="text-zinc-600 -mr-1" />
+                    <ChevronRight size={14} className="text-zinc-600 -ml-1" />
+                </div>
+            </div>
+            <div className="absolute top-3 left-3 px-2.5 py-1 bg-black/60 backdrop-blur-sm rounded-lg text-xs text-white font-medium flex items-center gap-1"><Moon size={10} />Night</div>
+            <div className="absolute top-3 right-3 px-2.5 py-1 bg-orange-500/80 backdrop-blur-sm rounded-lg text-xs text-white font-medium flex items-center gap-1"><Sun size={10} />{label}</div>
+        </div>
+    );
+};
+
+const NightToDayToolInner: React.FC = () => {
     const navigate = useNavigate();
-    const [activeFlyout, setActiveFlyout] = useState<FlyoutType>(null);
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     const [uploadedImage, setUploadedImage] = useState<File | null>(null);
     const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -36,6 +75,8 @@ export const NightToDayTool: React.FC = () => {
     const [generationProgress, setGenerationProgress] = useState(0);
     const [resultImage, setResultImage] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
+    const [savedToLibrary, setSavedToLibrary] = useState(false);
+    const { addAsset } = useAssets();
 
     const handleDrag = useCallback((e: React.DragEvent) => {
         e.preventDefault();
@@ -76,6 +117,7 @@ export const NightToDayTool: React.FC = () => {
         setIsGenerating(true);
         setGenerationProgress(0);
         setError(null);
+        setSavedToLibrary(false);
 
         if (!isFalConfigured()) {
             const progressInterval = setInterval(() => {
@@ -85,7 +127,9 @@ export const NightToDayTool: React.FC = () => {
             setTimeout(() => {
                 clearInterval(progressInterval);
                 setGenerationProgress(100);
-                setResultImage('https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=1200&h=800&fit=crop');
+                const mockUrl = 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=1200&h=800&fit=crop';
+                setResultImage(mockUrl);
+                try { await addAsset(mockUrl, 'image', 'Night to Day Result'); setSavedToLibrary(true); } catch {}
                 setIsGenerating(false);
             }, 3500);
             return;
@@ -102,6 +146,7 @@ export const NightToDayTool: React.FC = () => {
                 }
             );
             setResultImage(resultUrl);
+            try { await addAsset(resultUrl, 'image', 'Night to Day Result'); setSavedToLibrary(true); } catch {}
         } catch (err) {
             console.error('Night to day error:', err);
             setError(err instanceof Error ? err.message : 'Conversion failed. Please try again.');
@@ -114,14 +159,12 @@ export const NightToDayTool: React.FC = () => {
 
     return (
         <div className="h-screen flex bg-[#0a0a0b]">
-            <NavigationRail activeFlyout={activeFlyout} onFlyoutChange={setActiveFlyout} />
-            <FlyoutPanels activeFlyout={activeFlyout} onClose={() => setActiveFlyout(null)} />
-
-            <div className="flex-1 flex ml-56">
-                <div className="w-[320px] flex-shrink-0 bg-[#111113] border-r border-white/5 flex flex-col">
+            <NavigationRail isMobileOpen={mobileMenuOpen} onMobileClose={() => setMobileMenuOpen(false)} />
+<div className="flex-1 flex ml-0 lg:ml-16">
+                <div className="w-[360px] flex-shrink-0 bg-[#111113] border-r border-white/5 flex flex-col">
                     <div className="p-4 border-b border-white/5">
                         <div className="flex items-center gap-3">
-                            <button onClick={() => navigate('/studio/apps/real-estate')} className="p-2 hover:bg-white/5 rounded-lg transition-colors">
+                            <button onClick={() => navigate('/studio/real-estate')} className="p-2 hover:bg-white/5 rounded-lg transition-colors">
                                 <ArrowLeft size={18} className="text-zinc-400" />
                             </button>
                             <h1 className="text-base font-semibold text-white flex items-center gap-2">
@@ -211,7 +254,12 @@ export const NightToDayTool: React.FC = () => {
                         {resultImage && (
                             <div className="flex items-center gap-2">
                                 <button onClick={() => setResultImage(null)} className="px-3 py-1.5 text-xs font-medium text-zinc-400 hover:text-white bg-white/5 hover:bg-white/10 rounded-lg transition-colors flex items-center gap-1.5"><RefreshCw size={14} />Try Different Time</button>
-                                <button className="px-3 py-1.5 text-xs font-medium text-white bg-orange-600 hover:bg-orange-500 rounded-lg transition-colors flex items-center gap-1.5"><Download size={14} />Download</button>
+                                {savedToLibrary ? (
+                                    <span className="px-3 py-1.5 text-xs font-medium text-emerald-400 bg-emerald-500/10 rounded-lg flex items-center gap-1.5"><BookmarkPlus size={14} />Saved to Library</span>
+                                ) : (
+                                    <button onClick={async () => { if (resultImage) { try { await addAsset(resultImage, 'image', 'Night to Day Result'); setSavedToLibrary(true); } catch {} } }} className="px-3 py-1.5 text-xs font-medium text-zinc-400 hover:text-white bg-white/5 hover:bg-white/10 rounded-lg transition-colors flex items-center gap-1.5"><BookmarkPlus size={14} />Save to Library</button>
+                                )}
+                                <button onClick={() => resultImage && downloadFile(resultImage, `night-to-day-${Date.now()}.jpg`)} className="px-3 py-1.5 text-xs font-medium text-white bg-orange-600 hover:bg-orange-500 rounded-lg transition-colors flex items-center gap-1.5"><Download size={14} />Download</button>
                             </div>
                         )}
                     </div>
@@ -239,11 +287,12 @@ export const NightToDayTool: React.FC = () => {
                                 </div>
                                 <p className="text-zinc-400 font-medium">Converting to daytime...</p>
                             </div>
+                        ) : resultImage && imagePreview ? (
+                            <BeforeAfterSlider before={imagePreview} after={resultImage} label={selectedTime?.name || 'Daytime'} />
                         ) : (
                             <div className="relative rounded-2xl overflow-hidden shadow-2xl">
-                                <img src={resultImage || imagePreview} alt="Preview" className="max-w-full max-h-[calc(100vh-180px)] object-contain" />
-                                {resultImage && <div className="absolute top-4 right-4 px-3 py-1.5 bg-orange-500/80 backdrop-blur rounded-lg text-xs text-white font-medium flex items-center gap-1.5"><Sun size={12} />{selectedTime?.name}</div>}
-                                {!resultImage && <div className="absolute inset-0 flex items-center justify-center bg-black/40"><div className="text-center text-white"><Moon size={28} className="mx-auto mb-2 opacity-80" /><p className="text-sm font-medium">Ready to convert to day</p></div></div>}
+                                <img src={imagePreview} alt="Preview" className="max-w-full max-h-[calc(100vh-180px)] object-contain" />
+                                <div className="absolute inset-0 flex items-center justify-center bg-black/40"><div className="text-center text-white"><Moon size={28} className="mx-auto mb-2 opacity-80" /><p className="text-sm font-medium">Ready to convert to day</p></div></div>
                             </div>
                         )}
                     </div>
@@ -252,3 +301,9 @@ export const NightToDayTool: React.FC = () => {
         </div>
     );
 };
+
+export const NightToDayTool: React.FC = () => (
+    <AssetProvider>
+        <NightToDayToolInner />
+    </AssetProvider>
+);

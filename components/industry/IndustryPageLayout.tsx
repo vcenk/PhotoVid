@@ -1,24 +1,20 @@
 import React, { useState } from 'react';
-import { NavigationRail, FlyoutType } from '../dashboard/navigation/NavigationRail';
-import { FlyoutPanels } from '../dashboard/navigation/FlyoutPanels';
+import { NavigationRail } from '../dashboard/navigation/NavigationRail';
 
 interface IndustryPageLayoutProps {
     children: React.ReactNode;
 }
 
 export const IndustryPageLayout: React.FC<IndustryPageLayoutProps> = ({ children }) => {
-    const [activeFlyout, setActiveFlyout] = useState<FlyoutType>(null);
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     return (
         <div className="h-screen flex bg-white dark:bg-[#09090b]">
             {/* Navigation Rail */}
-            <NavigationRail activeFlyout={activeFlyout} onFlyoutChange={setActiveFlyout} />
-
-            {/* Flyout Panels */}
-            <FlyoutPanels activeFlyout={activeFlyout} onClose={() => setActiveFlyout(null)} />
+            <NavigationRail isMobileOpen={mobileMenuOpen} onMobileClose={() => setMobileMenuOpen(false)} />
 
             {/* Main Content */}
-            <div className="flex-1 overflow-y-auto ml-56">
+            <div className="flex-1 overflow-y-auto ml-0 lg:ml-16">
                 {children}
             </div>
         </div>

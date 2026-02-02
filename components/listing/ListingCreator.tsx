@@ -1,0 +1,166 @@
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Property } from '@/lib/store/contexts/PropertyContext';
+import { PropertySelector } from './PropertySelector';
+import { DescriptionTab } from './DescriptionTab';
+import { SocialMediaTab } from './SocialMediaTab';
+import { FlyerTab } from './FlyerTab';
+import { EmailTab } from './EmailTab';
+import { motion, AnimatePresence } from 'framer-motion';
+import {
+  FileText,
+  Share2,
+  LayoutTemplate,
+  Mail,
+  Video,
+  Home,
+  Check,
+  ExternalLink,
+} from 'lucide-react';
+import { cn } from '@/lib/utils';
+
+type TabId = 'description' | 'social' | 'flyer' | 'email';
+
+const TABS: { id: TabId; label: string; icon: React.ElementType }[] = [
+  { id: 'description', label: 'Description', icon: FileText },
+  { id: 'social', label: 'Social Media', icon: Share2 },
+  { id: 'flyer', label: 'Flyer', icon: LayoutTemplate },
+  { id: 'email', label: 'Email', icon: Mail },
+];
+
+const LINK_TABS = [
+  {
+    label: 'Video Walkthrough',
+    icon: Video,
+    path: '/studio/real-estate/room-tour',
+    desc: 'Create cinematic room tour video',
+  },
+  {
+    label: 'Virtual Staging',
+    icon: Home,
+    path: '/studio/real-estate/virtual-staging',
+    desc: 'Stage empty rooms with AI',
+  },
+];
+
+export function ListingCreator() {
+  const navigate = useNavigate();
+  const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
+  const [activeTab, setActiveTab] = useState<TabId>('description');
+  const [generatedTabs, setGeneratedTabs] = useState<Set<TabId>>(new Set());
+
+  const markGenerated = (tab: TabId) => {
+    setGeneratedTabs((prev) => new Set(prev).add(tab));
+  };
+
+  return (
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
+      {/* Hero */}
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-white mb-2">Listing Content Studio</h1>
+        <p className="text-zinc-400 text-sm">
+          Generate MLS descriptions, social media posts, flyers, and email campaigns for your listings.
+        </p>
+      </div>
+
+      {/* Property Selector */}
+      <div className="mb-6">
+        <PropertySelector
+          selectedProperty={selectedProperty}
+          onSelect={setSelectedProperty}
+        />
+      </div>
+
+      {!selectedProperty ? (
+        <div className="rounded-2xl border border-white/5 bg-zinc-900/30 p-12 text-center">
+          <Home size={32} className="mx-auto mb-3 text-zinc-700" />
+          <p className="text-zinc-500 text-sm">
+            Select a property above to start generating listing content.
+          </p>
+        </div>
+      ) : (
+        <>
+          {/* Tab Bar */}
+          <div className="flex items-center gap-1 mb-6 overflow-x-auto pb-1 scrollbar-none">
+            {TABS.map((tab) => {
+              const Icon = tab.icon;
+              const isActive = activeTab === tab.id;
+              const isGenerated = generatedTabs.has(tab.id);
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={cn(
+                    'flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all whitespace-nowrap relative',
+                    isActive
+                      ? 'bg-violet-600 text-white'
+                      : 'text-zinc-400 hover:text-white hover:bg-white/5'
+                  )}
+                >
+                  <Icon size={16} />
+                  {tab.label}
+                  {isGenerated && !isActive && (
+                    <Check size={12} className="text-green-500" />
+                  )}
+                </button>
+              );
+            })}
+
+            <div className="w-px h-6 bg-white/10 mx-1 shrink-0" />
+
+            {LINK_TABS.map((link) => {
+              const Icon = link.icon;
+              return (
+                <button
+                  key={link.path}
+                  onClick={() => navigate(link.path)}
+                  className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium text-zinc-500 hover:text-white hover:bg-white/5 transition-all whitespace-nowrap"
+                >
+                  <Icon size={16} />
+                  {link.label}
+                  <ExternalLink size={10} className="text-zinc-600" />
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Tab Content */}
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeTab}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.15 }}
+            >
+              {activeTab === 'description' && (
+                <DescriptionTab
+                  property={selectedProperty}
+                  onGenerated={() => markGenerated('description')}
+                />
+              )}
+              {activeTab === 'social' && (
+                <SocialMediaTab
+                  property={selectedProperty}
+                  onGenerated={() => markGenerated('social')}
+                />
+              )}
+              {activeTab === 'flyer' && (
+                <FlyerTab
+                  property={selectedProperty}
+                  onGenerated={() => markGenerated('flyer')}
+                />
+              )}
+              {activeTab === 'email' && (
+                <EmailTab
+                  property={selectedProperty}
+                  onGenerated={() => markGenerated('email')}
+                />
+              )}
+            </motion.div>
+          </AnimatePresence>
+        </>
+      )}
+    </div>
+  );
+}

@@ -22,14 +22,18 @@ export type RealEstateToolType =
   | 'item-removal'
   | 'lawn-enhancement'
   | 'declutter'
+  | 'auto-declutter'
   // Renovation & Design
   | 'virtual-renovation'
   | 'wall-color'
+  | 'exterior-paint'
   | 'floor-replacement'
   // Weather & Lighting
   | 'rain-to-shine'
   | 'night-to-day'
   | 'changing-seasons'
+  // Landscaping
+  | 'landscape-design'
   // Pool & Water
   | 'pool-enhancement'
   // Utility
@@ -78,26 +82,31 @@ export const TOOL_MODEL_MAP: Record<ToolType, string> = {
   'photo-relight': 'fal-ai/iclight-v2', // ICLight for bright/hdr presets
   'sky-segmentation': 'fal-ai/birefnet', // Background removal for sky mask
   'sky-replacement': 'fal-ai/flux-pro/v1/fill',
-  'twilight': 'fal-ai/flux/dev/image-to-image',
+  'twilight': 'fal-ai/flux-pro/kontext',
   'item-removal': 'fal-ai/bria/eraser',
-  'lawn-enhancement': 'fal-ai/flux/dev/image-to-image',
+  'lawn-enhancement': 'fal-ai/flux-pro/kontext',
   'declutter': 'fal-ai/bria/eraser',
+  'auto-declutter': 'fal-ai/image-editing/object-removal',
 
   // Renovation & Design Tools
-  'virtual-renovation': 'fal-ai/flux-pro/v1/fill',
-  'wall-color': 'fal-ai/flux-pro/v1/fill',
-  'floor-replacement': 'fal-ai/flux-pro/v1/fill',
+  'virtual-renovation': 'fal-ai/flux-pro/kontext',
+  'wall-color': 'fal-ai/flux-pro/kontext',
+  'exterior-paint': 'fal-ai/flux-pro/kontext',
+  'floor-replacement': 'fal-ai/flux-pro/kontext',
 
   // Weather & Lighting Tools
-  'rain-to-shine': 'fal-ai/flux/dev/image-to-image',
-  'night-to-day': 'fal-ai/flux/dev/image-to-image',
-  'changing-seasons': 'fal-ai/flux/dev/image-to-image',
+  'rain-to-shine': 'fal-ai/flux-pro/kontext',
+  'night-to-day': 'fal-ai/flux-pro/kontext',
+  'changing-seasons': 'fal-ai/flux-pro/kontext',
+
+  // Landscaping Tools
+  'landscape-design': 'fal-ai/flux-pro/kontext',
 
   // Pool & Water Tools
-  'pool-enhancement': 'fal-ai/flux-pro/v1/fill',
+  'pool-enhancement': 'fal-ai/flux-pro/kontext',
 
   // Utility Tools
-  'watermark-removal': 'fal-ai/bria/eraser',
+  'watermark-removal': 'fal-ai/flux-pro/kontext',
   'headshot-retouching': 'fal-ai/flux/dev/image-to-image',
   'hdr-merge': 'fal-ai/clarity-upscaler',
 
@@ -140,20 +149,25 @@ export const TOOL_CREDITS_MAP: Record<ToolType, number> = {
   'photo-relight': 1, // ICLight step for bright/hdr presets
   'sky-segmentation': 1, // Auto sky mask generation
   'sky-replacement': 2,
-  'twilight': 2,
+  'twilight': 4,
   'item-removal': 2,
-  'lawn-enhancement': 2,
-  'declutter': 2,
+  'lawn-enhancement': 4,
+  'declutter': 4,
+  'auto-declutter': 2,
 
   // Renovation & Design
-  'virtual-renovation': 3,
+  'virtual-renovation': 4,
   'wall-color': 2,
+  'exterior-paint': 2,
   'floor-replacement': 2,
 
   // Weather & Lighting
-  'rain-to-shine': 1,
-  'night-to-day': 2,
+  'rain-to-shine': 4,
+  'night-to-day': 4,
   'changing-seasons': 2,
+
+  // Landscaping
+  'landscape-design': 4,
 
   // Pool & Water
   'pool-enhancement': 2,
@@ -214,16 +228,21 @@ export const TOOL_INFO: ToolInfo[] = [
   { id: 'item-removal', name: 'Item Removal', description: 'Remove clutter, cars & unwanted objects', category: 'photo' },
   { id: 'lawn-enhancement', name: 'Lawn Enhancement', description: 'Make grass greener & landscaping vibrant', category: 'photo' },
   { id: 'declutter', name: 'One-Click Declutter', description: 'Auto-remove clutter without masking', category: 'photo', isNew: true },
+  { id: 'auto-declutter', name: 'Auto Declutter', description: 'One-click automatic clutter removal — no brushing needed', category: 'photo', isNew: true },
 
   // Renovation & Design
   { id: 'virtual-renovation', name: 'Virtual Renovation', description: 'Visualize kitchen/bathroom remodels', category: 'renovation', isPremium: true, isNew: true },
   { id: 'wall-color', name: 'Wall Color Changer', description: 'Preview different paint colors', category: 'renovation', isNew: true },
+  { id: 'exterior-paint', name: 'Exterior Paint Visualizer', description: 'Preview exterior paint colors on your home', category: 'renovation', isNew: true },
   { id: 'floor-replacement', name: 'Floor Replacement', description: 'Swap hardwood, tile, or carpet styles', category: 'renovation', isNew: true },
 
   // Weather & Lighting
   { id: 'rain-to-shine', name: 'Rain to Shine', description: 'Convert cloudy/rainy to sunny weather', category: 'weather', isNew: true },
   { id: 'night-to-day', name: 'Night to Day', description: 'Convert nighttime exteriors to daylight', category: 'weather', isNew: true },
   { id: 'changing-seasons', name: 'Changing Seasons', description: 'Add spring blooms, fall leaves, or snow', category: 'weather', isNew: true },
+
+  // Landscaping
+  { id: 'landscape-design', name: 'Landscape Design', description: 'Enhance or redesign exterior landscaping', category: 'renovation', isNew: true },
 
   // Pool & Water
   { id: 'pool-enhancement', name: 'Pool Enhancement', description: 'Add water to empty pools, clarify murky water', category: 'pool', isNew: true },
@@ -328,8 +347,9 @@ export interface SkyReplacementOptions {
 }
 
 export interface TwilightOptions {
-  style: 'blue-hour' | 'golden-dusk' | 'purple-twilight' | 'dramatic';
-  glowIntensity: 30 | 60 | 100;
+  style: 'warm-sunset' | 'blue-hour' | 'golden-dusk' | 'dramatic';
+  windowBrightness: 'subtle' | 'normal' | 'bright';
+  skyIntensity: 'muted' | 'normal' | 'vivid';
 }
 
 export interface ItemRemovalOptions {
@@ -348,6 +368,27 @@ export interface DeclutterOptions {
   maskDataUrl?: string;
 }
 
+export type DeclutterLevel = 'light' | 'medium' | 'deep';
+
+export type DeclutterCategory =
+  | 'personal-photos'
+  | 'toys-kids'
+  | 'pet-items'
+  | 'countertop-items'
+  | 'shoes-coats'
+  | 'trash-bins'
+  | 'cords-cables'
+  | 'bathroom-items'
+  | 'laundry'
+  | 'exercise-equipment'
+  | 'holiday-decor'
+  | 'religious-items';
+
+export interface AutoDeclutterOptions {
+  level: DeclutterLevel;
+  categories: DeclutterCategory[];
+}
+
 export interface VirtualRenovationOptions {
   renovationType: 'kitchen' | 'bathroom' | 'full-room';
   style: 'modern' | 'traditional' | 'contemporary' | 'farmhouse' | 'luxury';
@@ -357,8 +398,24 @@ export interface VirtualRenovationOptions {
 
 export interface WallColorOptions {
   color: string; // Hex color code
+  colorName: string; // Human-readable name e.g. "Sage Green", "Navy Blue"
   finish: 'matte' | 'eggshell' | 'satin' | 'semi-gloss';
   maskDataUrl?: string;
+}
+
+export interface ExteriorPaintElement {
+  enabled: boolean;
+  color: string; // Hex color code
+  colorName: string; // Human-readable name
+}
+
+export interface ExteriorPaintOptions {
+  finish: 'matte' | 'eggshell' | 'satin' | 'semi-gloss';
+  siding: ExteriorPaintElement;
+  trim: ExteriorPaintElement;
+  door: ExteriorPaintElement;
+  shutters: ExteriorPaintElement;
+  garageDoor: ExteriorPaintElement;
 }
 
 export interface FloorReplacementOptions {
@@ -382,10 +439,50 @@ export interface ChangingSeasonsOptions {
   intensity: 'subtle' | 'moderate' | 'dramatic';
 }
 
+export type LandscapeStyle =
+  | 'lush-green'
+  | 'modern-minimal'
+  | 'tropical'
+  | 'cottage-garden'
+  | 'desert-xeriscape'
+  | 'formal-estate';
+
+export type LandscapeElement =
+  | 'trees'
+  | 'flower-beds'
+  | 'pathway'
+  | 'hedges'
+  | 'outdoor-lighting'
+  | 'garden-beds'
+  | 'water-feature'
+  | 'planters'
+  | 'retaining-wall'
+  | 'pergola';
+
+export interface LandscapeDesignOptions {
+  style: LandscapeStyle;
+  elements: LandscapeElement[];
+}
+
+export type PoolMode = 'clean-water' | 'luxury-upgrade' | 'add-pool';
+
+export type PoolElement =
+  | 'lounge-chairs'
+  | 'umbrella'
+  | 'hot-tub'
+  | 'pool-lighting'
+  | 'outdoor-kitchen'
+  | 'fire-pit'
+  | 'water-features'
+  | 'pool-fence'
+  | 'cabana'
+  | 'landscaping'
+  | 'deck-upgrade'
+  | 'diving-board';
+
 export interface PoolEnhancementOptions {
-  mode: 'add-water' | 'clarify' | 'enhance-color';
-  waterColor: 'crystal-blue' | 'turquoise' | 'natural';
-  maskDataUrl?: string;
+  mode: PoolMode;
+  elements: PoolElement[];
 }
 
 export interface WatermarkRemovalOptions {
@@ -414,7 +511,6 @@ export interface RoomTourOptions {
 export interface FloorPlanOptions {
   style: '2d-basic' | '2d-detailed' | '3d-isometric';
   includeLabels: boolean;
-  includeDimensions: boolean;
 }
 
 export interface Staging360Options {
@@ -542,12 +638,15 @@ export type ToolOptions =
   | ItemRemovalOptions
   | LawnEnhancementOptions
   | DeclutterOptions
+  | AutoDeclutterOptions
   | VirtualRenovationOptions
   | WallColorOptions
+  | ExteriorPaintOptions
   | FloorReplacementOptions
   | RainToShineOptions
   | NightToDayOptions
   | ChangingSeasonsOptions
+  | LandscapeDesignOptions
   | PoolEnhancementOptions
   | WatermarkRemovalOptions
   | HeadshotRetouchingOptions

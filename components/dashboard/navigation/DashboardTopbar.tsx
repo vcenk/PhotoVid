@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Bell, Crown, User, Settings, LogOut } from 'lucide-react';
+import { Bell, Crown, User, Settings, LogOut, Menu } from 'lucide-react';
 
 interface DashboardTopbarProps {
   onMenuClick?: () => void;
@@ -10,9 +10,17 @@ export function DashboardTopbar({ onMenuClick }: DashboardTopbarProps) {
   const [showNotifications, setShowNotifications] = useState(false);
 
   return (
-    <header className="sticky top-0 z-10 h-16 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-md border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between px-8 shrink-0">
-      {/* Left Spacer */}
-      <div />
+    <header className="sticky top-0 z-10 h-16 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-md border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between px-4 sm:px-8 shrink-0">
+      {/* Left: Hamburger on mobile */}
+      <div className="flex items-center">
+        <button
+          onClick={onMenuClick}
+          className="p-2 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-colors lg:hidden mr-2"
+          aria-label="Open menu"
+        >
+          <Menu size={20} />
+        </button>
+      </div>
 
       {/* Right actions */}
       <div className="flex items-center gap-3">

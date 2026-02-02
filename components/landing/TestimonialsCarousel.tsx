@@ -19,11 +19,11 @@ interface Testimonial {
 const TESTIMONIALS: Testimonial[] = [
   {
     id: 1,
-    name: "Sarah Chen",
-    role: "Content Director",
-    company: "Vogue Digital",
+    name: "Sarah Mitchell",
+    role: "Top Producer",
+    company: "Keller Williams",
     avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=150&auto=format&fit=crop",
-    content: "Photovid transformed our editorial workflow. We're producing 10x more video content with half the team. The AI understands fashion aesthetics better than any tool we've tried.",
+    content: "I used to wait 3 days for a stager and photographer. Now I upload photos at 9am and have listing-ready images by 9:05. My clients can't believe how fast I move.",
     rating: 5,
   },
   {
@@ -32,43 +32,43 @@ const TESTIMONIALS: Testimonial[] = [
     role: "Founder & CEO",
     company: "PropertyVista",
     avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=150&auto=format&fit=crop",
-    content: "Our listings sell 40% faster with Photovid virtual staging. Empty rooms become furnished showpieces in seconds. It's like having a Hollywood production studio on demand.",
+    content: "Our listings sell 40% faster with Photovid virtual staging. Empty rooms become furnished showpieces in seconds. We've cut our photo editing costs by 80%.",
     rating: 5,
   },
   {
     id: 3,
     name: "Emily Watson",
-    role: "Head of Marketing",
-    company: "Glossier",
+    role: "RE Photographer",
+    company: "Watson Photography",
     avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=150&auto=format&fit=crop",
-    content: "We went from 2 product videos per month to 50. The quality is indistinguishable from our professional shoots. Our social engagement has tripled since we started using Photovid.",
+    content: "I shoot 5 properties a day and Photovid handles all the post-processing. Sky replacements, HDR merge, twilight conversions — what took me hours now takes minutes.",
     rating: 5,
   },
   {
     id: 4,
     name: "David Park",
-    role: "Creative Lead",
-    company: "TikTok Creators",
+    role: "Managing Broker",
+    company: "Compass",
     avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=150&auto=format&fit=crop",
-    content: "As a creator, speed is everything. Photovid lets me turn ideas into polished videos before the trend dies. It's my secret weapon for staying relevant.",
+    content: "We rolled Photovid out to our entire team of 120 agents. The consistency in listing quality has been remarkable. Every property looks like it had a professional shoot.",
     rating: 5,
   },
   {
     id: 5,
     name: "Jessica Liu",
-    role: "Brand Director",
-    company: "Nike Digital",
+    role: "Property Manager",
+    company: "Greystar",
     avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=150&auto=format&fit=crop",
-    content: "The AI motion synthesis is game-changing. Product shots come alive with cinematic movement that would take our team days to produce manually.",
+    content: "Managing 200+ rental units means constant turnover photos. Photovid's declutter and staging tools make every vacancy look move-in ready without staging a single room.",
     rating: 5,
   },
 ];
 
 const COMPANY_LOGOS = [
-  { name: 'Forbes', logo: 'Forbes' },
-  { name: 'TechCrunch', logo: 'TechCrunch' },
-  { name: 'Product Hunt', logo: 'Product Hunt' },
-  { name: 'Wired', logo: 'Wired' },
+  { name: 'Inman', logo: 'Inman' },
+  { name: 'Realtor.com', logo: 'Realtor.com' },
+  { name: 'HousingWire', logo: 'HousingWire' },
+  { name: 'The Real Deal', logo: 'The Real Deal' },
 ];
 
 export const TestimonialsCarousel: React.FC = () => {
@@ -115,7 +115,7 @@ export const TestimonialsCarousel: React.FC = () => {
       <div className="absolute inset-0 bg-gradient-to-b from-zinc-900 via-zinc-950 to-black" />
 
       {/* Ambient glow */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-violet-600/10 rounded-full blur-[150px]" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-indigo-600/10 rounded-full blur-[150px]" />
 
       <div className="relative max-w-7xl mx-auto px-6">
         {/* Header */}
@@ -126,8 +126,8 @@ export const TestimonialsCarousel: React.FC = () => {
             viewport={{ once: true }}
             className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-zinc-400 text-xs font-bold uppercase tracking-widest mb-6"
           >
-            <Quote size={14} className="text-violet-400" />
-            What creators say
+            <Quote size={14} className="text-indigo-400" />
+            What professionals say
           </motion.span>
 
           <motion.h2
@@ -136,11 +136,11 @@ export const TestimonialsCarousel: React.FC = () => {
             viewport={{ once: true }}
             className="text-3xl md:text-5xl font-bold text-white tracking-tight"
           >
-            Loved by{' '}
-            <span className="bg-gradient-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-transparent">
-              50,000+
+            Trusted by{' '}
+            <span className="bg-gradient-to-r from-indigo-400 to-violet-400 bg-clip-text text-transparent">
+              10,000+
             </span>{' '}
-            creators
+            real estate pros
           </motion.h2>
         </div>
 
@@ -164,7 +164,7 @@ export const TestimonialsCarousel: React.FC = () => {
               >
                 <div className="relative bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8 md:p-12">
                   {/* Quote icon */}
-                  <div className="absolute -top-4 -left-4 w-12 h-12 rounded-2xl bg-gradient-to-br from-violet-500 to-fuchsia-500 flex items-center justify-center shadow-lg shadow-violet-500/30">
+                  <div className="absolute -top-4 -left-4 w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center shadow-lg shadow-indigo-500/30">
                     <Quote size={20} className="text-white" />
                   </div>
 
@@ -188,7 +188,7 @@ export const TestimonialsCarousel: React.FC = () => {
                         alt={currentTestimonial.name}
                         className="w-14 h-14 rounded-full object-cover border-2 border-white/20"
                       />
-                      <div className="absolute inset-0 rounded-full bg-gradient-to-br from-violet-500/20 to-transparent" />
+                      <div className="absolute inset-0 rounded-full bg-gradient-to-br from-indigo-500/20 to-transparent" />
                     </div>
                     <div>
                       <div className="font-bold text-white">{currentTestimonial.name}</div>
@@ -199,7 +199,7 @@ export const TestimonialsCarousel: React.FC = () => {
                   </div>
 
                   {/* Decorative gradient */}
-                  <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-violet-500/5 to-fuchsia-500/5 pointer-events-none" />
+                  <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-indigo-500/5 to-violet-500/5 pointer-events-none" />
                 </div>
               </motion.div>
             </AnimatePresence>
@@ -236,7 +236,7 @@ export const TestimonialsCarousel: React.FC = () => {
                 }}
                 className={`w-2 h-2 rounded-full transition-all duration-300 ${
                   idx === activeIndex
-                    ? 'w-8 bg-gradient-to-r from-violet-500 to-fuchsia-500'
+                    ? 'w-8 bg-gradient-to-r from-indigo-500 to-violet-500'
                     : 'bg-white/20 hover:bg-white/40'
                 }`}
               />

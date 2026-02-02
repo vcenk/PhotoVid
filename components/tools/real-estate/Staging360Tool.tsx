@@ -2,11 +2,12 @@ import React, { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
     ArrowLeft, UploadCloud, Sparkles, Download, RefreshCw, Loader2, Trash2,
-    Image as ImageIcon, Check, AlertCircle, Compass, Crown
+    Image as ImageIcon, Check, AlertCircle, Compass, Crown, BookmarkPlus
 } from 'lucide-react';
-import { NavigationRail, FlyoutType } from '../../dashboard/navigation/NavigationRail';
-import { FlyoutPanels } from '../../dashboard/navigation/FlyoutPanels';
+import { NavigationRail } from '../../dashboard/navigation/NavigationRail';
+import { AssetProvider, useAssets } from '@/lib/store/contexts/AssetContext';
 import { generate360Staging, isFalConfigured } from '@/lib/api/toolGeneration';
+import { downloadFile } from '@/lib/utils';
 import type { Staging360Options } from '@/lib/types/generation';
 
 const ROOM_TYPES = [
@@ -23,9 +24,9 @@ const STYLES = [
     { id: 'farmhouse', name: 'Farmhouse', desc: 'Warm rustic charm' },
 ];
 
-export const Staging360Tool: React.FC = () => {
+const Staging360ToolInner: React.FC = () => {
     const navigate = useNavigate();
-    const [activeFlyout, setActiveFlyout] = useState<FlyoutType>(null);
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     const [uploadedImage, setUploadedImage] = useState<File | null>(null);
     const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -37,6 +38,8 @@ export const Staging360Tool: React.FC = () => {
     const [generationProgress, setGenerationProgress] = useState(0);
     const [resultImage, setResultImage] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
+    const [savedToLibrary, setSavedToLibrary] = useState(false);
+    const { addAsset } = useAssets();
 
     const handleDrag = useCallback((e: React.DragEvent) => {
         e.preventDefault();
@@ -77,16 +80,19 @@ export const Staging360Tool: React.FC = () => {
         setIsGenerating(true);
         setGenerationProgress(0);
         setError(null);
+        setSavedToLibrary(false);
 
         if (!isFalConfigured()) {
             const progressInterval = setInterval(() => {
                 setGenerationProgress(prev => prev >= 90 ? (clearInterval(progressInterval), 90) : prev + 10);
             }, 500);
 
-            setTimeout(() => {
+            setTimeout(async () => {
                 clearInterval(progressInterval);
                 setGenerationProgress(100);
-                setResultImage('https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=1200&h=600&fit=crop');
+                const mockUrl = 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=1200&h=600&fit=crop';
+                setResultImage(mockUrl);
+                try { await addAsset(mockUrl, 'image', '360 Staging Result'); setSavedToLibrary(true); } catch {}
                 setIsGenerating(false);
             }, 5000);
             return;
@@ -103,6 +109,7 @@ export const Staging360Tool: React.FC = () => {
                 }
             );
             setResultImage(resultUrl);
+            try { await addAsset(resultUrl, 'image', '360 Staging Result'); setSavedToLibrary(true); } catch {}
         } catch (err) {
             console.error('360 staging error:', err);
             setError(err instanceof Error ? err.message : '360° staging failed. Please try again.');
@@ -115,14 +122,12 @@ export const Staging360Tool: React.FC = () => {
 
     return (
         <div className="h-screen flex bg-[#0a0a0b]">
-            <NavigationRail activeFlyout={activeFlyout} onFlyoutChange={setActiveFlyout} />
-            <FlyoutPanels activeFlyout={activeFlyout} onClose={() => setActiveFlyout(null)} />
-
-            <div className="flex-1 flex ml-56">
-                <div className="w-[320px] flex-shrink-0 bg-[#111113] border-r border-white/5 flex flex-col">
+            <NavigationRail isMobileOpen={mobileMenuOpen} onMobileClose={() => setMobileMenuOpen(false)} />
+<div className="flex-1 flex ml-0 lg:ml-16">
+                <div className="w-[360px] flex-shrink-0 bg-[#111113] border-r border-white/5 flex flex-col">
                     <div className="p-4 border-b border-white/5">
                         <div className="flex items-center gap-3">
-                            <button onClick={() => navigate('/studio/apps/real-estate')} className="p-2 hover:bg-white/5 rounded-lg transition-colors">
+                            <button onClick={() => navigate('/studio/real-estate')} className="p-2 hover:bg-white/5 rounded-lg transition-colors">
                                 <ArrowLeft size={18} className="text-zinc-400" />
                             </button>
                             <h1 className="text-base font-semibold text-white flex items-center gap-2">
@@ -217,7 +222,12 @@ export const Staging360Tool: React.FC = () => {
                         {resultImage && (
                             <div className="flex items-center gap-2">
                                 <button onClick={() => setResultImage(null)} className="px-3 py-1.5 text-xs font-medium text-zinc-400 hover:text-white bg-white/5 hover:bg-white/10 rounded-lg transition-colors flex items-center gap-1.5"><RefreshCw size={14} />Try Different Style</button>
-                                <button className="px-3 py-1.5 text-xs font-medium text-white bg-violet-600 hover:bg-violet-500 rounded-lg transition-colors flex items-center gap-1.5"><Download size={14} />Download</button>
+                                {savedToLibrary ? (
+                                    <span className="px-3 py-1.5 text-xs font-medium text-emerald-400 bg-emerald-500/10 rounded-lg flex items-center gap-1.5"><BookmarkPlus size={14} />Saved to Library</span>
+                                ) : (
+                                    <button onClick={async () => { if (resultImage) { try { await addAsset(resultImage, 'image', '360 Staging Result'); setSavedToLibrary(true); } catch {} } }} className="px-3 py-1.5 text-xs font-medium text-zinc-400 hover:text-white bg-white/5 hover:bg-white/10 rounded-lg transition-colors flex items-center gap-1.5"><BookmarkPlus size={14} />Save to Library</button>
+                                )}
+                                <button onClick={() => resultImage && downloadFile(resultImage, `360-staging-${Date.now()}.jpg`)} className="px-3 py-1.5 text-xs font-medium text-white bg-violet-600 hover:bg-violet-500 rounded-lg transition-colors flex items-center gap-1.5"><Download size={14} />Download</button>
                             </div>
                         )}
                     </div>
@@ -259,3 +269,9 @@ export const Staging360Tool: React.FC = () => {
         </div>
     );
 };
+
+export const Staging360Tool: React.FC = () => (
+    <AssetProvider>
+        <Staging360ToolInner />
+    </AssetProvider>
+);

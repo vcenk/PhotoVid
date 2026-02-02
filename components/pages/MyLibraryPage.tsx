@@ -1,8 +1,7 @@
 import React, { useState, useMemo, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AssetProvider, useAssets, Asset } from '../../lib/store/contexts/AssetContext';
-import { NavigationRail, FlyoutType } from '../dashboard/navigation/NavigationRail';
-import { FlyoutPanels } from '../dashboard/navigation/FlyoutPanels';
+import { NavigationRail } from '../dashboard/navigation/NavigationRail';
 import { DashboardTopbar } from '../dashboard/navigation/DashboardTopbar';
 import { uploadToR2 } from '../../lib/api/r2';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -38,19 +37,19 @@ type SortType = 'newest' | 'oldest' | 'name';
 
 // Tool options for "Use in Tool" menu
 const TOOL_OPTIONS = [
-  { id: 'virtual-staging', name: 'Virtual Staging', path: '/studio/apps/real-estate/virtual-staging', icon: '🏠' },
-  { id: 'photo-enhancement', name: 'Photo Enhancement', path: '/studio/apps/real-estate/photo-enhancement', icon: '✨' },
-  { id: 'sky-replacement', name: 'Sky Replacement', path: '/studio/apps/real-estate/sky-replacement', icon: '☁️' },
-  { id: 'twilight', name: 'Day to Twilight', path: '/studio/apps/real-estate/twilight', icon: '🌅' },
-  { id: 'item-removal', name: 'Item Removal', path: '/studio/apps/real-estate/item-removal', icon: '🗑️' },
-  { id: 'lawn-enhancement', name: 'Lawn Enhancement', path: '/studio/apps/real-estate/lawn-enhancement', icon: '🌿' },
-  { id: 'room-tour', name: 'Room Tour Video', path: '/studio/apps/real-estate/room-tour', icon: '🎬' },
+  { id: 'virtual-staging', name: 'Virtual Staging', path: '/studio/real-estate/virtual-staging', icon: '🏠' },
+  { id: 'photo-enhancement', name: 'Photo Enhancement', path: '/studio/real-estate/photo-enhancement', icon: '✨' },
+  { id: 'sky-replacement', name: 'Sky Replacement', path: '/studio/real-estate/sky-replacement', icon: '☁️' },
+  { id: 'twilight', name: 'Day to Twilight', path: '/studio/real-estate/twilight', icon: '🌅' },
+  { id: 'item-removal', name: 'Item Removal', path: '/studio/real-estate/item-removal', icon: '🗑️' },
+  { id: 'lawn-enhancement', name: 'Lawn Enhancement', path: '/studio/real-estate/lawn-enhancement', icon: '🌿' },
+  { id: 'room-tour', name: 'Room Tour Video', path: '/studio/real-estate/room-tour', icon: '🎬' },
 ];
 
 const MyLibraryContent: React.FC = () => {
   const navigate = useNavigate();
   const { assets, loading, deleteAsset, addAsset } = useAssets();
-  const [activeFlyout, setActiveFlyout] = useState<FlyoutType>(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // UI State
@@ -214,10 +213,8 @@ const MyLibraryContent: React.FC = () => {
 
   return (
     <div className="flex h-screen bg-white dark:bg-[#09090b] text-zinc-900 dark:text-white font-sans overflow-hidden">
-      <NavigationRail activeFlyout={activeFlyout} onFlyoutChange={setActiveFlyout} />
-      <FlyoutPanels activeFlyout={activeFlyout} onClose={() => setActiveFlyout(null)} />
-
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden" style={{ marginLeft: '224px' }}>
+      <NavigationRail isMobileOpen={mobileMenuOpen} onMobileClose={() => setMobileMenuOpen(false)} />
+<div className="flex-1 flex flex-col min-w-0 overflow-hidden ml-0 lg:ml-16">
         <DashboardTopbar onMenuClick={() => {}} />
 
         <main className="flex-1 overflow-y-auto">

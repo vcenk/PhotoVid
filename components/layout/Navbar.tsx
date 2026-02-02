@@ -3,22 +3,18 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { Menu, X, ChevronDown, Moon, Sun } from 'lucide-react';
+import { Menu, X, ChevronDown } from 'lucide-react';
 import { createClient } from '../../lib/database/client';
 import { AuthButton } from '../common/AuthButton';
-import { useTheme } from '../common/ThemeProvider';
 
 const PRIMARY_NAV = [
-  { name: 'Home', id: 'hero-start' },
-  { name: 'Industries', id: 'use-cases' },
+  { name: 'Tools', id: 'workflow' },
   { name: 'Showcase', id: 'showcase' },
+  { name: 'Pricing', id: 'pricing' },
+  { name: 'Templates', id: 'templates' },
 ];
 
 const SECONDARY_NAV = [
-  { name: 'Workflow', id: 'workflow' },
-  { name: 'Presets', id: 'presets' },
-  { name: 'Templates', id: 'templates' },
-  { name: 'Pricing', id: 'pricing' },
   { name: 'FAQ', id: 'faq' },
 ];
 
@@ -28,17 +24,14 @@ export const Navbar: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [activeId, setActiveId] = useState('');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isMoreOpen, setIsMoreOpen] = useState(false);
   const [user, setUser] = useState<any>(null);
-  
+
   const navigate = useNavigate();
-  const moreDropdownRef = useRef<HTMLDivElement>(null);
   const supabase = createClient();
-  const { theme, toggleTheme } = useTheme();
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
+      setIsScrolled(window.scrollY > 50);
     };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
@@ -62,16 +55,6 @@ export const Navbar: React.FC = () => {
       if (subscription) subscription.unsubscribe();
     };
   }, [supabase]);
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (moreDropdownRef.current && !moreDropdownRef.current.contains(event.target as Node)) {
-        setIsMoreOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
 
   useEffect(() => {
     const observerOptions = {
@@ -102,163 +85,140 @@ export const Navbar: React.FC = () => {
     if (element) {
       element.scrollIntoView({ behavior: 'smooth', block: 'start' });
       setIsMobileMenuOpen(false);
-      setIsMoreOpen(false);
     }
-  };
-
-  const isSecondaryActive = SECONDARY_NAV.some(item => item.id === activeId);
-
-  const getTextColor = (isActive: boolean) => {
-    if (!isScrolled) {
-      return isActive ? "text-white" : "text-zinc-300 hover:text-white";
-    }
-    if (isActive) {
-      return "text-indigo-600";
-    }
-    return "text-zinc-500 hover:text-zinc-900";
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-[100] flex justify-center p-4 md:p-8 transition-all duration-500 pointer-events-none">
+    <header className="fixed top-0 left-0 right-0 z-[100] transition-all duration-500">
       <motion.nav
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
         className={`
-          pointer-events-auto flex items-center justify-between w-full transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]
+          flex items-center justify-between w-full px-8 md:px-14 transition-all duration-500
           ${isScrolled
-            ? "max-w-6xl px-6 md:px-10 py-4 md:py-5 rounded-3xl bg-white/80 backdrop-blur-2xl border border-zinc-200 shadow-[0_20px_50px_rgba(0,0,0,0.1)]"
-            : "max-w-none px-8 md:px-12 py-10 bg-transparent border-transparent"
+            ? "py-4 bg-black/70 backdrop-blur-xl border-b border-white/5"
+            : "py-6 md:py-8 bg-transparent"
           }
         `}
       >
+        {/* ── Logo (left) ── */}
         <div
-          className="flex items-center gap-2 cursor-pointer group"
+          className="flex items-center gap-2 cursor-pointer flex-shrink-0"
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
         >
           <img
             src="/photovid.svg"
             alt="Photovid"
-            className={`h-8 md:h-10 w-auto transition-all duration-500 ${isScrolled ? '' : 'brightness-0 invert'}`}
+            className="h-14 md:h-16 w-auto brightness-0 invert"
           />
         </div>
 
-        <div className="hidden lg:flex items-center space-x-10">
+        {/* ── Centered Nav Links ── */}
+        <div className="hidden lg:flex items-center gap-10 absolute left-1/2 -translate-x-1/2">
           {PRIMARY_NAV.map((item) => (
             <button
               key={item.id}
               onClick={() => scrollToSection(item.id)}
               className={`
-                text-sm md:text-base font-black uppercase tracking-[0.2em] transition-all relative py-2
-                ${getTextColor(activeId === item.id)}
+                text-base font-medium transition-all duration-300 relative py-1
+                ${activeId === item.id
+                  ? 'text-white'
+                  : 'text-white/60 hover:text-white'
+                }
               `}
             >
               {item.name}
               {activeId === item.id && (
                 <motion.div
-                  layoutId="activeUnderline"
-                  className="absolute bottom-0 left-0 right-0 h-1 rounded-full bg-indigo-500 shadow-[0_0_15px_rgba(99,102,241,0.4)]"
+                  layoutId="navUnderline"
+                  className="absolute -bottom-1 left-0 right-0 h-px bg-white/60"
+                  transition={{ type: 'spring', stiffness: 300, damping: 30 }}
                 />
               )}
             </button>
           ))}
 
-          <div className="relative" ref={moreDropdownRef}>
+          {SECONDARY_NAV.length > 0 && (
             <button
-              onClick={() => setIsMoreOpen(!isMoreOpen)}
+              onClick={() => scrollToSection(SECONDARY_NAV[0].id)}
               className={`
-                text-sm md:text-base font-black uppercase tracking-[0.2em] transition-all relative py-2 flex items-center gap-2
-                ${getTextColor(isSecondaryActive || isMoreOpen)}
+                text-base font-medium transition-all duration-300 py-1
+                ${activeId === SECONDARY_NAV[0].id
+                  ? 'text-white'
+                  : 'text-white/60 hover:text-white'
+                }
               `}
             >
-              Explore <ChevronDown size={18} className={`transition-transform duration-300 ${isMoreOpen ? 'rotate-180' : ''}`} />
+              {SECONDARY_NAV[0].name}
             </button>
-
-            <AnimatePresence>
-              {isMoreOpen && (
-                <motion.div
-                  initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                  className="absolute top-full right-0 mt-6 w-64 py-4 rounded-[2rem] bg-white border border-zinc-200 shadow-2xl flex flex-col overflow-hidden p-2 ring-1 ring-black/5"
-                >
-                  {SECONDARY_NAV.map((item) => (
-                    <button
-                      key={item.id}
-                      onClick={() => scrollToSection(item.id)}
-                      className={`
-                        px-8 py-4 text-xs font-black uppercase tracking-widest text-left rounded-2xl transition-all
-                        ${activeId === item.id
-                          ? "text-indigo-600 bg-zinc-100"
-                          : "text-zinc-500 hover:text-zinc-900 hover:bg-zinc-50"
-                        }
-                      `}
-                    >
-                      {item.name}
-                    </button>
-                  ))}
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
+          )}
         </div>
 
-        <div className="flex items-center gap-4 md:gap-6">
-          <div className="hidden sm:block">
-            <AuthButton user={user} isScrolled={isScrolled} />
-          </div>
-
+        {/* ── Right Side: Auth + Mobile Menu ── */}
+        <div className="flex items-center gap-4 flex-shrink-0">
+          {/* Sign In */}
           <button
-            className={`lg:hidden p-3 rounded-full transition-colors ${
-              !isScrolled
-                ? 'text-white hover:bg-white/10'
-                : 'text-zinc-900 hover:bg-zinc-100'
-            }`}
+            onClick={() => navigate(user ? '/studio' : '/login')}
+            className="hidden sm:inline-flex text-base font-medium text-white/70 hover:text-white transition-colors px-5 py-2.5"
+          >
+            {user ? 'Dashboard' : 'Sign In'}
+          </button>
+
+          {/* Primary CTA */}
+          <button
+            onClick={() => navigate(user ? '/studio/real-estate' : '/studio')}
+            className="hidden sm:inline-flex items-center gap-2 px-7 py-2.5 bg-white text-black text-base font-semibold rounded-full hover:bg-white/90 transition-all duration-300"
+          >
+            Start For Free
+          </button>
+
+          {/* Mobile Menu Toggle */}
+          <button
+            className="lg:hidden p-2 rounded-full text-white hover:bg-white/10 transition-colors"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
           >
-            {isMobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
+            {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
         </div>
       </motion.nav>
 
+      {/* ── Mobile Menu ── */}
       <AnimatePresence>
         {isMobileMenuOpen && (
           <motion.div
-            initial={{ opacity: 0, y: -20, scale: 0.98 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -20, scale: 0.98 }}
-            className="fixed top-24 left-4 right-4 mx-auto max-w-md p-8 rounded-[2.5rem] bg-white/95 backdrop-blur-3xl border border-zinc-200 shadow-[0_30px_100px_rgba(0,0,0,0.3)] lg:hidden pointer-events-auto max-h-[80vh] overflow-y-auto z-[90]"
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.2 }}
+            className="fixed top-16 left-0 right-0 bg-black/95 backdrop-blur-xl border-b border-white/10 lg:hidden z-[90]"
           >
-            <div className="flex flex-col gap-6">
+            <div className="flex flex-col px-6 py-6 gap-1">
               {[...PRIMARY_NAV, ...SECONDARY_NAV].map((item) => (
                 <button
                   key={item.id}
                   onClick={() => scrollToSection(item.id)}
                   className={`
-                    text-2xl font-black uppercase tracking-tight text-left py-2
+                    text-left px-4 py-3 rounded-xl text-base font-medium transition-all
                     ${activeId === item.id
-                      ? "text-indigo-600"
-                      : "text-zinc-500 hover:text-zinc-900"
+                      ? 'text-white bg-white/10'
+                      : 'text-white/60 hover:text-white hover:bg-white/5'
                     }
                   `}
                 >
                   {item.name}
                 </button>
               ))}
-              <div className="h-px bg-zinc-200 my-4" />
+              <div className="h-px bg-white/10 my-3" />
               <button
                 onClick={() => {
-                  if (user) {
-                    navigate('/studio');
-                  } else {
-                    navigate('/login');
-                  }
+                  navigate(user ? '/studio' : '/login');
                   setIsMobileMenuOpen(false);
                 }}
-                className="w-full py-6 rounded-[2rem] bg-zinc-900 text-white font-black text-sm uppercase tracking-[0.2em] shadow-xl active:scale-95 transition-all"
+                className="w-full py-3 rounded-full bg-white text-black font-semibold text-sm transition-all active:scale-95"
               >
-                {user ? 'Launch Studio' : 'Get Started Now'}
+                {user ? 'Launch Studio' : 'Start For Free'}
               </button>
             </div>
           </motion.div>

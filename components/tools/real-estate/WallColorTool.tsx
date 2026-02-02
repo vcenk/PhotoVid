@@ -1,12 +1,13 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
     ArrowLeft, UploadCloud, Sparkles, Download, RefreshCw, Loader2, Trash2,
-    Image as ImageIcon, Check, AlertCircle, Paintbrush
+    Image as ImageIcon, Check, AlertCircle, Paintbrush, ChevronLeft, ChevronRight, BookmarkPlus
 } from 'lucide-react';
-import { NavigationRail, FlyoutType } from '../../dashboard/navigation/NavigationRail';
-import { FlyoutPanels } from '../../dashboard/navigation/FlyoutPanels';
+import { NavigationRail } from '../../dashboard/navigation/NavigationRail';
+import { AssetProvider, useAssets } from '@/lib/store/contexts/AssetContext';
 import { generateWallColor, isFalConfigured } from '@/lib/api/toolGeneration';
+import { downloadFile } from '@/lib/utils';
 import type { WallColorOptions } from '@/lib/types/generation';
 
 const COLOR_PRESETS = [
@@ -31,9 +32,57 @@ const FINISHES = [
     { id: 'semi-gloss', name: 'Semi-Gloss', desc: 'Reflective, moisture-resistant' },
 ];
 
-export const WallColorTool: React.FC = () => {
+const BeforeAfterSlider: React.FC<{ before: string; after: string; colorName: string; colorHex: string }> = ({ before, after, colorName, colorHex }) => {
+    const [sliderPosition, setSliderPosition] = useState(50);
+    const containerRef = useRef<HTMLDivElement>(null);
+    const isDraggingSlider = useRef(false);
+
+    const handleMove = (clientX: number) => {
+        if (!containerRef.current) return;
+        const rect = containerRef.current.getBoundingClientRect();
+        const x = Math.max(0, Math.min(clientX - rect.left, rect.width));
+        setSliderPosition((x / rect.width) * 100);
+    };
+
+    return (
+        <div
+            ref={containerRef}
+            className="relative rounded-2xl overflow-hidden shadow-2xl w-full max-w-4xl aspect-[16/10] cursor-ew-resize select-none"
+            onMouseDown={() => { isDraggingSlider.current = true; }}
+            onMouseUp={() => { isDraggingSlider.current = false; }}
+            onMouseLeave={() => { isDraggingSlider.current = false; }}
+            onMouseMove={(e) => { if (isDraggingSlider.current) handleMove(e.clientX); }}
+            onTouchMove={(e) => handleMove(e.touches[0].clientX)}
+        >
+            {/* After (full background) */}
+            <img src={after} alt="After" className="absolute inset-0 w-full h-full object-cover" />
+
+            {/* Before (clipped) */}
+            <div className="absolute inset-0 overflow-hidden" style={{ clipPath: `inset(0 ${100 - sliderPosition}% 0 0)` }}>
+                <img src={before} alt="Before" className="absolute inset-0 w-full h-full object-cover" />
+            </div>
+
+            {/* Slider line */}
+            <div className="absolute top-0 bottom-0 w-0.5 bg-white shadow-lg" style={{ left: `${sliderPosition}%`, transform: 'translateX(-50%)' }}>
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 bg-white rounded-full shadow-xl flex items-center justify-center">
+                    <ChevronLeft size={14} className="text-zinc-600 -mr-1" />
+                    <ChevronRight size={14} className="text-zinc-600 -ml-1" />
+                </div>
+            </div>
+
+            {/* Labels */}
+            <div className="absolute top-3 left-3 px-2.5 py-1 bg-black/60 backdrop-blur-sm rounded-lg text-xs text-white font-medium">Before</div>
+            <div className="absolute top-3 right-3 px-2.5 py-1 bg-pink-500/80 backdrop-blur-sm rounded-lg text-xs text-white font-medium flex items-center gap-1.5">
+                <div className="w-3 h-3 rounded-sm border border-white/30" style={{ backgroundColor: colorHex }} />
+                {colorName}
+            </div>
+        </div>
+    );
+};
+
+const WallColorToolInner: React.FC = () => {
     const navigate = useNavigate();
-    const [activeFlyout, setActiveFlyout] = useState<FlyoutType>(null);
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     const [uploadedImage, setUploadedImage] = useState<File | null>(null);
     const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -46,6 +95,8 @@ export const WallColorTool: React.FC = () => {
     const [generationProgress, setGenerationProgress] = useState(0);
     const [resultImage, setResultImage] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
+    const [savedToLibrary, setSavedToLibrary] = useState(false);
+    const { addAsset } = useAssets();
 
     const handleDrag = useCallback((e: React.DragEvent) => {
         e.preventDefault();
@@ -86,6 +137,7 @@ export const WallColorTool: React.FC = () => {
         setIsGenerating(true);
         setGenerationProgress(0);
         setError(null);
+        setSavedToLibrary(false);
 
         if (!isFalConfigured()) {
             const progressInterval = setInterval(() => {
@@ -95,7 +147,9 @@ export const WallColorTool: React.FC = () => {
             setTimeout(() => {
                 clearInterval(progressInterval);
                 setGenerationProgress(100);
-                setResultImage('https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=1200&h=800&fit=crop');
+                const mockUrl = 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=1200&h=800&fit=crop';
+                setResultImage(mockUrl);
+                try { await addAsset(mockUrl, 'image', 'Wall Color Result'); setSavedToLibrary(true); } catch {}
                 setIsGenerating(false);
             }, 3500);
             return;
@@ -104,6 +158,7 @@ export const WallColorTool: React.FC = () => {
         try {
             const options: WallColorOptions = {
                 color: selectedColor,
+                colorName: selectedColorName,
                 finish,
             };
             const resultUrl = await generateWallColor(
@@ -116,6 +171,7 @@ export const WallColorTool: React.FC = () => {
                 }
             );
             setResultImage(resultUrl);
+            try { await addAsset(resultUrl, 'image', 'Wall Color Result'); setSavedToLibrary(true); } catch {}
         } catch (err) {
             console.error('Wall color error:', err);
             setError(err instanceof Error ? err.message : 'Wall color change failed. Please try again.');
@@ -128,14 +184,12 @@ export const WallColorTool: React.FC = () => {
 
     return (
         <div className="h-screen flex bg-[#0a0a0b]">
-            <NavigationRail activeFlyout={activeFlyout} onFlyoutChange={setActiveFlyout} />
-            <FlyoutPanels activeFlyout={activeFlyout} onClose={() => setActiveFlyout(null)} />
-
-            <div className="flex-1 flex ml-56">
-                <div className="w-[320px] flex-shrink-0 bg-[#111113] border-r border-white/5 flex flex-col">
+            <NavigationRail isMobileOpen={mobileMenuOpen} onMobileClose={() => setMobileMenuOpen(false)} />
+<div className="flex-1 flex ml-0 lg:ml-16">
+                <div className="w-[360px] flex-shrink-0 bg-[#111113] border-r border-white/5 flex flex-col">
                     <div className="p-4 border-b border-white/5">
                         <div className="flex items-center gap-3">
-                            <button onClick={() => navigate('/studio/apps/real-estate')} className="p-2 hover:bg-white/5 rounded-lg transition-colors">
+                            <button onClick={() => navigate('/studio/real-estate')} className="p-2 hover:bg-white/5 rounded-lg transition-colors">
                                 <ArrowLeft size={18} className="text-zinc-400" />
                             </button>
                             <h1 className="text-base font-semibold text-white flex items-center gap-2">
@@ -248,7 +302,12 @@ export const WallColorTool: React.FC = () => {
                         {resultImage && (
                             <div className="flex items-center gap-2">
                                 <button onClick={() => setResultImage(null)} className="px-3 py-1.5 text-xs font-medium text-zinc-400 hover:text-white bg-white/5 hover:bg-white/10 rounded-lg transition-colors flex items-center gap-1.5"><RefreshCw size={14} />Try Different Color</button>
-                                <button className="px-3 py-1.5 text-xs font-medium text-white bg-pink-600 hover:bg-pink-500 rounded-lg transition-colors flex items-center gap-1.5"><Download size={14} />Download</button>
+                                {savedToLibrary ? (
+                                    <span className="px-3 py-1.5 text-xs font-medium text-emerald-400 bg-emerald-500/10 rounded-lg flex items-center gap-1.5"><BookmarkPlus size={14} />Saved to Library</span>
+                                ) : (
+                                    <button onClick={async () => { if (resultImage) { try { await addAsset(resultImage, 'image', 'Wall Color Result'); setSavedToLibrary(true); } catch {} } }} className="px-3 py-1.5 text-xs font-medium text-zinc-400 hover:text-white bg-white/5 hover:bg-white/10 rounded-lg transition-colors flex items-center gap-1.5"><BookmarkPlus size={14} />Save to Library</button>
+                                )}
+                                <button onClick={() => resultImage && downloadFile(resultImage, `wall-color-${Date.now()}.jpg`)} className="px-3 py-1.5 text-xs font-medium text-white bg-pink-600 hover:bg-pink-500 rounded-lg transition-colors flex items-center gap-1.5"><Download size={14} />Download</button>
                             </div>
                         )}
                     </div>
@@ -276,11 +335,12 @@ export const WallColorTool: React.FC = () => {
                                 </div>
                                 <p className="text-zinc-400 font-medium">Applying paint color...</p>
                             </div>
+                        ) : resultImage && imagePreview ? (
+                            <BeforeAfterSlider before={imagePreview} after={resultImage} colorName={selectedColorName} colorHex={selectedColor} />
                         ) : (
                             <div className="relative rounded-2xl overflow-hidden shadow-2xl">
-                                <img src={resultImage || imagePreview} alt="Preview" className="max-w-full max-h-[calc(100vh-180px)] object-contain" />
-                                {resultImage && <div className="absolute top-4 right-4 px-3 py-1.5 bg-pink-500/80 backdrop-blur rounded-lg text-xs text-white font-medium flex items-center gap-1.5"><Paintbrush size={12} />{selectedColorName}</div>}
-                                {!resultImage && <div className="absolute inset-0 flex items-center justify-center bg-black/40"><div className="text-center text-white"><Paintbrush size={28} className="mx-auto mb-2 opacity-80" /><p className="text-sm font-medium">Ready to change color</p></div></div>}
+                                <img src={imagePreview} alt="Preview" className="max-w-full max-h-[calc(100vh-180px)] object-contain" />
+                                <div className="absolute inset-0 flex items-center justify-center bg-black/40"><div className="text-center text-white"><Paintbrush size={28} className="mx-auto mb-2 opacity-80" /><p className="text-sm font-medium">Ready to change color</p></div></div>
                             </div>
                         )}
                     </div>
@@ -289,3 +349,9 @@ export const WallColorTool: React.FC = () => {
         </div>
     );
 };
+
+export const WallColorTool: React.FC = () => (
+    <AssetProvider>
+        <WallColorToolInner />
+    </AssetProvider>
+);

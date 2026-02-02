@@ -1,6 +1,6 @@
 // Industry configuration types and data for reusable industry pages
 
-import { LucideIcon, Building2, Car, Utensils, Briefcase, Camera, Video, Wand2, Paintbrush, Square, Sun, Moon, Leaf, Waves, Ban, User, Layers, LayoutGrid, Compass, Hammer, Sparkles, CircleDot, BadgeCheck, Palette, Circle, Film, Share2, AlertTriangle } from 'lucide-react';
+import { LucideIcon, Building2, Car, Utensils, Briefcase, Camera, Video, Wand2, Paintbrush, Square, Sun, Moon, Leaf, Waves, Ban, User, Layers, Hammer, Sparkles, CircleDot, BadgeCheck, Palette, Circle, Film, Share2, AlertTriangle } from 'lucide-react';
 
 // ============ TYPE DEFINITIONS ============
 
@@ -79,12 +79,12 @@ export const INDUSTRY_CONFIGS: Record<string, IndustryConfig> = {
                 longDescription: 'Upload a photo of any empty room and our AI will furnish it with designer-quality furniture and decor. Choose from Modern, Scandinavian, Traditional, or Minimalist styles. Buyers can finally visualize the space.',
                 icon: Building2,
                 gradient: 'from-blue-500 to-indigo-600',
-                image: '/showcase/real-estate/after/empty-living-room.jpg',
-                beforeImage: '/showcase/real-estate/before/empty-living-room.jpg',
-                afterImage: '/showcase/real-estate/after/empty-living-room.jpg',
+                image: '/showcase/real-estate/after/virtual-staging.jpg',
+                beforeImage: '/showcase/real-estate/before/virtual-staging.jpg',
+                afterImage: '/showcase/real-estate/after/virtual-staging.jpg',
                 isFeatured: true,
                 tags: ['Most Used'],
-                route: '/studio/apps/real-estate/virtual-staging',
+                route: '/studio/real-estate/virtual-staging',
             },
             // 2. Photo Enhancement - Essential, high volume
             {
@@ -97,7 +97,7 @@ export const INDUSTRY_CONFIGS: Record<string, IndustryConfig> = {
                 image: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=600&h=400&fit=crop',
                 isFeatured: true,
                 tags: ['Essential'],
-                route: '/studio/apps/real-estate/photo-enhancement',
+                route: '/studio/real-estate/photo-enhancement',
             },
             // 3. Sky Replacement - Quick win, high visual impact
             {
@@ -110,7 +110,7 @@ export const INDUSTRY_CONFIGS: Record<string, IndustryConfig> = {
                 image: 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=600&h=400&fit=crop',
                 isFeatured: true,
                 tags: ['Quick Fix'],
-                route: '/studio/apps/real-estate/sky-replacement',
+                route: '/studio/real-estate/sky-replacement',
             },
             // 4. Twilight Conversion - Premium, high impact
             {
@@ -124,7 +124,7 @@ export const INDUSTRY_CONFIGS: Record<string, IndustryConfig> = {
                 isPremium: true,
                 isFeatured: true,
                 tags: ['Pro', 'High Impact'],
-                route: '/studio/apps/real-estate/twilight',
+                route: '/studio/real-estate/twilight',
             },
             // 5. Item Removal - Utility, declutter
             {
@@ -137,35 +137,11 @@ export const INDUSTRY_CONFIGS: Record<string, IndustryConfig> = {
                 image: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=600&h=400&fit=crop',
                 isFeatured: true,
                 tags: ['Utility'],
-                route: '/studio/apps/real-estate/item-removal',
+                route: '/studio/real-estate/item-removal',
             },
         ],
         tools: [
             // Video Tools
-            {
-                id: 'storyboard',
-                name: 'Property Storyboard',
-                description: 'Build cinematic video tours from property photos',
-                longDescription: 'Create a complete property video tour by uploading room photos, choosing motion styles, and generating AI-powered video clips. Perfect for listings, social media, and virtual tours.',
-                icon: Video,
-                gradient: 'from-violet-500 to-purple-600',
-                image: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=600&h=400&fit=crop',
-                isPremium: true,
-                isFeatured: true,
-                tags: ['New', 'Video'],
-                route: '/studio/apps/real-estate/storyboard',
-            },
-            {
-                id: 'text-to-video',
-                name: 'Text-to-Video Wizard',
-                description: 'Generate complete property videos from descriptions',
-                icon: Wand2,
-                gradient: 'from-fuchsia-500 to-pink-600',
-                image: 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=600&h=400&fit=crop',
-                isPremium: true,
-                tags: ['AI', 'Automated'],
-                route: '/studio/apps/real-estate/text-to-video',
-            },
             {
                 id: 'room-tour',
                 name: 'Room Tour Video',
@@ -174,7 +150,7 @@ export const INDUSTRY_CONFIGS: Record<string, IndustryConfig> = {
                 gradient: 'from-violet-500 to-purple-600',
                 image: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=600&h=400&fit=crop',
                 isPremium: true,
-                route: '/studio/apps/real-estate/room-tour',
+                route: '/studio/real-estate/room-tour',
             },
             // Renovation & Design
             {
@@ -186,7 +162,7 @@ export const INDUSTRY_CONFIGS: Record<string, IndustryConfig> = {
                 image: 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=600&h=400&fit=crop',
                 isPremium: true,
                 tags: ['New', 'Premium'],
-                route: '/studio/apps/real-estate/virtual-renovation',
+                route: '/studio/real-estate/virtual-renovation',
             },
             {
                 id: 'wall-color',
@@ -196,7 +172,19 @@ export const INDUSTRY_CONFIGS: Record<string, IndustryConfig> = {
                 gradient: 'from-pink-500 to-rose-600',
                 image: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=600&h=400&fit=crop',
                 tags: ['New'],
-                route: '/studio/apps/real-estate/wall-color',
+                route: '/studio/real-estate/wall-color',
+            },
+            {
+                id: 'exterior-paint',
+                name: 'Exterior Paint Visualizer',
+                description: 'Preview exterior paint colors on your home',
+                icon: Paintbrush,
+                gradient: 'from-emerald-500 to-teal-600',
+                image: '/showcase/real-estate/after/exterior-paint-visualizer.jpg',
+                beforeImage: '/showcase/real-estate/before/exterior-paint-visualizer.jpg',
+                afterImage: '/showcase/real-estate/after/exterior-paint-visualizer.jpg',
+                tags: ['New'],
+                route: '/studio/real-estate/exterior-paint',
             },
             {
                 id: 'floor-replacement',
@@ -206,7 +194,7 @@ export const INDUSTRY_CONFIGS: Record<string, IndustryConfig> = {
                 gradient: 'from-amber-500 to-orange-600',
                 image: 'https://images.unsplash.com/photo-1615529182904-14819c35db37?w=600&h=400&fit=crop',
                 tags: ['New'],
-                route: '/studio/apps/real-estate/floor-replacement',
+                route: '/studio/real-estate/floor-replacement',
             },
             // Weather & Lighting
             {
@@ -217,7 +205,7 @@ export const INDUSTRY_CONFIGS: Record<string, IndustryConfig> = {
                 gradient: 'from-yellow-500 to-amber-600',
                 image: 'https://images.unsplash.com/photo-1428908728789-d2de25dbd4e2?w=600&h=400&fit=crop',
                 tags: ['New'],
-                route: '/studio/apps/real-estate/rain-to-shine',
+                route: '/studio/real-estate/rain-to-shine',
             },
             {
                 id: 'night-to-day',
@@ -227,7 +215,7 @@ export const INDUSTRY_CONFIGS: Record<string, IndustryConfig> = {
                 gradient: 'from-orange-500 to-yellow-600',
                 image: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=600&h=400&fit=crop',
                 tags: ['New'],
-                route: '/studio/apps/real-estate/night-to-day',
+                route: '/studio/real-estate/night-to-day',
             },
             {
                 id: 'changing-seasons',
@@ -237,7 +225,7 @@ export const INDUSTRY_CONFIGS: Record<string, IndustryConfig> = {
                 gradient: 'from-orange-500 to-red-600',
                 image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&h=400&fit=crop',
                 tags: ['New'],
-                route: '/studio/apps/real-estate/changing-seasons',
+                route: '/studio/real-estate/changing-seasons',
             },
             // Pool & Water
             {
@@ -246,21 +234,38 @@ export const INDUSTRY_CONFIGS: Record<string, IndustryConfig> = {
                 description: 'Add water to empty pools, clarify murky water',
                 icon: Waves,
                 gradient: 'from-cyan-500 to-blue-600',
-                image: 'https://images.unsplash.com/photo-1576013551627-0cc20b96c2a7?w=600&h=400&fit=crop',
+                image: '/showcase/real-estate/after/pool-enhancement.jpg',
+                beforeImage: '/showcase/real-estate/before/pool-enhancement.jpg',
+                afterImage: '/showcase/real-estate/after/pool-enhancement.jpg',
                 tags: ['New'],
-                route: '/studio/apps/real-estate/pool-enhancement',
+                route: '/studio/real-estate/pool-enhancement',
+            },
+            // Landscaping
+            {
+                id: 'landscape-design',
+                name: 'Landscape Design',
+                description: 'Enhance or redesign exterior landscaping',
+                icon: Leaf,
+                gradient: 'from-green-500 to-lime-600',
+                image: '/showcase/real-estate/after/landscape-design.jpg',
+                beforeImage: '/showcase/real-estate/before/landscape-design.jpg',
+                afterImage: '/showcase/real-estate/after/landscape-design.jpg',
+                tags: ['New'],
+                route: '/studio/real-estate/landscape-design',
+            },
+            {
+                id: 'auto-declutter',
+                name: 'Auto Declutter',
+                description: 'One-click clutter removal — no brushing needed',
+                icon: Wand2,
+                gradient: 'from-amber-500 to-orange-600',
+                image: '/showcase/real-estate/after/auto-declutter.jpg',
+                beforeImage: '/showcase/real-estate/before/auto-declutter.jpg',
+                afterImage: '/showcase/real-estate/after/auto-declutter.jpg',
+                tags: ['New'],
+                route: '/studio/real-estate/auto-declutter',
             },
             // Utility Tools
-            {
-                id: 'declutter',
-                name: 'One-Click Declutter',
-                description: 'Auto-remove clutter without manual masking',
-                icon: Wand2,
-                gradient: 'from-emerald-500 to-teal-600',
-                image: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=600&h=400&fit=crop',
-                tags: ['New'],
-                route: '/studio/apps/real-estate/declutter',
-            },
             {
                 id: 'lawn-enhancement',
                 name: 'Lawn & Landscape',
@@ -268,60 +273,7 @@ export const INDUSTRY_CONFIGS: Record<string, IndustryConfig> = {
                 icon: Building2,
                 gradient: 'from-green-500 to-emerald-600',
                 image: 'https://images.unsplash.com/photo-1558036117-15d82a90b9b1?w=600&h=400&fit=crop',
-                route: '/studio/apps/real-estate/lawn-enhancement',
-            },
-            {
-                id: 'watermark-removal',
-                name: 'Watermark Removal',
-                description: 'Remove watermarks from images',
-                icon: Ban,
-                gradient: 'from-red-500 to-rose-600',
-                image: 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=600&h=400&fit=crop',
-                tags: ['New'],
-                route: '/studio/apps/real-estate/watermark-removal',
-            },
-            {
-                id: 'headshot-retouching',
-                name: 'Headshot Retouching',
-                description: 'Professional agent portrait enhancement',
-                icon: User,
-                gradient: 'from-purple-500 to-violet-600',
-                image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&h=400&fit=crop&crop=face',
-                tags: ['New'],
-                route: '/studio/apps/real-estate/headshot-retouching',
-            },
-            {
-                id: 'hdr-merge',
-                name: 'HDR Auto-Merge',
-                description: 'Merge bracketed exposures automatically',
-                icon: Layers,
-                gradient: 'from-teal-500 to-cyan-600',
-                image: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=600&h=400&fit=crop',
-                tags: ['New'],
-                route: '/studio/apps/real-estate/hdr-merge',
-            },
-            // Advanced / Premium
-            {
-                id: 'floor-plan',
-                name: 'Floor Plan Generator',
-                description: 'Create 2D floor plans from room photos',
-                icon: LayoutGrid,
-                gradient: 'from-emerald-500 to-teal-600',
-                image: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=600&h=400&fit=crop',
-                isPremium: true,
-                tags: ['Premium'],
-                route: '/studio/apps/real-estate/floor-plan',
-            },
-            {
-                id: '360-staging',
-                name: '360° Virtual Staging',
-                description: 'Stage panoramic VR photos',
-                icon: Compass,
-                gradient: 'from-violet-500 to-purple-600',
-                image: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=600&h=400&fit=crop',
-                isPremium: true,
-                tags: ['New', 'Premium'],
-                route: '/studio/apps/real-estate/360-staging',
+                route: '/studio/real-estate/lawn-enhancement',
             },
         ],
         workflows: [

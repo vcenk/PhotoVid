@@ -125,6 +125,12 @@ export const CREDIT_COSTS = {
   'vehicle-walkthrough': 5,
   'social-clips': 5,
 
+  // Listing Content (1 credit each)
+  'listing-description': 1,
+  'listing-social-post': 1,
+  'listing-flyer': 1,
+  'listing-email': 1,
+
   // General Tools
   'text-to-image': 2,
   'image-to-image': 2,

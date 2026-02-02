@@ -10,6 +10,7 @@ Photovid is a React SPA for an AI-powered video creation platform with:
 3. **Specialized Tools** - Lipsync (`/studio/lipsync`), Image generation (`/studio/image`), Apps gallery (`/studio/apps`)
 4. **Industry Portals** - Real Estate (`/studio/apps/real-estate`), Auto Dealership (`/studio/apps/auto`)
 5. **Workflow Canvas** (`/studio/workflow`) - Node-based visual editor using React Flow
+6. **Timeline Video Editor** (`/studio/apps/real-estate/video-builder`) - Multi-track timeline editor with Remotion preview
 
 **Important Architecture Note:** This is a **Vite + React SPA** with **React Router**, NOT a Next.js application, despite Next.js being in dependencies. The entry flow is `index.html` → `index.tsx` → `App.tsx` (which sets up routing). The `app/` directory contains standalone page components imported into the React Router configuration.
 
@@ -26,6 +27,7 @@ Photovid is a React SPA for an AI-powered video creation platform with:
 - **Auth/Backend:** Supabase (@supabase/ssr)
 - **AI Generation:** FAL AI (Kling Video, Flux Dev, Lipsync models)
 - **Storage:** Cloudflare R2 (S3-compatible via AWS SDK)
+- **Video Rendering:** Remotion v4 (`@remotion/player` for preview, `remotion` for compositions)
 - **Type Safety:** TypeScript 5.8
 
 ## Essential Commands
@@ -158,6 +160,14 @@ Display in ResultViewer
     - `NodePalette.tsx` - Draggable node sidebar
     - `TemplatePanel.tsx` - Pre-built workflow templates
     - `nodes/` - Custom node types (ImageInputNode, TextToImageNode, LipsyncNode, etc.)
+- **`components/video-editor/`** - Timeline video editor
+  - `VideoEditorPage.tsx` - Entry point (wraps in `VideoEditorProvider`)
+  - `VideoEditorContext.tsx` - State management (project, clips, tracks, assets, playback)
+  - `layout/` - EditorLayout (3-panel), AssetSidebar (tabs), PreviewPanel (player + timeline)
+- **`remotion/`** - Remotion compositions
+  - `compositions/DynamicTimeline.tsx` - Main dynamic composition for editor preview
+  - `compositions/PropertyVideo.tsx` - Pre-built property video composition
+  - `Root.tsx` / `index.ts` - Composition registration for Remotion CLI
 - **`components/industry/`** - Industry-specific portal pages (IndustryPage, IndustryHero, ToolsGrid)
 - **`components/tools/`** - Individual tool implementations by industry
   - `real-estate/` - VirtualStagingTool, ItemRemovalTool, PhotoEnhancementTool, SkyReplacementTool, TwilightTool, LawnEnhancementTool, RoomTourTool
@@ -278,6 +288,7 @@ The app uses React Router v7 with the following routes:
 /studio/apps/real-estate/twilight           → TwilightTool
 /studio/apps/real-estate/lawn-enhancement   → LawnEnhancementTool
 /studio/apps/real-estate/room-tour          → RoomTourTool
+/studio/apps/real-estate/video-builder      → VideoEditorPage (timeline editor)
 /studio/apps/auto                           → IndustryPage (auto dealership portal)
 /studio/lipsync                             → LipsyncPage
 /studio/image                               → ImagePage
@@ -299,6 +310,54 @@ The workflow canvas (`WorkflowPage`) uses React Flow for a node-based visual edi
 - Processes nodes in topological order
 - Handles async operations (API calls to FAL)
 - Manages data flow between connected nodes
+
+### Video Editor Architecture
+
+The timeline-based video editor (`/studio/apps/real-estate/video-builder`) is a standalone subsystem with its own context, layout, and Remotion-based rendering.
+
+#### Layout (3-panel)
+- **AssetSidebar** (left, 300px): Tabbed interface — Media, Music, SFX, Text, Transitions, Effects. Glassmorphism cards. Click-to-add-at-playhead.
+- **PreviewPanel** (center): Remotion `<Player>` rendering `DynamicTimeline` composition + ClipInspector + transport bar + Timeline.
+- **EditorLayout** wraps everything in a full-viewport container with a top bar (project name, format selector, nav toggle).
+
+#### State: VideoEditorContext (`components/video-editor/VideoEditorContext.tsx`)
+- Single React Context managing the entire `VideoEditorProject` (defined in `lib/types/video-editor.ts`)
+- **localStorage persistence** — auto-saves on every change, restores on mount
+- **Blob URL cleanup** — on load, filters out assets with stale `blob:` URLs (invalid after page reload) and removes their associated clips from tracks
+- Provides 70+ action methods for assets, tracks, clips, transitions, effects, Ken Burns, playback, zoom, selection
+
+#### Types: `lib/types/video-editor.ts`
+- Frame-based timing: all durations/positions in frames at 30fps
+- `VideoEditorProject` holds `assets` (Record), `tracks` (array), `clips` (Record), `transitions` (Record)
+- `TextClipContent` supports both preset positions (`top`/`center`/`bottom`/`lower-third`) and free `x`/`y` percentage coordinates
+- `FORMAT_CONFIGS` maps `landscape`/`square`/`vertical` to pixel dimensions
+- `createDefaultProject()` factory creates a project with 4 pre-built tracks (Video, Text, Music, SFX)
+
+#### Remotion: `remotion/compositions/DynamicTimeline.tsx`
+- **Uses plain HTML `<img>`/`<video>`/`<audio>` instead of Remotion's `<Img>`/`<Video>`/`<Audio>`** — Remotion components use `delayRender` internally which hangs indefinitely on blob URLs
+- Clips rendered via `<Sequence from={startFrame} durationInFrames={duration}>`
+- Visual effects applied as CSS `filter` strings (blur, brightness, contrast, etc.)
+- Overlay effects: vignette (radial-gradient), light-leak (animated gradient), glitch (random offset)
+- Ken Burns: frame-based `scale()`/`translateX()` transforms on images
+- Text animations via Remotion's `spring()` function
+
+#### Player-Context Sync Pattern (PreviewPanel)
+```
+Context.isPlaying → Player.play()/pause()
+Player.getCurrentFrame() → polled every 100ms → Context.seekTo()
+Context.currentFrame changed externally → Player.seekTo() (via lastSyncedFrame ref)
+```
+The `lastSyncedFrame` ref prevents feedback loops between context updates and player seeks.
+
+#### Text Drag Overlay
+- `TextDragOverlay` component renders inside the same `relative` container as the Player
+- Uses Pointer Events API (`setPointerCapture`) for reliable drag tracking
+- Auto-enables free positioning (`x`/`y`) on first drag of a preset-positioned clip
+- `presetToXY()` maps preset positions to approximate percentage coordinates
+
+#### Presets: `lib/data/editor-presets.ts`
+- 10 transition presets, 9 effect presets, 8 text presets, 6 Ken Burns presets
+- Font options, color options for text styling
 
 ## Important Patterns
 
@@ -370,6 +429,9 @@ The WizardContext implements a robust async generation pattern:
 8. **Context nesting**: WizardProvider must be inside StudioProvider, and both need access to AssetContext.
 9. **Mock fallback**: If Supabase is unavailable, WizardContext uses mock generation with test video URL.
 10. **React Flow**: The @xyflow/react package requires nodes and edges to have stable IDs for proper rendering.
+11. **Remotion blob URLs**: Never use Remotion's `<Img>`/`<Video>`/`<Audio>` components with blob URLs — they call `delayRender` internally which hangs forever. Use plain HTML `<img>`/`<video>`/`<audio>` instead.
+12. **Video editor number inputs**: Use `onBlur` for clamping numeric ranges, not `onChange` — otherwise users can't clear the field to type a new value (e.g., clearing "48" to type "120" briefly produces "1" which gets clamped to the minimum).
+13. **Video editor state is frame-based**: All timing uses frames (30fps default), not seconds. Use `framesToSeconds()`/`secondsToFrames()` from `lib/types/video-editor.ts` for conversion.
 
 ## Development Patterns
 

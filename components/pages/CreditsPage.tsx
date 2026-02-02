@@ -11,8 +11,7 @@ import {
   CreditCard,
   AlertCircle,
 } from 'lucide-react';
-import { NavigationRail, FlyoutType } from '../dashboard/navigation/NavigationRail';
-import { FlyoutPanels } from '../dashboard/navigation/FlyoutPanels';
+import { NavigationRail } from '../dashboard/navigation/NavigationRail';
 import { useCredits } from '@/lib/store/contexts/CreditsContext';
 import {
   CREDIT_PACKAGES,
@@ -28,7 +27,7 @@ export const CreditsPage: React.FC = () => {
   const [searchParams] = useSearchParams();
   const selectedPackageId = searchParams.get('package');
   const { balance, loading } = useCredits();
-  const [activeFlyout, setActiveFlyout] = useState<FlyoutType>(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [selectedPkg, setSelectedPkg] = useState<string | null>(selectedPackageId);
   const [isProcessing, setIsProcessing] = useState(false);
 
@@ -70,21 +69,12 @@ export const CreditsPage: React.FC = () => {
     <div className="flex h-screen bg-white dark:bg-[#09090b] text-zinc-900 dark:text-white font-sans overflow-hidden">
       {/* Navigation Rail */}
       <NavigationRail
-        activeFlyout={activeFlyout}
-        onFlyoutChange={setActiveFlyout}
-      />
-
-      {/* Flyout Panels */}
-      <FlyoutPanels
-        activeFlyout={activeFlyout}
-        onClose={() => setActiveFlyout(null)}
+        isMobileOpen={mobileMenuOpen}
+        onMobileClose={() => setMobileMenuOpen(false)}
       />
 
       {/* Main Content */}
-      <div
-        className="flex-1 flex flex-col min-w-0 overflow-hidden"
-        style={{ marginLeft: '224px' }}
-      >
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden ml-0 lg:ml-16">
         {/* Header */}
         <div className="flex-shrink-0 h-16 border-b border-zinc-200 dark:border-zinc-800 flex items-center px-6">
           <button

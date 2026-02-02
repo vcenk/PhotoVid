@@ -14,11 +14,12 @@ import {
     ZoomIn,
     Image as ImageIcon,
     AlertCircle,
-    Zap
+    Zap,
+    BookmarkPlus
 } from 'lucide-react';
 import { BeforeAfterSlider } from '@/components/common/BeforeAfterSlider';
-import { NavigationRail, FlyoutType } from '../../dashboard/navigation/NavigationRail';
-import { FlyoutPanels } from '../../dashboard/navigation/FlyoutPanels';
+import { AssetProvider, useAssets } from '@/lib/store/contexts/AssetContext';
+import { NavigationRail } from '../../dashboard/navigation/NavigationRail';
 import { generateVirtualStaging, isFalConfigured, safeImageUrl } from '@/lib/api/toolGeneration';
 import { useCredits } from '@/lib/store/contexts/CreditsContext';
 import { CREDIT_COSTS } from '@/lib/types/credits';
@@ -78,13 +79,13 @@ const TOOL_ID = 'virtual-staging';
 const CREDIT_COST = CREDIT_COSTS[TOOL_ID] || 2;
 
 // Default showcase images
-const DEFAULT_BEFORE_IMAGE = '/showcase/real-estate/before/empty-living-room.jpg';
-const DEFAULT_AFTER_IMAGE = '/showcase/real-estate/after/empty-living-room.jpg';
+const DEFAULT_BEFORE_IMAGE = '/showcase/real-estate/before/virtual-staging.jpg';
+const DEFAULT_AFTER_IMAGE = '/showcase/real-estate/after/virtual-staging.jpg';
 
-export const VirtualStagingTool: React.FC = () => {
+const VirtualStagingToolInner: React.FC = () => {
     const navigate = useNavigate();
     const { balance, deductCredits, hasEnoughCredits } = useCredits();
-    const [activeFlyout, setActiveFlyout] = useState<FlyoutType>(null);
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const hasCredits = hasEnoughCredits(TOOL_ID as any);
 
     // Upload state
@@ -104,6 +105,8 @@ export const VirtualStagingTool: React.FC = () => {
 
     // Error state
     const [error, setError] = useState<string | null>(null);
+    const [savedToLibrary, setSavedToLibrary] = useState(false);
+    const { addAsset } = useAssets();
 
     // Check for pre-selected asset from library
     useEffect(() => {
@@ -182,6 +185,7 @@ export const VirtualStagingTool: React.FC = () => {
         setIsGenerating(true);
         setGenerationProgress(0);
         setError(null);
+        setSavedToLibrary(false);
 
         // Deduct credits before starting generation
         const deducted = await deductCredits(TOOL_ID as any);
@@ -204,10 +208,12 @@ export const VirtualStagingTool: React.FC = () => {
                 });
             }, 500);
 
-            setTimeout(() => {
+            setTimeout(async () => {
                 clearInterval(progressInterval);
                 setGenerationProgress(100);
-                setResultImage('https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=1200&h=800&fit=crop');
+                const mockUrl = 'https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=1200&h=800&fit=crop';
+                setResultImage(mockUrl);
+                try { await addAsset(mockUrl, 'image', 'Virtual Staging Result'); setSavedToLibrary(true); } catch {}
                 setIsGenerating(false);
             }, 3000);
             return;
@@ -235,6 +241,7 @@ export const VirtualStagingTool: React.FC = () => {
             const safeUrl = await safeImageUrl(resultUrl);
             setGenerationProgress(100);
             setResultImage(safeUrl);
+            try { await addAsset(safeUrl, 'image', 'Virtual Staging Result'); setSavedToLibrary(true); } catch {}
         } catch (err) {
             console.error('Virtual staging generation error:', err);
             setError(err instanceof Error ? err.message : 'Generation failed. Please try again.');
@@ -275,18 +282,16 @@ export const VirtualStagingTool: React.FC = () => {
     return (
         <div className="h-screen flex bg-[#0a0a0b]">
             {/* Navigation Rail */}
-            <NavigationRail activeFlyout={activeFlyout} onFlyoutChange={setActiveFlyout} />
-            <FlyoutPanels activeFlyout={activeFlyout} onClose={() => setActiveFlyout(null)} />
-
-            {/* Main Content */}
-            <div className="flex-1 flex ml-56">
+            <NavigationRail isMobileOpen={mobileMenuOpen} onMobileClose={() => setMobileMenuOpen(false)} />
+{/* Main Content */}
+            <div className="flex-1 flex ml-0 lg:ml-16">
                 {/* Left Sidebar - Controls */}
                 <div className="w-[340px] flex-shrink-0 bg-[#111113] border-r border-white/5 flex flex-col">
                     {/* Header */}
                     <div className="p-4 border-b border-white/5">
                         <div className="flex items-center gap-3">
                             <button
-                                onClick={() => navigate('/studio/apps/real-estate')}
+                                onClick={() => navigate('/studio/real-estate')}
                                 className="p-2 hover:bg-white/5 rounded-lg transition-colors"
                             >
                                 <ArrowLeft size={18} className="text-zinc-400" />
@@ -484,6 +489,11 @@ export const VirtualStagingTool: React.FC = () => {
                                     <RefreshCw size={14} />
                                     Regenerate
                                 </button>
+                                {savedToLibrary ? (
+                                    <span className="px-3 py-1.5 text-xs font-medium text-emerald-400 bg-emerald-500/10 rounded-lg flex items-center gap-1.5"><BookmarkPlus size={14} />Saved to Library</span>
+                                ) : (
+                                    <button onClick={async () => { if (resultImage) { try { await addAsset(resultImage, 'image', 'Virtual Staging Result'); setSavedToLibrary(true); } catch {} } }} className="px-3 py-1.5 text-xs font-medium text-zinc-400 hover:text-white bg-white/5 hover:bg-white/10 rounded-lg transition-colors flex items-center gap-1.5"><BookmarkPlus size={14} />Save to Library</button>
+                                )}
                                 <button
                                     onClick={handleDownload}
                                     className="px-3 py-1.5 text-xs font-medium text-white bg-indigo-600 hover:bg-indigo-500 rounded-lg transition-colors flex items-center gap-1.5"
@@ -598,3 +608,9 @@ export const VirtualStagingTool: React.FC = () => {
         </div>
     );
 };
+
+export const VirtualStagingTool: React.FC = () => (
+    <AssetProvider>
+        <VirtualStagingToolInner />
+    </AssetProvider>
+);

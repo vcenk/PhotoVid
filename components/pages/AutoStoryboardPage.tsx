@@ -1,7 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { NavigationRail, FlyoutType } from '../dashboard/navigation/NavigationRail';
-import { FlyoutPanels } from '../dashboard/navigation/FlyoutPanels';
+import { NavigationRail } from '../dashboard/navigation/NavigationRail';
 import {
     Video, ArrowRight, Car, Loader2, FileText, Wand2, ArrowLeft,
     UploadCloud, Trash2, Play, Pause, Plus, GripVertical, Sparkles,
@@ -762,7 +761,7 @@ const NewStoryboardForm: React.FC<{
 // Main Page Component
 export const AutoStoryboardPage: React.FC = () => {
     const navigate = useNavigate();
-    const [activeFlyout, setActiveFlyout] = useState<FlyoutType>(null);
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [storyboard, setStoryboard] = useState<{ vehicleData: VehicleData; scenes: VehicleScene[] } | null>(null);
 
     const handleCreateStoryboard = (vehicleData: VehicleData, scenes: VehicleScene[]) => {
@@ -781,10 +780,8 @@ export const AutoStoryboardPage: React.FC = () => {
 
     return (
         <div className="h-screen flex bg-[#0a0a0b]">
-            <NavigationRail activeFlyout={activeFlyout} onFlyoutChange={setActiveFlyout} />
-            <FlyoutPanels activeFlyout={activeFlyout} onClose={() => setActiveFlyout(null)} />
-
-            <div className="flex-1 flex flex-col ml-56">
+            <NavigationRail isMobileOpen={mobileMenuOpen} onMobileClose={() => setMobileMenuOpen(false)} />
+<div className="flex-1 flex flex-col ml-0 lg:ml-16">
                 {storyboard ? (
                     <StoryboardEditorView
                         vehicleData={storyboard.vehicleData}

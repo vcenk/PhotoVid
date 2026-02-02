@@ -1,35 +1,75 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
     ArrowLeft, UploadCloud, Sparkles, Download, RefreshCw, Loader2, Trash2,
-    Image as ImageIcon, Check, AlertCircle, LayoutGrid, Crown
+    Image as ImageIcon, Check, AlertCircle, LayoutGrid, Crown, ChevronLeft, ChevronRight, BookmarkPlus
 } from 'lucide-react';
-import { NavigationRail, FlyoutType } from '../../dashboard/navigation/NavigationRail';
-import { FlyoutPanels } from '../../dashboard/navigation/FlyoutPanels';
+import { NavigationRail } from '../../dashboard/navigation/NavigationRail';
+import { AssetProvider, useAssets } from '@/lib/store/contexts/AssetContext';
 import { generateFloorPlan, isFalConfigured } from '@/lib/api/toolGeneration';
+import { downloadFile } from '@/lib/utils';
 import type { FloorPlanOptions } from '@/lib/types/generation';
 
 const STYLES = [
     { id: '2d-basic', name: '2D Basic', desc: 'Simple room outlines', image: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=200&h=120&fit=crop' },
-    { id: '2d-detailed', name: '2D Detailed', desc: 'With furniture and measurements', image: 'https://images.unsplash.com/photo-1554995207-c18c203602cb?w=200&h=120&fit=crop' },
+    { id: '2d-detailed', name: '2D Detailed', desc: 'With furniture placement', image: 'https://images.unsplash.com/photo-1554995207-c18c203602cb?w=200&h=120&fit=crop' },
     { id: '3d-isometric', name: '3D Isometric', desc: 'Isometric 3D view', image: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=200&h=120&fit=crop' },
 ];
 
-export const FloorPlanTool: React.FC = () => {
+const BeforeAfterSlider: React.FC<{ before: string; after: string }> = ({ before, after }) => {
+    const [sliderPosition, setSliderPosition] = useState(50);
+    const containerRef = useRef<HTMLDivElement>(null);
+    const isDraggingSlider = useRef(false);
+
+    const handleMove = (clientX: number) => {
+        if (!containerRef.current) return;
+        const rect = containerRef.current.getBoundingClientRect();
+        const x = Math.max(0, Math.min(clientX - rect.left, rect.width));
+        setSliderPosition((x / rect.width) * 100);
+    };
+
+    return (
+        <div
+            ref={containerRef}
+            className="relative rounded-2xl overflow-hidden shadow-2xl w-full max-w-4xl aspect-[16/10] cursor-ew-resize select-none"
+            onMouseDown={() => { isDraggingSlider.current = true; }}
+            onMouseUp={() => { isDraggingSlider.current = false; }}
+            onMouseLeave={() => { isDraggingSlider.current = false; }}
+            onMouseMove={(e) => { if (isDraggingSlider.current) handleMove(e.clientX); }}
+            onTouchMove={(e) => handleMove(e.touches[0].clientX)}
+        >
+            <img src={after} alt="After" className="absolute inset-0 w-full h-full object-cover" />
+            <div className="absolute inset-0 overflow-hidden" style={{ clipPath: `inset(0 ${100 - sliderPosition}% 0 0)` }}>
+                <img src={before} alt="Before" className="absolute inset-0 w-full h-full object-cover" />
+            </div>
+            <div className="absolute top-0 bottom-0 w-0.5 bg-white shadow-lg" style={{ left: `${sliderPosition}%`, transform: 'translateX(-50%)' }}>
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 bg-white rounded-full shadow-xl flex items-center justify-center">
+                    <ChevronLeft size={14} className="text-zinc-600 -mr-1" />
+                    <ChevronRight size={14} className="text-zinc-600 -ml-1" />
+                </div>
+            </div>
+            <div className="absolute top-3 left-3 px-2.5 py-1 bg-black/60 backdrop-blur-sm rounded-lg text-xs text-white font-medium flex items-center gap-1"><ImageIcon size={10} />Photo</div>
+            <div className="absolute top-3 right-3 px-2.5 py-1 bg-emerald-500/80 backdrop-blur-sm rounded-lg text-xs text-white font-medium flex items-center gap-1"><LayoutGrid size={10} />Layout</div>
+        </div>
+    );
+};
+
+const FloorPlanToolInner: React.FC = () => {
     const navigate = useNavigate();
-    const [activeFlyout, setActiveFlyout] = useState<FlyoutType>(null);
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     const [uploadedImage, setUploadedImage] = useState<File | null>(null);
     const [imagePreview, setImagePreview] = useState<string | null>(null);
     const [isDragging, setIsDragging] = useState(false);
     const [style, setStyle] = useState<'2d-basic' | '2d-detailed' | '3d-isometric'>('2d-detailed');
     const [includeLabels, setIncludeLabels] = useState(true);
-    const [includeDimensions, setIncludeDimensions] = useState(true);
 
     const [isGenerating, setIsGenerating] = useState(false);
     const [generationProgress, setGenerationProgress] = useState(0);
     const [resultImage, setResultImage] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
+    const [savedToLibrary, setSavedToLibrary] = useState(false);
+    const { addAsset } = useAssets();
 
     const handleDrag = useCallback((e: React.DragEvent) => {
         e.preventDefault();
@@ -70,23 +110,26 @@ export const FloorPlanTool: React.FC = () => {
         setIsGenerating(true);
         setGenerationProgress(0);
         setError(null);
+        setSavedToLibrary(false);
 
         if (!isFalConfigured()) {
             const progressInterval = setInterval(() => {
                 setGenerationProgress(prev => prev >= 90 ? (clearInterval(progressInterval), 90) : prev + 10);
             }, 500);
 
-            setTimeout(() => {
+            setTimeout(async () => {
                 clearInterval(progressInterval);
                 setGenerationProgress(100);
-                setResultImage('https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=1200&h=800&fit=crop');
+                const mockUrl = 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=1200&h=800&fit=crop';
+                setResultImage(mockUrl);
+                try { await addAsset(mockUrl, 'image', 'Floor Plan Result'); setSavedToLibrary(true); } catch {}
                 setIsGenerating(false);
             }, 5000);
             return;
         }
 
         try {
-            const options: FloorPlanOptions = { style, includeLabels, includeDimensions };
+            const options: FloorPlanOptions = { style, includeLabels };
             const resultUrl = await generateFloorPlan(
                 uploadedImage,
                 options,
@@ -96,6 +139,7 @@ export const FloorPlanTool: React.FC = () => {
                 }
             );
             setResultImage(resultUrl);
+            try { await addAsset(resultUrl, 'image', 'Floor Plan Result'); setSavedToLibrary(true); } catch {}
         } catch (err) {
             console.error('Floor plan error:', err);
             setError(err instanceof Error ? err.message : 'Floor plan generation failed. Please try again.');
@@ -106,19 +150,17 @@ export const FloorPlanTool: React.FC = () => {
 
     return (
         <div className="h-screen flex bg-[#0a0a0b]">
-            <NavigationRail activeFlyout={activeFlyout} onFlyoutChange={setActiveFlyout} />
-            <FlyoutPanels activeFlyout={activeFlyout} onClose={() => setActiveFlyout(null)} />
-
-            <div className="flex-1 flex ml-56">
-                <div className="w-[320px] flex-shrink-0 bg-[#111113] border-r border-white/5 flex flex-col">
+            <NavigationRail isMobileOpen={mobileMenuOpen} onMobileClose={() => setMobileMenuOpen(false)} />
+<div className="flex-1 flex ml-0 lg:ml-16">
+                <div className="w-[360px] flex-shrink-0 bg-[#111113] border-r border-white/5 flex flex-col">
                     <div className="p-4 border-b border-white/5">
                         <div className="flex items-center gap-3">
-                            <button onClick={() => navigate('/studio/apps/real-estate')} className="p-2 hover:bg-white/5 rounded-lg transition-colors">
+                            <button onClick={() => navigate('/studio/real-estate')} className="p-2 hover:bg-white/5 rounded-lg transition-colors">
                                 <ArrowLeft size={18} className="text-zinc-400" />
                             </button>
                             <h1 className="text-base font-semibold text-white flex items-center gap-2">
                                 <LayoutGrid size={18} className="text-emerald-400" />
-                                Floor Plan Generator
+                                Room Layout Illustration
                             </h1>
                             <span className="ml-auto px-2 py-0.5 bg-gradient-to-r from-amber-500 to-orange-500 rounded text-[10px] font-bold text-white flex items-center gap-1">
                                 <Crown size={10} />PRO
@@ -174,7 +216,6 @@ export const FloorPlanTool: React.FC = () => {
                             <div className="space-y-2">
                                 {[
                                     { id: 'labels', label: 'Include Room Labels', checked: includeLabels, onChange: setIncludeLabels },
-                                    { id: 'dimensions', label: 'Include Dimensions', checked: includeDimensions, onChange: setIncludeDimensions },
                                 ].map((option) => (
                                     <button
                                         key={option.id}
@@ -190,9 +231,15 @@ export const FloorPlanTool: React.FC = () => {
                             </div>
                         </div>
 
+                        <div className="p-3 rounded-xl bg-amber-500/5 border border-amber-500/10">
+                            <p className="text-xs text-amber-300/80 leading-relaxed">
+                                <strong className="text-amber-300">Disclaimer:</strong> This generates an artistic illustration of the room layout, not an accurate architectural floor plan. Do not use for measurements, construction, or legal purposes.
+                            </p>
+                        </div>
+
                         <div className="p-3 rounded-xl bg-emerald-500/5 border border-emerald-500/10">
                             <p className="text-xs text-emerald-300/80 leading-relaxed">
-                                <strong className="text-emerald-300">Premium Feature:</strong> Generates approximate floor plans from room photos. Best with wide-angle or aerial views.
+                                <strong className="text-emerald-300">Tip:</strong> Best with wide-angle or aerial views of the room. Use as a visual aid for marketing, not as a substitute for professional measurements.
                             </p>
                         </div>
                     </div>
@@ -203,7 +250,7 @@ export const FloorPlanTool: React.FC = () => {
                             disabled={!uploadedImage || isGenerating}
                             className={`w-full py-3 rounded-xl font-semibold text-sm transition-all flex items-center justify-center gap-2 ${uploadedImage && !isGenerating ? 'bg-emerald-600 hover:bg-emerald-500 text-white' : 'bg-white/5 text-zinc-600 cursor-not-allowed'}`}
                         >
-                            {isGenerating ? <><Loader2 size={18} className="animate-spin" />Generating {generationProgress}%</> : <><Sparkles size={18} />Generate Floor Plan</>}
+                            {isGenerating ? <><Loader2 size={18} className="animate-spin" />Generating {generationProgress}%</> : <><Sparkles size={18} />Generate Layout</>}
                         </button>
                         <p className="text-xs text-zinc-600 text-center mt-2">5 credits per generation</p>
                     </div>
@@ -211,11 +258,16 @@ export const FloorPlanTool: React.FC = () => {
 
                 <div className="flex-1 flex flex-col bg-[#0a0a0b]">
                     <div className="h-14 flex items-center justify-between px-6 border-b border-white/5">
-                        <span className="text-sm text-zinc-500">{resultImage ? 'Generated Floor Plan' : 'Preview'}</span>
+                        <span className="text-sm text-zinc-500">{resultImage ? 'Room Layout Illustration' : 'Preview'}</span>
                         {resultImage && (
                             <div className="flex items-center gap-2">
                                 <button onClick={() => setResultImage(null)} className="px-3 py-1.5 text-xs font-medium text-zinc-400 hover:text-white bg-white/5 hover:bg-white/10 rounded-lg transition-colors flex items-center gap-1.5"><RefreshCw size={14} />Try Different Style</button>
-                                <button className="px-3 py-1.5 text-xs font-medium text-white bg-emerald-600 hover:bg-emerald-500 rounded-lg transition-colors flex items-center gap-1.5"><Download size={14} />Download</button>
+                                {savedToLibrary ? (
+                                    <span className="px-3 py-1.5 text-xs font-medium text-emerald-400 bg-emerald-500/10 rounded-lg flex items-center gap-1.5"><BookmarkPlus size={14} />Saved to Library</span>
+                                ) : (
+                                    <button onClick={async () => { if (resultImage) { try { await addAsset(resultImage, 'image', 'Floor Plan Result'); setSavedToLibrary(true); } catch {} } }} className="px-3 py-1.5 text-xs font-medium text-zinc-400 hover:text-white bg-white/5 hover:bg-white/10 rounded-lg transition-colors flex items-center gap-1.5"><BookmarkPlus size={14} />Save to Library</button>
+                                )}
+                                <button onClick={() => resultImage && downloadFile(resultImage, `floor-plan-${Date.now()}.jpg`)} className="px-3 py-1.5 text-xs font-medium text-white bg-emerald-600 hover:bg-emerald-500 rounded-lg transition-colors flex items-center gap-1.5"><Download size={14} />Download</button>
                             </div>
                         )}
                     </div>
@@ -226,14 +278,14 @@ export const FloorPlanTool: React.FC = () => {
                                 <div className="w-20 h-20 rounded-2xl bg-red-500/10 flex items-center justify-center mx-auto mb-4">
                                     <AlertCircle size={32} className="text-red-500" />
                                 </div>
-                                <p className="text-red-400 text-sm font-medium mb-2">Floor Plan Generation Failed</p>
+                                <p className="text-red-400 text-sm font-medium mb-2">Layout Generation Failed</p>
                                 <p className="text-zinc-500 text-xs max-w-xs">{error}</p>
                                 <button onClick={() => setError(null)} className="mt-4 px-4 py-2 text-xs font-medium text-white bg-emerald-600 hover:bg-emerald-500 rounded-lg transition-colors">Try Again</button>
                             </div>
                         ) : !imagePreview ? (
                             <div className="text-center">
                                 <div className="w-20 h-20 rounded-2xl bg-white/5 flex items-center justify-center mx-auto mb-4"><ImageIcon size={32} className="text-zinc-700" /></div>
-                                <p className="text-zinc-500 text-sm">Upload a room photo to generate floor plan</p>
+                                <p className="text-zinc-500 text-sm">Upload a room photo to generate layout illustration</p>
                             </div>
                         ) : isGenerating ? (
                             <div className="text-center">
@@ -243,11 +295,12 @@ export const FloorPlanTool: React.FC = () => {
                                 </div>
                                 <p className="text-zinc-400 font-medium">Analyzing room layout...</p>
                             </div>
+                        ) : resultImage && imagePreview ? (
+                            <BeforeAfterSlider before={imagePreview} after={resultImage} />
                         ) : (
                             <div className="relative rounded-2xl overflow-hidden shadow-2xl">
-                                <img src={resultImage || imagePreview} alt="Preview" className="max-w-full max-h-[calc(100vh-180px)] object-contain" />
-                                {resultImage && <div className="absolute top-4 right-4 px-3 py-1.5 bg-emerald-500/80 backdrop-blur rounded-lg text-xs text-white font-medium flex items-center gap-1.5"><LayoutGrid size={12} />Floor Plan</div>}
-                                {!resultImage && <div className="absolute inset-0 flex items-center justify-center bg-black/40"><div className="text-center text-white"><LayoutGrid size={28} className="mx-auto mb-2 opacity-80" /><p className="text-sm font-medium">Ready to generate</p></div></div>}
+                                <img src={imagePreview} alt="Preview" className="max-w-full max-h-[calc(100vh-180px)] object-contain" />
+                                <div className="absolute inset-0 flex items-center justify-center bg-black/40"><div className="text-center text-white"><LayoutGrid size={28} className="mx-auto mb-2 opacity-80" /><p className="text-sm font-medium">Ready to generate</p></div></div>
                             </div>
                         )}
                     </div>
@@ -256,3 +309,9 @@ export const FloorPlanTool: React.FC = () => {
         </div>
     );
 };
+
+export const FloorPlanTool: React.FC = () => (
+    <AssetProvider>
+        <FloorPlanToolInner />
+    </AssetProvider>
+);

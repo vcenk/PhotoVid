@@ -15,37 +15,87 @@ async function getAuthToken(): Promise<string | null> {
   return session?.access_token || null;
 }
 
+// ==========================================
+// Type Definitions
+// ==========================================
+
+export type ImageSize = 
+  | 'square_hd' 
+  | 'square' 
+  | 'portrait_4_3' 
+  | 'portrait_16_9' 
+  | 'landscape_4_3' 
+  | 'landscape_16_9';
+
+export interface TextToImageParams {
+  prompt: string;
+  imageSize?: ImageSize;
+  numInferenceSteps?: number; // Default: 28
+  guidanceScale?: number; // Default: 3.5
+  numImages?: number; // Default: 1
+  seed?: number;
+  negativePrompt?: string;
+  enableSafetyChecker?: boolean; // Default: true
+}
+
+export interface ImageToVideoParams {
+  imageUrl: string;
+  prompt?: string;
+  duration?: '5' | '10'; // Default: '5'
+  aspectRatio?: '16:9' | '9:16' | '1:1'; // Default: '16:9'
+}
+
+export interface InpaintParams {
+  imageUrl: string;
+  maskUrl: string;
+  prompt: string;
+  negativePrompt?: string;
+  numImages?: number; // Default: 1
+  outputFormat?: 'jpeg' | 'png'; // Default: 'jpeg'
+  safetyTolerance?: '1' | '2' | '3' | '4' | '5' | '6'; // Default: '2'
+}
+
+export interface FalError {
+  message: string;
+  status?: number;
+  code?: string;
+}
+
+// ==========================================
+// API Functions
+// ==========================================
+
 /**
- * Generate Image to Video via secure Edge Function
+ * Generate Text to Image via secure Edge Function
+ * Model: fal-ai/flux/dev
  */
-export const generateImageToVideo = async (imageUrl: string, prompt?: string) => {
+export const generateTextToImage = async (params: TextToImageParams) => {
   const token = await getAuthToken();
-  if (!token) {
-    throw new Error('Authentication required');
-  }
+  if (!token) throw new Error('Authentication required');
 
   const supabase = createClient();
-  if (!supabase) {
-    throw new Error('Supabase not configured');
-  }
+  if (!supabase) throw new Error('Supabase not configured');
 
   const { data, error } = await supabase.functions.invoke('fal-generate', {
     body: {
-      tool: 'image-to-video',
-      imageUrl,
-      prompt: prompt || "Cinematic motion, high quality, 4k",
+      tool: 'text-to-image',
+      prompt: params.prompt,
       options: {
-        duration: '5',
-        aspect_ratio: '16:9',
+        image_size: params.imageSize || "landscape_16_9",
+        num_inference_steps: params.numInferenceSteps || 28,
+        guidance_scale: params.guidanceScale || 3.5,
+        num_images: params.numImages || 1,
+        seed: params.seed,
+        negative_prompt: params.negativePrompt,
+        enable_safety_checker: params.enableSafetyChecker ?? true,
+        model_endpoint: 'fal-ai/flux/dev',
       },
     },
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
+    headers: { Authorization: `Bearer ${token}` },
   });
 
   if (error) {
-    console.error("FAL Generation Error:", error);
+    console.error("FAL Text-to-Image Error:", error);
     throw error;
   }
 
@@ -53,31 +103,68 @@ export const generateImageToVideo = async (imageUrl: string, prompt?: string) =>
 };
 
 /**
- * Generate Text to Image via secure Edge Function
+ * Generate Image to Video via secure Edge Function
+ * Model: fal-ai/kling-video/v1.5/pro/image-to-video
  */
-export const generateTextToImage = async (prompt: string) => {
+export const generateImageToVideo = async (params: ImageToVideoParams) => {
   const token = await getAuthToken();
-  if (!token) {
-    throw new Error('Authentication required');
-  }
+  if (!token) throw new Error('Authentication required');
 
   const supabase = createClient();
-  if (!supabase) {
-    throw new Error('Supabase not configured');
-  }
+  if (!supabase) throw new Error('Supabase not configured');
 
   const { data, error } = await supabase.functions.invoke('fal-generate', {
     body: {
-      tool: 'text-to-image',
-      prompt,
+      tool: 'image-to-video',
+      imageUrl: params.imageUrl,
+      prompt: params.prompt || "Cinematic motion, high quality, 4k",
+      options: {
+        duration: params.duration || '5',
+        aspect_ratio: params.aspectRatio || '16:9',
+        model_endpoint: 'fal-ai/kling-video/v1.5/pro/image-to-video',
+      },
     },
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
+    headers: { Authorization: `Bearer ${token}` },
   });
 
   if (error) {
-    console.error("FAL Generation Error:", error);
+    console.error("FAL Image-to-Video Error:", error);
+    throw error;
+  }
+
+  return data;
+};
+
+/**
+ * Generate Inpainting (Fill) via secure Edge Function
+ * Model: fal-ai/flux-pro/v1/fill
+ */
+export const generateInpaint = async (params: InpaintParams) => {
+  const token = await getAuthToken();
+  if (!token) throw new Error('Authentication required');
+
+  const supabase = createClient();
+  if (!supabase) throw new Error('Supabase not configured');
+
+  const { data, error } = await supabase.functions.invoke('fal-generate', {
+    body: {
+      tool: 'virtual-renovation', // Using mapped tool name for 'fill' model
+      imageUrl: params.imageUrl,
+      maskUrl: params.maskUrl,
+      prompt: params.prompt,
+      options: {
+        negative_prompt: params.negativePrompt,
+        num_images: params.numImages || 1,
+        output_format: params.outputFormat || 'jpeg',
+        safety_tolerance: params.safetyTolerance || '2',
+        model_endpoint: 'fal-ai/flux-pro/v1/fill',
+      },
+    },
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+  if (error) {
+    console.error("FAL Inpaint Error:", error);
     throw error;
   }
 
@@ -89,23 +176,14 @@ export const generateTextToImage = async (prompt: string) => {
  */
 export const checkStatus = async (requestId: string) => {
   const token = await getAuthToken();
-  if (!token) {
-    throw new Error('Authentication required');
-  }
+  if (!token) throw new Error('Authentication required');
 
   const supabase = createClient();
-  if (!supabase) {
-    throw new Error('Supabase not configured');
-  }
+  if (!supabase) throw new Error('Supabase not configured');
 
   const { data, error } = await supabase.functions.invoke('fal-status', {
-    body: {
-      requestId,
-      model: 'fal-ai/kling-video/v1.5/pro/image-to-video',
-    },
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
+    body: { requestId },
+    headers: { Authorization: `Bearer ${token}` },
   });
 
   if (error) {
@@ -120,33 +198,7 @@ export const checkStatus = async (requestId: string) => {
  * Get the result of a completed FAL job via secure Edge Function
  */
 export const getResult = async (requestId: string) => {
-  const token = await getAuthToken();
-  if (!token) {
-    throw new Error('Authentication required');
-  }
-
-  const supabase = createClient();
-  if (!supabase) {
-    throw new Error('Supabase not configured');
-  }
-
-  // Use fal-status to get completed result
-  const { data, error } = await supabase.functions.invoke('fal-status', {
-    body: {
-      requestId,
-      model: 'fal-ai/kling-video/v1.5/pro/image-to-video',
-    },
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-
-  if (error) {
-    console.error("FAL Result Error:", error);
-    throw error;
-  }
-
-  return data;
+  return checkStatus(requestId);
 };
 
 /**

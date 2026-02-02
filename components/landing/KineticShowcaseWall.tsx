@@ -3,107 +3,105 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 
-// --- TOP ROW: 8 Unique High-Res Images ---
 const SHOWCASE_ITEMS_TOP = [
   {
     id: 1,
-    image: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1000&auto=format&fit=crop",
-    title: "Liquid Metal",
-    tag: "3D Render"
+    image: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?q=80&w=1000&auto=format&fit=crop",
+    title: "Modern Living Room",
+    tag: "Virtual Staging"
   },
   {
     id: 2,
-    image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=1000&auto=format&fit=crop",
-    title: "Vogue Edit",
-    tag: "Portrait"
+    image: "https://images.unsplash.com/photo-1613490493576-7fde63acd811?q=80&w=1000&auto=format&fit=crop",
+    title: "Luxury Villa",
+    tag: "Twilight"
   },
   {
     id: 3,
-    image: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=1000&auto=format&fit=crop",
-    title: "Retro Tech",
-    tag: "Product"
+    image: "https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?q=80&w=1000&auto=format&fit=crop",
+    title: "Gourmet Kitchen",
+    tag: "Enhancement"
   },
   {
     id: 4,
-    image: "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?q=80&w=1000&auto=format&fit=crop",
-    title: "Night Drive",
-    tag: "Cinematic"
+    image: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?q=80&w=1000&auto=format&fit=crop",
+    title: "Curb Appeal",
+    tag: "Lawn Enhancement"
   },
   {
     id: 5,
-    image: "https://images.unsplash.com/photo-1555685812-4b943f1cb0eb?q=80&w=1000&auto=format&fit=crop",
-    title: "Neon Rain",
-    tag: "Cyberpunk"
+    image: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=1000&auto=format&fit=crop",
+    title: "Penthouse View",
+    tag: "Sky Replacement"
   },
   {
     id: 6,
-    image: "https://images.unsplash.com/photo-1511818966892-d7d671e672a2?q=80&w=1000&auto=format&fit=crop",
-    title: "Glass Spire",
-    tag: "Architecture"
+    image: "https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?q=80&w=1000&auto=format&fit=crop",
+    title: "Craftsman Home",
+    tag: "Photo Enhancement"
   },
   {
     id: 7,
-    image: "https://images.unsplash.com/photo-1549298916-b41d501d3772?q=80&w=1000&auto=format&fit=crop",
-    title: "Urban Kicks",
-    tag: "E-Commerce"
+    image: "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?q=80&w=1000&auto=format&fit=crop",
+    title: "Open Floor Plan",
+    tag: "Declutter"
   },
   {
     id: 8,
-    image: "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?q=80&w=1000&auto=format&fit=crop",
-    title: "Digital Soul",
-    tag: "Abstract"
+    image: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80&w=1000&auto=format&fit=crop",
+    title: "Contemporary Estate",
+    tag: "Twilight"
   },
 ];
 
-// --- BOTTOM ROW: 8 Different Unique Images ---
 const SHOWCASE_ITEMS_BOTTOM = [
   {
     id: 9,
-    image: "https://images.unsplash.com/photo-1563089145-599997674d42?q=80&w=1000&auto=format&fit=crop",
-    title: "Neon Signs",
-    tag: "Cyberpunk"
+    image: "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?q=80&w=1000&auto=format&fit=crop",
+    title: "Primary Bedroom",
+    tag: "Virtual Staging"
   },
   {
     id: 10,
-    image: "https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?q=80&w=1000&auto=format&fit=crop",
-    title: "Modern Home",
-    tag: "Real Estate"
+    image: "https://images.unsplash.com/photo-1600585154526-990dced4db0d?q=80&w=1000&auto=format&fit=crop",
+    title: "Spa Bathroom",
+    tag: "Enhancement"
   },
   {
     id: 11,
-    image: "https://images.unsplash.com/photo-1614850523459-c2f4c699c52e?q=80&w=1000&auto=format&fit=crop",
-    title: "Fluid Art",
-    tag: "Abstract"
+    image: "https://images.unsplash.com/photo-1600573472550-8090b5e0745e?q=80&w=1000&auto=format&fit=crop",
+    title: "Dining Space",
+    tag: "Virtual Staging"
   },
   {
     id: 12,
-    image: "https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=1000&auto=format&fit=crop",
-    title: "AI Matrix",
-    tag: "Tech"
+    image: "https://images.unsplash.com/photo-1582268611958-ebfd161ef9cf?q=80&w=1000&auto=format&fit=crop",
+    title: "Waterfront Property",
+    tag: "Sky Replacement"
   },
   {
     id: 13,
-    image: "https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?q=80&w=1000&auto=format&fit=crop",
-    title: "Studio Sound",
-    tag: "Audio Viz"
+    image: "https://images.unsplash.com/photo-1560185893-a55cbc8c57e8?q=80&w=1000&auto=format&fit=crop",
+    title: "Cozy Reading Nook",
+    tag: "Virtual Staging"
   },
   {
     id: 14,
-    image: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=1000&auto=format&fit=crop",
-    title: "Culinary Art",
-    tag: "Food"
+    image: "https://images.unsplash.com/photo-1600563438938-a9a27215b4b4?q=80&w=1000&auto=format&fit=crop",
+    title: "Backyard Oasis",
+    tag: "Lawn Enhancement"
   },
   {
     id: 15,
-    image: "https://images.unsplash.com/photo-1598550476439-c9212f6433e2?q=80&w=1000&auto=format&fit=crop",
-    title: "Battle Station",
-    tag: "Gaming"
+    image: "https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?q=80&w=1000&auto=format&fit=crop",
+    title: "Home Office",
+    tag: "Declutter"
   },
   {
     id: 16,
-    image: "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?q=80&w=1000&auto=format&fit=crop",
-    title: "Nordic Mist",
-    tag: "Nature"
+    image: "https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?q=80&w=1000&auto=format&fit=crop",
+    title: "Great Room",
+    tag: "Photo Enhancement"
   },
 ];
 
@@ -112,7 +110,7 @@ interface ShowcaseItemProps {
   index: number;
 }
 
-const ShowcaseCard: React.FC<ShowcaseItemProps> = ({ item, index }) => {
+const ShowcaseCard: React.FC<ShowcaseItemProps> = ({ item }) => {
   const [isHovered, setIsHovered] = useState(false);
 
   return (
@@ -204,7 +202,6 @@ export const KineticShowcaseWall = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
-  // Track mouse for spotlight effect
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       if (containerRef.current) {
@@ -220,7 +217,6 @@ export const KineticShowcaseWall = () => {
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, []);
 
-  // We duplicate the arrays to ensure a seamless infinite loop
   const topRow = [...SHOWCASE_ITEMS_TOP, ...SHOWCASE_ITEMS_TOP];
   const bottomRow = [...SHOWCASE_ITEMS_BOTTOM, ...SHOWCASE_ITEMS_BOTTOM];
 
@@ -244,10 +240,9 @@ export const KineticShowcaseWall = () => {
         }}
       />
 
-      {/* The Tilted Wall Container */}
+      {/* Tilted Wall */}
       <div className="relative z-0 space-y-8 rotate-[-2deg] scale-110">
-
-        {/* Row 1: Moving Left */}
+        {/* Row 1: Left */}
         <div className="flex gap-6 animate-marquee-left w-max">
           {topRow.map((item, idx) => (
             <ShowcaseCard
@@ -258,7 +253,7 @@ export const KineticShowcaseWall = () => {
           ))}
         </div>
 
-        {/* Row 2: Moving Right */}
+        {/* Row 2: Right */}
         <div className="flex gap-6 animate-marquee-right w-max ml-[-100%]">
           {bottomRow.map((item, idx) => (
             <ShowcaseCard
@@ -268,7 +263,6 @@ export const KineticShowcaseWall = () => {
             />
           ))}
         </div>
-
       </div>
 
       {/* Overlay Text */}

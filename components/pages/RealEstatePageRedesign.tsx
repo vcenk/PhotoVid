@@ -21,8 +21,7 @@ import {
   Clock,
   Check,
 } from 'lucide-react';
-import { NavigationRail, FlyoutType } from '../dashboard/navigation/NavigationRail';
-import { FlyoutPanels } from '../dashboard/navigation/FlyoutPanels';
+import { NavigationRail } from '../dashboard/navigation/NavigationRail';
 
 // Tool categories for tabs
 type ToolCategory = 'all' | 'photo' | 'video' | 'ai';
@@ -48,7 +47,7 @@ const TOOLS: Tool[] = [
     description: 'Transform empty rooms with AI-generated furniture and decor',
     icon: Building2,
     gradient: 'from-blue-500 to-indigo-600',
-    route: '/studio/apps/real-estate/virtual-staging',
+    route: '/studio/real-estate/virtual-staging',
     category: ['all', 'photo', 'ai'],
     isFeatured: true,
     stats: '73% faster sales',
@@ -59,7 +58,7 @@ const TOOLS: Tool[] = [
     description: 'One-click HDR, lighting fixes, and professional color grading',
     icon: Camera,
     gradient: 'from-amber-500 to-orange-600',
-    route: '/studio/apps/real-estate/photo-enhancement',
+    route: '/studio/real-estate/photo-enhancement',
     category: ['all', 'photo'],
     stats: '30% more clicks',
   },
@@ -69,7 +68,7 @@ const TOOLS: Tool[] = [
     description: 'Replace overcast skies with perfect blue skies instantly',
     icon: Sun,
     gradient: 'from-cyan-400 to-blue-500',
-    route: '/studio/apps/real-estate/sky-replacement',
+    route: '/studio/real-estate/sky-replacement',
     category: ['all', 'photo'],
   },
   {
@@ -78,7 +77,7 @@ const TOOLS: Tool[] = [
     description: 'Convert daytime exteriors into stunning dusk photography',
     icon: Sparkles,
     gradient: 'from-indigo-500 to-purple-600',
-    route: '/studio/apps/real-estate/twilight',
+    route: '/studio/real-estate/twilight',
     category: ['all', 'photo', 'ai'],
     isPremium: true,
     stats: '35% more views',
@@ -89,7 +88,7 @@ const TOOLS: Tool[] = [
     description: 'Remove clutter, cars, and unwanted objects seamlessly',
     icon: Eraser,
     gradient: 'from-rose-500 to-pink-600',
-    route: '/studio/apps/real-estate/item-removal',
+    route: '/studio/real-estate/item-removal',
     category: ['all', 'photo', 'ai'],
   },
   {
@@ -98,7 +97,7 @@ const TOOLS: Tool[] = [
     description: 'Make grass greener and landscaping more vibrant',
     icon: TreePine,
     gradient: 'from-green-500 to-emerald-600',
-    route: '/studio/apps/real-estate/lawn-enhancement',
+    route: '/studio/real-estate/lawn-enhancement',
     category: ['all', 'photo'],
   },
   {
@@ -107,7 +106,7 @@ const TOOLS: Tool[] = [
     description: 'Generate cinematic video clips from still photos',
     icon: Video,
     gradient: 'from-violet-500 to-purple-600',
-    route: '/studio/apps/real-estate/room-tour',
+    route: '/studio/real-estate/room-tour',
     category: ['all', 'video', 'ai'],
     isPremium: true,
   },
@@ -117,7 +116,7 @@ const TOOLS: Tool[] = [
     description: 'Build complete video tours with multiple scenes and transitions',
     icon: ImageIcon,
     gradient: 'from-fuchsia-500 to-pink-600',
-    route: '/studio/apps/real-estate/storyboard',
+    route: '/studio/real-estate/storyboard',
     category: ['all', 'video', 'ai'],
     isPremium: true,
     isNew: true,
@@ -128,7 +127,7 @@ const TOOLS: Tool[] = [
     description: 'Generate entire property videos from listing descriptions',
     icon: Wand2,
     gradient: 'from-violet-600 to-indigo-600',
-    route: '/studio/apps/real-estate/text-to-video',
+    route: '/studio/real-estate/text-to-video',
     category: ['all', 'video', 'ai'],
     isPremium: true,
     isNew: true,
@@ -305,7 +304,7 @@ const FeaturedToolCard: React.FC<{ tool: Tool }> = ({ tool }) => {
 // Main Page Component
 export const RealEstatePageRedesign: React.FC = () => {
   const navigate = useNavigate();
-  const [activeFlyout, setActiveFlyout] = useState<FlyoutType>(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeCategory, setActiveCategory] = useState<ToolCategory>('all');
 
   const filteredTools = TOOLS.filter(
@@ -323,10 +322,8 @@ export const RealEstatePageRedesign: React.FC = () => {
 
   return (
     <div className="min-h-screen flex bg-[#08080a]">
-      <NavigationRail activeFlyout={activeFlyout} onFlyoutChange={setActiveFlyout} />
-      <FlyoutPanels activeFlyout={activeFlyout} onClose={() => setActiveFlyout(null)} />
-
-      <div className="flex-1 ml-56 overflow-y-auto">
+      <NavigationRail isMobileOpen={mobileMenuOpen} onMobileClose={() => setMobileMenuOpen(false)} />
+<div className="flex-1 ml-0 lg:ml-16 overflow-y-auto">
         {/* Hero Section */}
         <div className="relative overflow-hidden">
           {/* Background gradient */}
@@ -500,7 +497,7 @@ export const RealEstatePageRedesign: React.FC = () => {
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                onClick={() => navigate('/studio/apps/real-estate/virtual-staging')}
+                onClick={() => navigate('/studio/real-estate/virtual-staging')}
                 className="px-8 py-4 bg-violet-600 hover:bg-violet-500 text-white font-semibold rounded-xl flex items-center gap-2 transition-colors"
               >
                 Start Creating

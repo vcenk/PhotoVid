@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PropertyProvider, useProperties, Property } from '../../lib/store/contexts/PropertyContext';
-import { NavigationRail, FlyoutType } from '../dashboard/navigation/NavigationRail';
-import { FlyoutPanels } from '../dashboard/navigation/FlyoutPanels';
+import { NavigationRail } from '../dashboard/navigation/NavigationRail';
 import { DashboardTopbar } from '../dashboard/navigation/DashboardTopbar';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -296,7 +295,7 @@ const AddPropertyModal: React.FC<AddPropertyModalProps> = ({ onClose, onAdd }) =
 const PropertiesContent: React.FC = () => {
   const navigate = useNavigate();
   const { properties, loading, addProperty, deleteProperty } = useProperties();
-  const [activeFlyout, setActiveFlyout] = useState<FlyoutType>(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
   const [showAddModal, setShowAddModal] = useState(false);
@@ -327,10 +326,8 @@ const PropertiesContent: React.FC = () => {
 
   return (
     <div className="flex h-screen bg-white dark:bg-[#09090b] text-zinc-900 dark:text-white font-sans overflow-hidden">
-      <NavigationRail activeFlyout={activeFlyout} onFlyoutChange={setActiveFlyout} />
-      <FlyoutPanels activeFlyout={activeFlyout} onClose={() => setActiveFlyout(null)} />
-
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden" style={{ marginLeft: '224px' }}>
+      <NavigationRail isMobileOpen={mobileMenuOpen} onMobileClose={() => setMobileMenuOpen(false)} />
+<div className="flex-1 flex flex-col min-w-0 overflow-hidden ml-0 lg:ml-16">
         <DashboardTopbar onMenuClick={() => {}} />
 
         <main className="flex-1 overflow-y-auto">
@@ -485,7 +482,7 @@ const PropertiesContent: React.FC = () => {
                                   <button
                                     onClick={() => {
                                       setMenuOpen(null);
-                                      navigate('/studio/apps/real-estate');
+                                      navigate('/studio/real-estate');
                                     }}
                                     className="w-full flex items-center gap-2 px-4 py-2 text-sm text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-700"
                                   >

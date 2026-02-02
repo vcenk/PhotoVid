@@ -54,7 +54,7 @@ export const StoryboardEditor: React.FC = () => {
       <div className="h-14 flex items-center justify-between px-6 border-b border-white/5 flex-shrink-0">
         <div className="flex items-center gap-4">
           <button
-            onClick={() => navigate('/studio/apps/real-estate')}
+            onClick={() => navigate('/studio/real-estate')}
             className="p-2 hover:bg-white/5 rounded-lg transition-colors"
           >
             <ArrowLeft size={18} className="text-zinc-400" />

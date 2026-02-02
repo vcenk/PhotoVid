@@ -26,9 +26,6 @@ import { ChangingSeasonsTool } from './components/tools/real-estate/ChangingSeas
 import { PoolEnhancementTool } from './components/tools/real-estate/PoolEnhancementTool';
 import { WatermarkRemovalTool } from './components/tools/real-estate/WatermarkRemovalTool';
 import { HeadshotRetouchingTool } from './components/tools/real-estate/HeadshotRetouchingTool';
-import { HDRMergeTool } from './components/tools/real-estate/HDRMergeTool';
-import { FloorPlanTool } from './components/tools/real-estate/FloorPlanTool';
-import { Staging360Tool } from './components/tools/real-estate/Staging360Tool';
 // Auto Dealership Tools
 import { BackgroundSwapTool } from './components/tools/auto/BackgroundSwapTool';
 import { AutoEnhanceTool } from './components/tools/auto/AutoEnhanceTool';
@@ -50,6 +47,10 @@ import { DamageDetectionTool } from './components/tools/auto/DamageDetectionTool
 import { AutoStoryboardPage } from './components/pages/AutoStoryboardPage';
 import { StoryboardPage } from './components/pages/StoryboardPage';
 import { TextToVideoPage } from './components/pages/TextToVideoPage';
+import { VideoEditorPage } from './components/video-editor/VideoEditorPage';
+import { ExteriorPaintTool } from './components/tools/real-estate/ExteriorPaintTool';
+import { LandscapeDesignTool } from './components/tools/real-estate/LandscapeDesignTool';
+import { AutoDeclutterTool } from './components/tools/real-estate/AutoDeclutterTool';
 import { RealEstatePageV2 } from './components/pages/RealEstatePageV2';
 import { AuthPage } from './components/pages/AuthPage';
 import { AuthCallbackPage } from './components/pages/AuthCallbackPage';
@@ -58,7 +59,10 @@ import { PrivacyPolicyPage } from './components/pages/PrivacyPolicyPage';
 import { TermsOfServicePage } from './components/pages/TermsOfServicePage';
 import { CreditsPage } from './components/pages/CreditsPage';
 import { MyLibraryPage } from './components/pages/MyLibraryPage';
+import { VideoPage } from './components/pages/VideoPage';
+import { EditPage } from './components/pages/EditPage';
 import { PropertiesPage } from './components/pages/PropertiesPage';
+import { ListingPage } from './components/pages/ListingPage';
 import { AuthProvider } from './lib/store/contexts/AuthContext';
 
 // Simple Error Boundary to catch crashes
@@ -111,30 +115,29 @@ const App: React.FC = () => {
             <Route path="/studio" element={<StudioPage />} />
             <Route path="/studio/library" element={<MyLibraryPage />} />
             <Route path="/studio/properties" element={<PropertiesPage />} />
-            <Route path="/studio/apps" element={<AppsPage />} />
-            <Route path="/studio/apps/real-estate" element={<RealEstatePageV2 />} />
-            <Route path="/studio/apps/real-estate/virtual-staging" element={<VirtualStagingTool />} />
-            <Route path="/studio/apps/real-estate/item-removal" element={<ItemRemovalTool />} />
-            <Route path="/studio/apps/real-estate/photo-enhancement" element={<PhotoEnhancementTool />} />
-            <Route path="/studio/apps/real-estate/sky-replacement" element={<SkyReplacementTool />} />
-            <Route path="/studio/apps/real-estate/twilight" element={<TwilightTool />} />
-            <Route path="/studio/apps/real-estate/lawn-enhancement" element={<LawnEnhancementTool />} />
-            <Route path="/studio/apps/real-estate/room-tour" element={<RoomTourTool />} />
-            <Route path="/studio/apps/real-estate/declutter" element={<DeclutterTool />} />
-            <Route path="/studio/apps/real-estate/virtual-renovation" element={<VirtualRenovationTool />} />
-            <Route path="/studio/apps/real-estate/wall-color" element={<WallColorTool />} />
-            <Route path="/studio/apps/real-estate/floor-replacement" element={<FloorReplacementTool />} />
-            <Route path="/studio/apps/real-estate/rain-to-shine" element={<RainToShineTool />} />
-            <Route path="/studio/apps/real-estate/night-to-day" element={<NightToDayTool />} />
-            <Route path="/studio/apps/real-estate/changing-seasons" element={<ChangingSeasonsTool />} />
-            <Route path="/studio/apps/real-estate/pool-enhancement" element={<PoolEnhancementTool />} />
-            <Route path="/studio/apps/real-estate/watermark-removal" element={<WatermarkRemovalTool />} />
-            <Route path="/studio/apps/real-estate/headshot-retouching" element={<HeadshotRetouchingTool />} />
-            <Route path="/studio/apps/real-estate/hdr-merge" element={<HDRMergeTool />} />
-            <Route path="/studio/apps/real-estate/floor-plan" element={<FloorPlanTool />} />
-            <Route path="/studio/apps/real-estate/360-staging" element={<Staging360Tool />} />
-            <Route path="/studio/apps/real-estate/storyboard" element={<StoryboardPage />} />
-            <Route path="/studio/apps/real-estate/text-to-video" element={<TextToVideoPage />} />
+            <Route path="/studio/real-estate" element={<RealEstatePageV2 />} />
+            <Route path="/studio/real-estate/virtual-staging" element={<VirtualStagingTool />} />
+            <Route path="/studio/real-estate/item-removal" element={<ItemRemovalTool />} />
+            <Route path="/studio/real-estate/photo-enhancement" element={<PhotoEnhancementTool />} />
+            <Route path="/studio/real-estate/sky-replacement" element={<SkyReplacementTool />} />
+            <Route path="/studio/real-estate/twilight" element={<TwilightTool />} />
+            <Route path="/studio/real-estate/lawn-enhancement" element={<LawnEnhancementTool />} />
+            <Route path="/studio/real-estate/room-tour" element={<RoomTourTool />} />
+            <Route path="/studio/real-estate/declutter" element={<DeclutterTool />} />
+            <Route path="/studio/real-estate/virtual-renovation" element={<VirtualRenovationTool />} />
+            <Route path="/studio/real-estate/wall-color" element={<WallColorTool />} />
+            <Route path="/studio/real-estate/exterior-paint" element={<ExteriorPaintTool />} />
+            <Route path="/studio/real-estate/landscape-design" element={<LandscapeDesignTool />} />
+            <Route path="/studio/real-estate/auto-declutter" element={<AutoDeclutterTool />} />
+            <Route path="/studio/real-estate/floor-replacement" element={<FloorReplacementTool />} />
+            <Route path="/studio/real-estate/rain-to-shine" element={<RainToShineTool />} />
+            <Route path="/studio/real-estate/night-to-day" element={<NightToDayTool />} />
+            <Route path="/studio/real-estate/changing-seasons" element={<ChangingSeasonsTool />} />
+            <Route path="/studio/real-estate/pool-enhancement" element={<PoolEnhancementTool />} />
+            <Route path="/studio/edit/headshot-retouching" element={<HeadshotRetouchingTool />} />
+            <Route path="/studio/real-estate/storyboard" element={<StoryboardPage />} />
+            <Route path="/studio/real-estate/video-builder" element={<VideoEditorPage />} />
+            <Route path="/studio/real-estate/text-to-video" element={<TextToVideoPage />} />
             <Route path="/studio/apps/auto" element={<IndustryPage industryId="auto" />} />
             <Route path="/studio/apps/auto/background-swap" element={<BackgroundSwapTool />} />
             <Route path="/studio/apps/auto/auto-enhance" element={<AutoEnhanceTool />} />
@@ -154,8 +157,12 @@ const App: React.FC = () => {
             <Route path="/studio/apps/auto/social-clips" element={<SocialClipsTool />} />
             <Route path="/studio/apps/auto/damage-detection" element={<DamageDetectionTool />} />
             <Route path="/studio/apps/auto/storyboard" element={<AutoStoryboardPage />} />
+            <Route path="/studio/listing" element={<ListingPage />} />
             <Route path="/studio/lipsync" element={<LipsyncPage />} />
             <Route path="/studio/image" element={<ImagePage />} />
+            <Route path="/studio/edit" element={<EditPage />} />
+            <Route path="/studio/edit/watermark-removal" element={<WatermarkRemovalTool />} />
+            <Route path="/studio/video" element={<VideoPage />} />
             <Route path="/studio/workflow" element={<WorkflowPage />} />
             <Route path="/studio/credits" element={<CreditsPage />} />
             {/* Redirect old dashboard routes to studio */}

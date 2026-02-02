@@ -136,6 +136,12 @@ export const NODE_DEFINITIONS: Record<string, NodeDefinition> = {
         min: 1,
         max: 50,
         step: 1
+      },
+      {
+        id: 'negative_prompt',
+        label: 'Negative Prompt',
+        type: 'textarea',
+        defaultValue: ''
       }
     ]
   },
@@ -175,6 +181,12 @@ export const NODE_DEFINITIONS: Record<string, NodeDefinition> = {
           { value: '9:16', label: '9:16 (Vertical)' },
           { value: '1:1', label: '1:1 (Square)' }
         ]
+      },
+      {
+        id: 'negative_prompt',
+        label: 'Negative Prompt',
+        type: 'textarea',
+        defaultValue: ''
       }
     ]
   },
@@ -220,7 +232,14 @@ export const NODE_DEFINITIONS: Record<string, NodeDefinition> = {
     outputs: [
       { id: 'image', label: 'Edited Image', type: 'image' }
     ],
-    parameters: []
+    parameters: [
+      {
+        id: 'negative_prompt',
+        label: 'Negative Prompt',
+        type: 'textarea',
+        defaultValue: ''
+      }
+    ]
   },
 
   'gen-lipsync': {

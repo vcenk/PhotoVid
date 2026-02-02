@@ -9,7 +9,7 @@ import { MosaicSlideshow } from '../landing/MosaicSlideshow';
 import { UseCasesSection } from '../landing/UseCasesSection';
 import { TemplatePacks } from '../landing/TemplatePacks';
 import { KineticShowcaseWall } from '../landing/KineticShowcaseWall';
-import { TestimonialsCarousel } from '../landing/TestimonialsCarousel';
+
 import { PricingSection } from '../landing/PricingSection';
 import { FaqAndFinalCtaSection } from '../landing/FaqAndFinalCtaSection';
 import { Footer } from '../landing/Footer';
@@ -30,10 +30,8 @@ export const LandingPage: React.FC = () => {
         {/* Hero - Full viewport with particles and dynamic headlines */}
         <Hero />
 
-        {/* Social Proof - Logo strip */}
-        <div className="border-b border-white/5 bg-black/50 backdrop-blur-sm">
-          <LogoMarquee />
-        </div>
+        {/* Tool Marquee strip */}
+        <LogoMarquee />
 
         {/* Before/After Showcase - Interactive comparison */}
         <BeforeAfterShowcase />
@@ -45,10 +43,10 @@ export const LandingPage: React.FC = () => {
               How It Works
             </span>
             <h2 className="text-4xl md:text-5xl font-bold tracking-tighter text-white mb-6">
-              From Prompt to <span className="bg-gradient-to-r from-indigo-400 to-violet-400 bg-clip-text text-transparent">Production</span>
+              From Photo to <span className="bg-gradient-to-r from-indigo-400 to-violet-400 bg-clip-text text-transparent">Listing-Ready</span>
             </h2>
             <p className="text-zinc-400 max-w-2xl mx-auto">
-              Our industry-tuned models understand lighting, composition, and motion better than generic AI.
+              Three steps. One platform. Transform any property photo into a polished, listing-ready image in seconds.
             </p>
           </div>
           <WorkflowDemo />
@@ -74,9 +72,6 @@ export const LandingPage: React.FC = () => {
 
         {/* Kinetic Showcase Wall - Dynamic gallery */}
         <KineticShowcaseWall />
-
-        {/* Testimonials - Social proof */}
-        <TestimonialsCarousel />
 
         {/* Pricing Section */}
         <SectionWrapper id="pricing">

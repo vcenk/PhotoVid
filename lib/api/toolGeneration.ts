@@ -13,6 +13,10 @@ import {
   TOOL_MODEL_MAP,
   TOOL_CREDITS_MAP,
   // Real Estate Options
+  ExteriorPaintOptions,
+  LandscapeDesignOptions,
+  LandscapeStyle,
+  LandscapeElement,
   VirtualStagingOptions,
   PhotoEnhancementOptions,
   SkyReplacementOptions,
@@ -21,6 +25,9 @@ import {
   LawnEnhancementOptions,
   RoomTourOptions,
   DeclutterOptions,
+  AutoDeclutterOptions,
+  DeclutterLevel,
+  DeclutterCategory,
   VirtualRenovationOptions,
   WallColorOptions,
   FloorReplacementOptions,
@@ -28,6 +35,8 @@ import {
   NightToDayOptions,
   ChangingSeasonsOptions,
   PoolEnhancementOptions,
+  PoolMode,
+  PoolElement,
   WatermarkRemovalOptions,
   HeadshotRetouchingOptions,
   HDRMergeOptions,
@@ -327,47 +336,58 @@ function buildSkyPrompt(options: SkyReplacementOptions): string {
 }
 
 /**
- * Build the prompt for Twilight Conversion
+ * Build the prompt for Twilight Conversion (FLUX Kontext Pro)
  *
- * Updated prompts to preserve architecture and avoid "fake looking" results
+ * Detailed per-style prompts with window brightness and sky intensity modifiers
  */
 function buildTwilightPrompt(options: TwilightOptions): string {
   const stylePrompts: Record<string, string> = {
-    'blue-hour': 'blue hour twilight sky, deep blue with purple undertones, warm interior lights glowing from windows',
-    'golden-dusk': 'golden dusk sky, warm orange fading to purple, cozy warm interior glow',
-    'purple-twilight': 'rich purple twilight sky, magical evening atmosphere, soft interior lighting',
-    'dramatic': 'dramatic night sky, deep dark blue, bright contrasting interior lights',
+    'warm-sunset': 'Transform this daytime exterior photo into a warm twilight scene at dusk. Replace the sky with a beautiful sunset gradient of deep orange, soft pink, and purple tones. Turn on all interior lights - every window should glow with warm amber light. Add subtle warm glow from porch lights and exterior fixtures. Keep the house, landscaping, and all architectural details exactly the same. Adjust the overall ambient lighting to match dusk - cooler blue tones on exterior surfaces, warm light spilling from windows onto lawn and driveway.',
+    'blue-hour': 'Transform this daytime exterior photo into a blue hour twilight scene. Replace the sky with a deep blue gradient fading to purple and soft pink near the horizon. Turn on all interior lights - windows should have warm golden-amber glow contrasting against the cool blue exterior. Add subtle landscape lighting and porch lights. Keep the house architecture and landscaping exactly the same. The exterior should have a cool blue ambient tone while windows radiate warm inviting light.',
+    'golden-dusk': 'Transform this daytime exterior photo into golden hour dusk. Replace the sky with warm golden and peach sunset colors with soft clouds catching the light. Turn on interior lights - windows glowing warmly. Add gentle golden light on the house facade as if from setting sun. Keep the house architecture and landscaping exactly the same. Warm, inviting atmosphere.',
+    'dramatic': 'Transform this daytime exterior photo into dramatic twilight. Replace the sky with vivid sunset colors - deep magenta, bright orange, dramatic cloud formations. Turn on all interior lights with warm amber glow. Add pronounced light spill from windows onto surrounding areas. Keep the house architecture and landscaping exactly the same. High contrast between warm interior light and cool exterior.',
   };
 
-  const glowIntensity = options.glowIntensity === 30 ? 'subtle' : options.glowIntensity === 60 ? 'warm' : 'bright';
+  const brightnessModifiers: Record<string, string> = {
+    'subtle': 'Keep window glow subtle and understated, just barely visible warm light.',
+    'normal': 'Windows should have a natural warm glow, as if lights are on inside.',
+    'bright': 'Make the window lights very bright, prominent, and eye-catching.',
+  };
 
-  // Better prompt structure to preserve architecture
-  return `Convert to realistic dusk/twilight. Preserve architecture completely. ${stylePrompts[options.style]}, ${glowIntensity} window glow effect. Turn on warm interior lights in windows subtly. Keep sky realistic, no cinematic grading. Professional twilight real estate photography.`;
+  const skyModifiers: Record<string, string> = {
+    'muted': 'Keep the sky colors muted and restrained for a natural look.',
+    'normal': 'Sky colors should be vivid but realistic.',
+    'vivid': 'Make the sky colors rich and saturated for maximum visual impact.',
+  };
+
+  return `${stylePrompts[options.style]} ${brightnessModifiers[options.windowBrightness]} ${skyModifiers[options.skyIntensity]} Photorealistic, professional real estate twilight photography. Smooth natural color blending at horizon edge.`;
 }
 
 /**
- * Build the prompt for Lawn Enhancement
+ * Build the prompt for Lawn Enhancement (FLUX Kontext Pro)
  *
- * Updated to preserve house/exterior materials and keep lighting consistent
+ * Detailed prompts that produce visible, dramatic lawn transformation
  */
 function buildLawnPrompt(options: LawnEnhancementOptions): string {
-  const parts: string[] = [];
+  const intensityPrompts: Record<string, string> = {
+    'natural': 'Transform the lawn into healthy, naturally green grass with even coverage and realistic texture. The grass should look well-maintained and freshly mowed, a natural medium green color.',
+    'enhanced': 'Transform the lawn into a lush, thick, deep green lawn with rich color and dense grass coverage. The grass should look like a professionally maintained lawn - uniformly green, thick, and healthy.',
+    'vibrant': 'Transform the lawn into a strikingly vibrant, emerald green lawn with perfectly dense, manicured grass. The grass should be intensely green and look like a golf course fairway - pristine and immaculate.',
+  };
 
-  if (options.greenerLawn) {
-    const intensityModifier = options.intensity === 'natural' ? 'naturally' : options.intensity === 'enhanced' ? 'lush' : 'vibrant';
-    parts.push(`${intensityModifier} green healthy lawn, realistic grass texture`);
-  }
+  const parts: string[] = [intensityPrompts[options.intensity]];
 
   if (options.addFlowers) {
-    parts.push('colorful flower beds and landscaping accents');
+    parts.push('Add colorful flower beds along the house foundation and walkway edges - bright red, pink, purple, and yellow flowers with fresh green foliage.');
   }
 
   if (options.freshDewy) {
-    parts.push('fresh morning dew effect, glistening grass');
+    parts.push('Add a fresh morning dew effect with subtle glistening on the grass blades, making the lawn look freshly watered.');
   }
 
-  // Better prompt to preserve house and lighting
-  return `Improve lawn health naturally. ${parts.join(', ')}. Keep lighting consistent, do not change house or exterior materials. Professional real estate photography.`;
+  parts.push('Replace any brown, dead, or patchy grass areas with healthy green grass. Make mulch beds look fresh and dark. Do not remove, alter, or cover any stone walls, retaining walls, walkways, pathways, driveways, fences, or hardscape features. Keep the house, roof, windows, porch, driveway, sky, trees, shrubs, and all architectural and hardscape details exactly the same. Only change the grass and landscaping vegetation. Photorealistic, professional real estate photography.');
+
+  return parts.join(' ');
 }
 
 /**
@@ -389,25 +409,24 @@ function buildRoomTourPrompt(options: RoomTourOptions): string {
  */
 function buildVirtualRenovationPrompt(options: VirtualRenovationOptions): string {
   const stylePrompts: Record<string, string> = {
-    'modern': 'sleek modern design with clean lines, minimalist fixtures, contemporary finishes',
-    'traditional': 'classic traditional design with elegant details, warm wood tones, timeless appeal',
-    'contemporary': 'contemporary design with bold accents, mixed materials, artistic elements',
-    'farmhouse': 'farmhouse style with rustic charm, shiplap details, warm inviting atmosphere',
-    'luxury': 'luxury high-end renovation with premium materials, elegant finishes, sophisticated design',
+    'modern': 'Transform this into a sleek modern renovation with clean lines, flat-panel cabinetry, quartz or marble countertops, minimalist hardware, and contemporary light fixtures.',
+    'traditional': 'Transform this into a classic traditional renovation with raised-panel cabinetry, warm wood tones, crown molding, elegant hardware, and timeless design details.',
+    'contemporary': 'Transform this into a contemporary renovation with bold accent colors, mixed materials like concrete and wood, geometric patterns, and artistic design elements.',
+    'farmhouse': 'Transform this into a charming farmhouse renovation with shiplap accent walls, open shelving, apron-front sink, rustic wood beams, and warm inviting finishes.',
+    'luxury': 'Transform this into a luxury high-end renovation with premium marble surfaces, custom cabinetry, designer fixtures, under-cabinet lighting, and sophisticated upscale finishes.',
   };
 
-  const elementPrompts = options.elements.map(el => {
-    switch (el) {
-      case 'cabinets': return 'new designer cabinets';
-      case 'countertops': return 'premium countertops';
-      case 'backsplash': return 'stylish backsplash';
-      case 'fixtures': return 'modern fixtures and hardware';
-      case 'appliances': return 'stainless steel appliances';
-      default: return el;
-    }
-  }).join(', ');
+  const elementDescriptions: Record<string, string> = {
+    'cabinets': 'Install brand new designer cabinets with soft-close doors and matching hardware.',
+    'countertops': 'Replace countertops with premium stone or quartz surfaces.',
+    'backsplash': 'Add a stylish new backsplash with modern tile patterns.',
+    'fixtures': 'Upgrade all fixtures and hardware to modern brushed or matte finishes.',
+    'appliances': 'Add new stainless steel professional-grade appliances.',
+  };
 
-  return `Professional ${options.renovationType} renovation with ${stylePrompts[options.style]}, featuring ${elementPrompts}. Photorealistic, professional real estate photography, well-lit, high-end finish`;
+  const elementDetails = options.elements.map(el => elementDescriptions[el] || el).join(' ');
+
+  return `${stylePrompts[options.style]} ${elementDetails} This is a ${options.renovationType} renovation. Keep the room layout, walls, windows, doors, ceiling, and floor exactly the same. Only renovate the specified elements. Photorealistic, professional real estate photography, well-lit, high-end finish.`;
 }
 
 /**
@@ -421,7 +440,50 @@ function buildWallColorPrompt(options: WallColorOptions): string {
     'semi-gloss': 'semi-gloss reflective finish',
   };
 
-  return `Paint the walls with color ${options.color}, ${finishDescriptions[options.finish]}. Maintain realistic lighting and shadows, keep all furniture and fixtures unchanged, professional interior photography`;
+  const colorDesc = options.colorName || options.color;
+  return `Change only the wall color in this room to ${colorDesc} (hex ${options.color}) with a ${finishDescriptions[options.finish]}. Paint every visible wall surface with this exact new color. The walls must clearly show the new ${colorDesc} paint color, noticeably different from the original. Keep all furniture, fixtures, flooring, ceiling, windows, doors, artwork, decor, and architectural trim exactly the same. Maintain realistic lighting, shadows, and reflections on the newly painted walls. Photorealistic, professional interior real estate photography.`;
+}
+
+/**
+ * Build the prompt for Exterior Paint Visualizer
+ */
+function buildExteriorPaintPrompt(options: ExteriorPaintOptions): string {
+  const finishDescriptions: Record<string, string> = {
+    'matte': 'matte finish with no shine',
+    'eggshell': 'subtle eggshell sheen',
+    'satin': 'soft satin luster',
+    'semi-gloss': 'semi-gloss reflective finish',
+  };
+
+  const parts: string[] = [];
+  const unchanged: string[] = [];
+
+  const elements = [
+    { key: 'siding', data: options.siding, label: 'exterior siding/walls' },
+    { key: 'trim', data: options.trim, label: 'exterior trim' },
+    { key: 'door', data: options.door, label: 'front door' },
+    { key: 'shutters', data: options.shutters, label: 'window shutters' },
+    { key: 'garageDoor', data: options.garageDoor, label: 'garage door' },
+  ];
+
+  for (const el of elements) {
+    if (el.data.enabled) {
+      const colorDesc = el.data.colorName || el.data.color;
+      parts.push(`Change the ${el.label} to ${colorDesc} (hex ${el.data.color})`);
+    } else {
+      unchanged.push(el.label);
+    }
+  }
+
+  if (parts.length === 0) {
+    return 'Keep this exterior photo exactly the same. No changes.';
+  }
+
+  const finishText = finishDescriptions[options.finish];
+  const changeText = parts.join('. ') + `. Use a ${finishText} on all painted surfaces.`;
+  const keepText = unchanged.length > 0 ? ` Keep the ${unchanged.join(', ')} in their original colors.` : '';
+
+  return `${changeText}${keepText} Keep the roof, landscaping, driveway, windows, and all surroundings exactly the same. Maintain realistic lighting, shadows, and weather conditions. Photorealistic, professional real estate exterior photography.`;
 }
 
 /**
@@ -437,7 +499,7 @@ function buildFloorReplacementPrompt(options: FloorReplacementOptions): string {
     'concrete': 'polished concrete flooring',
   };
 
-  return `Replace the floor with ${floorDescriptions[options.floorType]} in ${options.style} style. Maintain realistic perspective and lighting, seamless edge transitions, professional real estate photography`;
+  return `Replace only the floor in this room with ${floorDescriptions[options.floorType]} in a ${options.style} style. The new flooring should follow the correct perspective and cover the entire visible floor area with realistic plank or tile patterns. Keep all walls, furniture, fixtures, ceiling, doors, windows, and decor exactly the same. Maintain realistic lighting, shadows, and reflections on the new floor surface. Photorealistic, professional interior real estate photography.`;
 }
 
 /**
@@ -456,7 +518,7 @@ function buildRainToShinePrompt(options: RainToShineOptions): string {
     'very-bright': 'vibrant sun-drenched scene',
   };
 
-  return `Transform to ${skyTypes[options.skyType]}, ${brightnessLevels[options.brightness]}. Remove all rain, puddles, wet surfaces. Add realistic shadows and highlights for sunny weather, professional real estate exterior photography`;
+  return `Transform this rainy or overcast exterior photo into a bright sunny day with ${skyTypes[options.skyType]} and ${brightnessLevels[options.brightness]}. Remove all rain, raindrops, puddles, wet reflections, and wet surfaces from the ground, driveway, and sidewalks. Make the ground and pavement completely dry. Replace the gray or dark sky with a beautiful sunny sky. Add warm natural sunlight with realistic shadows and highlights. Keep the house, building, landscaping, trees, cars, and all architectural details exactly the same. Only change the weather and lighting. Photorealistic, professional real estate exterior photography.`;
 }
 
 /**
@@ -476,7 +538,7 @@ function buildNightToDayPrompt(options: NightToDayOptions): string {
     'dramatic': 'dramatic cloud formations',
   };
 
-  return `Convert nighttime exterior to ${timeDescriptions[options.timeOfDay]}, ${skyDescriptions[options.skyType]}. Turn off artificial lights, add natural daylight, realistic daytime atmosphere, professional real estate photography`;
+  return `Convert this nighttime exterior photo to bright daytime with ${timeDescriptions[options.timeOfDay]} and ${skyDescriptions[options.skyType]}. Replace the dark night sky with a bright daytime sky. Turn off all artificial lights, porch lights, and window glow. Add natural sunlight illumination with realistic shadows cast by the sun. Make the entire scene look like it was photographed during the day. Keep the house, building, landscaping, driveway, cars, and all architectural details exactly the same. Only change the lighting from night to day. Photorealistic, professional real estate exterior photography.`;
 }
 
 /**
@@ -484,38 +546,131 @@ function buildNightToDayPrompt(options: NightToDayOptions): string {
  */
 function buildChangingSeasonsPrompt(options: ChangingSeasonsOptions): string {
   const seasonPrompts: Record<string, string> = {
-    'spring': 'beautiful spring with blooming flowers, fresh green leaves, cherry blossoms',
-    'summer': 'lush summer with vibrant green foliage, bright sunshine, full leafy trees',
-    'fall': 'stunning autumn with colorful fall foliage, orange and red leaves, warm tones',
-    'winter': 'picturesque winter with snow-covered landscape, bare trees, cozy atmosphere',
+    'spring': 'Change the season to spring. Add blooming flowers, cherry blossoms, fresh green leaves on the trees and bushes. Make the grass bright green with spring wildflowers.',
+    'summer': 'Change the season to summer. Make all foliage lush and vibrant green, add bright warm sunshine, full leafy trees with dense canopy.',
+    'fall': 'Change the season to autumn. Transform the tree leaves to orange, red, and golden yellow fall colors. Add fallen leaves on the ground, warm autumn tones throughout.',
+    'winter': 'Change the season to winter. Add snow covering the ground, roof, trees, and bushes. Make trees bare or frost-covered. Add overcast winter sky. Snow on the lawn and walkways.',
   };
 
   const intensityModifiers: Record<string, string> = {
-    'subtle': 'subtle seasonal touches',
-    'moderate': 'clear seasonal atmosphere',
-    'dramatic': 'dramatic seasonal transformation',
+    'subtle': 'Apply light seasonal changes while keeping most of the scene recognizable.',
+    'moderate': 'Apply clear seasonal transformation to the landscaping, trees, and sky.',
+    'dramatic': 'Apply a full dramatic seasonal transformation to the entire scene.',
   };
 
-  return `Transform to ${seasonPrompts[options.season]}, ${intensityModifiers[options.intensity]}. Maintain property structure, adjust landscaping and sky to match season, professional real estate exterior photography`;
+  return `${seasonPrompts[options.season]} ${intensityModifiers[options.intensity]} Keep the house structure, architecture, and building materials exactly the same. Professional real estate exterior photography.`;
 }
 
 /**
  * Build the prompt for Pool Enhancement
  */
 function buildPoolEnhancementPrompt(options: PoolEnhancementOptions): string {
-  const modeDescriptions: Record<string, string> = {
-    'add-water': 'fill the empty pool with crystal clear water',
-    'clarify': 'clarify murky pool water to pristine clarity',
-    'enhance-color': 'enhance pool water color and clarity',
+  const POOL_MODE_PROMPTS: Record<string, string> = {
+    'clean-water': 'Make the pool water crystal clear turquoise blue. Clean, inviting water with natural light reflections and visible pool floor.',
+    'luxury-upgrade': 'Enhance the pool area to luxury resort style. Crystal clear blue water, clean pristine pool deck, lush landscaping around pool.',
+    'add-pool': 'Add a rectangular in-ground swimming pool with crystal clear turquoise water to the backyard. Include a clean concrete pool deck around it.',
   };
 
-  const colorDescriptions: Record<string, string> = {
-    'crystal-blue': 'sparkling crystal blue',
-    'turquoise': 'vibrant tropical turquoise',
-    'natural': 'natural aqua blue',
+  const POOL_ELEMENT_PROMPTS: Record<string, string> = {
+    'lounge-chairs': 'Add stylish poolside lounge chairs with cushions.',
+    'umbrella': 'Add a large patio umbrella providing shade near the pool.',
+    'hot-tub': 'Add a built-in hot tub/spa adjacent to the pool.',
+    'pool-lighting': 'Add underwater LED pool lighting and ambient deck lighting.',
+    'outdoor-kitchen': 'Add an outdoor kitchen/BBQ area near the pool.',
+    'fire-pit': 'Add a modern fire pit seating area near the pool.',
+    'water-features': 'Add water features like a waterfall or fountain built into the pool edge.',
+    'pool-fence': 'Add a glass or wrought iron safety fence around the pool.',
+    'cabana': 'Add a poolside cabana with curtains for shade and privacy.',
+    'landscaping': 'Add lush tropical landscaping with palms and flowering plants around the pool area.',
+    'deck-upgrade': 'Upgrade the pool deck to premium travertine or natural stone pavers.',
+    'diving-board': 'Add a diving board at the deep end of the pool.',
   };
 
-  return `${modeDescriptions[options.mode]}, ${colorDescriptions[options.waterColor]} water color. Add realistic reflections and light refraction, inviting pool atmosphere, professional real estate photography`;
+  let prompt = POOL_MODE_PROMPTS[options.mode];
+
+  if (options.elements.length > 0) {
+    const elementPrompts = options.elements.map(e => POOL_ELEMENT_PROMPTS[e]).join(' ');
+    prompt += ` ${elementPrompts}`;
+  }
+
+  prompt += ' Keep the house architecture and surrounding structures exactly the same. Only change the pool and immediate pool area. Photorealistic, professional real estate photography.';
+
+  return prompt;
+}
+
+/**
+ * Build the prompt for Auto Declutter
+ */
+// Object-removal model expects a list of OBJECTS to remove (not instructions).
+// The model auto-detects and removes these objects from the image.
+const DECLUTTER_LEVEL_PROMPTS: Record<DeclutterLevel, string> = {
+  'light': 'clutter, mess, scattered items, items on floor, items on countertops, trash, loose papers, random objects',
+  'medium': 'clutter, personal items, scattered objects, toys, blocks, figurines, balls, items on floor, items on countertops, items on tables, personal photos, picture frames, fridge magnets, toiletries, mail, shoes, bags, mess, small objects, papers, books',
+  'deep': 'all objects on floor, all items on surfaces, all items on countertops, all items on tables, all items on shelves, toys, blocks, figurines, balls, books, magazines, electronics, lamps, decorations, photos, frames, art, bags, shoes, coats, bottles, jars, plants, candles, clutter, personal items, small objects, everything except large furniture',
+};
+
+const DECLUTTER_CATEGORY_PROMPTS: Record<DeclutterCategory, string> = {
+  'personal-photos': 'personal photos, family photos, picture frames, portraits',
+  'toys-kids': 'toys, children toys, blocks, wooden blocks, figurines, dinosaur toys, dolls, balls, train tracks, building sets, stuffed animals, toy vehicles, puzzles, art supplies, crayons, baby items, highchair',
+  'pet-items': 'pet bowls, pet food bowls, pet beds, pet toys, litter box, pet crate, dog leash, cat scratching post',
+  'countertop-items': 'countertop items, kitchen appliances, utensils, dish rack, jars, bottles, cutting boards, toaster, coffee maker, blender',
+  'shoes-coats': 'shoes, boots, sandals, coats, jackets, bags, backpacks, umbrellas, hats',
+  'trash-bins': 'trash cans, recycling bins, waste baskets, garbage bags',
+  'cords-cables': 'cords, cables, power strips, chargers, extension cords, wires',
+  'bathroom-items': 'toiletries, towels, bath products, soap dispensers, toothbrushes, shampoo bottles, bathroom clutter',
+  'laundry': 'laundry, clothing piles, drying racks, laundry baskets, hampers, ironing boards',
+  'exercise-equipment': 'exercise equipment, treadmill, weights, dumbbells, yoga mats, resistance bands, exercise bike',
+  'holiday-decor': 'holiday decorations, Christmas lights, ornaments, wreaths, seasonal decorations',
+  'religious-items': 'religious items, religious symbols, altar, religious candles, spiritual decorations',
+};
+
+function buildAutoDeclutterPrompt(options: AutoDeclutterOptions): string {
+  let prompt = DECLUTTER_LEVEL_PROMPTS[options.level];
+
+  if (options.categories.length > 0) {
+    const categoryPrompts = options.categories.map(c => DECLUTTER_CATEGORY_PROMPTS[c]).join(', ');
+    prompt += `, ${categoryPrompts}`;
+  }
+
+  return prompt;
+}
+
+/**
+ * Build the prompt for Landscape Design
+ */
+const LANDSCAPE_STYLE_PROMPTS: Record<LandscapeStyle, string> = {
+  'lush-green': 'Enhance landscaping with lush green professional landscaping. Thick healthy lawn, well-maintained shrubs and hedges, mature shade trees, colorful flower beds along walkways and foundation. Neat mulch borders and clean edging.',
+  'modern-minimal': 'Redesign landscaping with modern minimalist style. Clean geometric lines, ornamental grasses, drought-tolerant succulents, decorative gravel beds, concrete stepping stones, minimal but sculptural plantings with architectural plants.',
+  'tropical': 'Redesign landscaping with tropical style. Palm trees, bird of paradise plants, lush tropical foliage, vibrant flowering bushes, ferns, large leafy plants, warm and exotic resort-like feel.',
+  'cottage-garden': 'Redesign landscaping with English cottage garden style. Abundant mixed flower beds with roses, lavender, hydrangeas, winding stone pathways, climbing vines on fences, charming and slightly wild natural look with rich colors.',
+  'desert-xeriscape': 'Redesign landscaping with desert xeriscape style. Drought-tolerant plants, cacti, agave, desert sage, decorative rock and gravel ground cover, natural stone boulders, minimal water usage aesthetic.',
+  'formal-estate': 'Redesign landscaping with formal estate style. Symmetrical design, perfectly trimmed boxwood hedges, manicured topiaries, stone urns with flowers, classic fountain or statue as focal point, elegant and grand.',
+};
+
+const ELEMENT_PROMPTS: Record<LandscapeElement, string> = {
+  'trees': 'Add mature shade trees strategically placed in the yard.',
+  'flower-beds': 'Add colorful flower beds along the foundation and walkways.',
+  'pathway': 'Add an attractive stone or paver pathway leading to the front door.',
+  'hedges': 'Add neatly trimmed hedges along the property border.',
+  'outdoor-lighting': 'Add subtle landscape lighting along pathways and uplighting on trees.',
+  'garden-beds': 'Add raised garden beds with mixed plantings.',
+  'water-feature': 'Add a small decorative water fountain or birdbath.',
+  'planters': 'Add decorative planters with flowers by the front entrance.',
+  'retaining-wall': 'Add a natural stone retaining wall with plantings.',
+  'pergola': 'Add a wooden or white pergola with climbing vines.',
+};
+
+function buildLandscapeDesignPrompt(options: LandscapeDesignOptions): string {
+  let prompt = LANDSCAPE_STYLE_PROMPTS[options.style];
+
+  if (options.elements.length > 0) {
+    const elementPrompts = options.elements.map(e => ELEMENT_PROMPTS[e]).join(' ');
+    prompt += ` ${elementPrompts}`;
+  }
+
+  prompt += ' Keep the house architecture, roof, walls, windows, doors, driveway, and structure exactly the same. Only change the landscaping and yard. Photorealistic, professional real estate photography.';
+
+  return prompt;
 }
 
 /**
@@ -969,12 +1124,10 @@ export async function generateSkyReplacement(
 }
 
 /**
- * Twilight Conversion Generation
+ * Twilight Conversion Generation (FLUX Kontext Pro)
  *
- * Updated based on analysis:
- * - Lower strength (0.60-0.72 instead of 0.75) to avoid over-transformation
- * - Generate 3 candidates (twilight is high-risk for "fake looking" results)
- * - Better prompt to preserve architecture
+ * Single high-quality image output with detailed style-specific prompts.
+ * Kontext Pro handles the full transformation in one step.
  */
 export async function generateTwilight(
   imageFile: File,
@@ -992,10 +1145,9 @@ export async function generateTwilight(
     input: {
       image_url: imageUrl,
       prompt,
-      strength: 0.65, // Lower than before (was 0.75) to avoid over-transformation
-      num_inference_steps: 32, // More steps for better quality
-      guidance_scale: 7,
-      num_images: 3, // Generate candidates - twilight often looks fake
+      guidance_scale: 3.5,
+      num_inference_steps: 28,
+      output_format: 'jpeg',
     },
     logs: true,
     onQueueUpdate: (update) => {
@@ -1007,9 +1159,12 @@ export async function generateTwilight(
 
   onProgress?.(100, 'Complete');
 
-  const data = result.data as { images?: Array<{ url: string }> };
+  const data = result.data as { images?: Array<{ url: string }>; image?: { url: string } };
   if (data?.images?.[0]?.url) {
     return data.images[0].url;
+  }
+  if (data?.image?.url) {
+    return data.image.url;
   }
   throw new Error('No image returned from twilight conversion');
 }
@@ -1057,12 +1212,9 @@ export async function generateItemRemoval(
 }
 
 /**
- * Lawn Enhancement Generation
+ * Lawn Enhancement Generation (FLUX Kontext Pro)
  *
- * Updated based on analysis:
- * - Lower strength (0.35-0.55 instead of 0.5-0.8) to avoid "plastic grass"
- * - Generate 2 candidates
- * - Better prompt to keep lighting consistent
+ * Single high-quality output with strong transformation prompts.
  */
 export async function generateLawnEnhancement(
   imageFile: File,
@@ -1076,21 +1228,13 @@ export async function generateLawnEnhancement(
 
   const prompt = buildLawnPrompt(options);
 
-  // Lower strengths to avoid "plastic grass" look
-  const strengthMap: Record<string, number> = {
-    natural: 0.35,
-    enhanced: 0.45,
-    vibrant: 0.55,
-  };
-
   const result = await secureSubscribe(TOOL_MODEL_MAP['lawn-enhancement'], {
     input: {
       image_url: imageUrl,
       prompt,
-      strength: strengthMap[options.intensity] || 0.40,
+      guidance_scale: 3.5,
       num_inference_steps: 28,
-      guidance_scale: 6.5, // Slightly lower for more natural look
-      num_images: 2, // Generate candidates
+      output_format: 'jpeg',
     },
     logs: true,
     onQueueUpdate: (update) => {
@@ -1102,9 +1246,12 @@ export async function generateLawnEnhancement(
 
   onProgress?.(100, 'Complete');
 
-  const data = result.data as { images?: Array<{ url: string }> };
+  const data = result.data as { images?: Array<{ url: string }>; image?: { url: string } };
   if (data?.images?.[0]?.url) {
     return data.images[0].url;
+  }
+  if (data?.image?.url) {
+    return data.image.url;
   }
   throw new Error('No image returned from lawn enhancement');
 }
@@ -1186,13 +1333,14 @@ export async function generateDeclutter(
     if (data?.image?.url) return data.image.url;
     throw new Error('No image returned from declutter');
   } else {
-    // Auto mode - use image-to-image with declutter prompt
-    const result = await secureSubscribe('fal-ai/flux/dev/image-to-image', {
+    // Auto mode - use Kontext Pro with detailed declutter prompt
+    const result = await secureSubscribe('fal-ai/flux-pro/kontext', {
       input: {
         image_url: imageUrl,
-        prompt: 'Remove all clutter, personal items, and unnecessary objects from this room. Keep furniture and fixtures, remove small items, papers, toys, clothes. Clean and organized space, professional real estate photography',
-        strength: 0.4,
+        prompt: 'Remove all clutter, personal belongings, and unnecessary small objects from this room. Remove toys, shoes, clothes, papers, magazines, mail, dishes, cups, remote controls, chargers, and any items left on floors, countertops, tables, shelves, and beds. Leave all furniture, large appliances, light fixtures, curtains, and architectural features exactly as they are. The room should look clean, tidy, and move-in ready. Photorealistic, professional real estate photography, well-lit.',
+        guidance_scale: 3.5,
         num_inference_steps: 28,
+        output_format: 'jpeg',
       },
       logs: true,
       onQueueUpdate: (update) => {
@@ -1203,8 +1351,9 @@ export async function generateDeclutter(
     });
 
     onProgress?.(100, 'Complete');
-    const data = result.data as { images?: Array<{ url: string }> };
+    const data = result.data as { images?: Array<{ url: string }>; image?: { url: string } };
     if (data?.images?.[0]?.url) return data.images[0].url;
+    if (data?.image?.url) return data.image.url;
     throw new Error('No image returned from auto declutter');
   }
 }
@@ -1215,20 +1364,12 @@ export async function generateDeclutter(
 export async function generateVirtualRenovation(
   imageFile: File,
   options: VirtualRenovationOptions,
-  maskCanvas?: HTMLCanvasElement,
+  _maskCanvas?: HTMLCanvasElement,
   onProgress?: GenerationProgressCallback
 ): Promise<string> {
   onProgress?.(10, 'Uploading image...');
 
   const imageUrl = await uploadFile(imageFile, 'virtual-renovation');
-  let maskUrl: string | undefined;
-
-  if (maskCanvas) {
-    onProgress?.(20, 'Processing renovation area...');
-    const maskBlob = await canvasMaskToBlob(maskCanvas);
-    const maskFile = new File([maskBlob], 'mask.png', { type: 'image/png' });
-    maskUrl = await uploadFile(maskFile, 'renovation-masks');
-  }
 
   onProgress?.(35, 'Generating renovation preview...');
 
@@ -1237,10 +1378,10 @@ export async function generateVirtualRenovation(
   const result = await secureSubscribe(TOOL_MODEL_MAP['virtual-renovation'], {
     input: {
       image_url: imageUrl,
-      mask_url: maskUrl,
       prompt,
+      guidance_scale: 3.5,
       num_inference_steps: 28,
-      guidance_scale: 7.5,
+      output_format: 'jpeg',
     },
     logs: true,
     onQueueUpdate: (update) => {
@@ -1252,8 +1393,9 @@ export async function generateVirtualRenovation(
 
   onProgress?.(100, 'Complete');
 
-  const data = result.data as { images?: Array<{ url: string }> };
+  const data = result.data as { images?: Array<{ url: string }>; image?: { url: string } };
   if (data?.images?.[0]?.url) return data.images[0].url;
+  if (data?.image?.url) return data.image.url;
   throw new Error('No image returned from virtual renovation');
 }
 
@@ -1263,20 +1405,12 @@ export async function generateVirtualRenovation(
 export async function generateWallColor(
   imageFile: File,
   options: WallColorOptions,
-  maskCanvas?: HTMLCanvasElement,
+  _maskCanvas?: HTMLCanvasElement,
   onProgress?: GenerationProgressCallback
 ): Promise<string> {
   onProgress?.(10, 'Uploading image...');
 
   const imageUrl = await uploadFile(imageFile, 'wall-color');
-  let maskUrl: string | undefined;
-
-  if (maskCanvas) {
-    onProgress?.(20, 'Processing wall area...');
-    const maskBlob = await canvasMaskToBlob(maskCanvas);
-    const maskFile = new File([maskBlob], 'mask.png', { type: 'image/png' });
-    maskUrl = await uploadFile(maskFile, 'wall-color-masks');
-  }
 
   onProgress?.(35, 'Changing wall color...');
 
@@ -1285,10 +1419,10 @@ export async function generateWallColor(
   const result = await secureSubscribe(TOOL_MODEL_MAP['wall-color'], {
     input: {
       image_url: imageUrl,
-      mask_url: maskUrl,
       prompt,
+      guidance_scale: 3.5,
       num_inference_steps: 28,
-      guidance_scale: 7.5,
+      output_format: 'jpeg',
     },
     logs: true,
     onQueueUpdate: (update) => {
@@ -1300,9 +1434,51 @@ export async function generateWallColor(
 
   onProgress?.(100, 'Complete');
 
-  const data = result.data as { images?: Array<{ url: string }> };
+  const data = result.data as { images?: Array<{ url: string }>; image?: { url: string } };
   if (data?.images?.[0]?.url) return data.images[0].url;
+  if (data?.image?.url) return data.image.url;
   throw new Error('No image returned from wall color change');
+}
+
+/**
+ * Exterior Paint Visualizer Generation
+ */
+export async function generateExteriorPaint(
+  imageFile: File,
+  options: ExteriorPaintOptions,
+  _maskCanvas?: HTMLCanvasElement,
+  onProgress?: GenerationProgressCallback
+): Promise<string> {
+  onProgress?.(10, 'Uploading image...');
+
+  const imageUrl = await uploadFile(imageFile, 'exterior-paint');
+
+  onProgress?.(35, 'Changing exterior paint...');
+
+  const prompt = buildExteriorPaintPrompt(options);
+
+  const result = await secureSubscribe(TOOL_MODEL_MAP['exterior-paint'], {
+    input: {
+      image_url: imageUrl,
+      prompt,
+      guidance_scale: 3.5,
+      num_inference_steps: 28,
+      output_format: 'jpeg',
+    },
+    logs: true,
+    onQueueUpdate: (update) => {
+      if (update.status === 'IN_PROGRESS') {
+        onProgress?.(Math.round(50 + Math.random() * 30), 'Applying exterior paint...');
+      }
+    },
+  });
+
+  onProgress?.(100, 'Complete');
+
+  const data = result.data as { images?: Array<{ url: string }>; image?: { url: string } };
+  if (data?.images?.[0]?.url) return data.images[0].url;
+  if (data?.image?.url) return data.image.url;
+  throw new Error('No image returned from exterior paint change');
 }
 
 /**
@@ -1311,20 +1487,12 @@ export async function generateWallColor(
 export async function generateFloorReplacement(
   imageFile: File,
   options: FloorReplacementOptions,
-  maskCanvas?: HTMLCanvasElement,
+  _maskCanvas?: HTMLCanvasElement,
   onProgress?: GenerationProgressCallback
 ): Promise<string> {
   onProgress?.(10, 'Uploading image...');
 
   const imageUrl = await uploadFile(imageFile, 'floor-replacement');
-  let maskUrl: string | undefined;
-
-  if (maskCanvas) {
-    onProgress?.(20, 'Processing floor area...');
-    const maskBlob = await canvasMaskToBlob(maskCanvas);
-    const maskFile = new File([maskBlob], 'mask.png', { type: 'image/png' });
-    maskUrl = await uploadFile(maskFile, 'floor-masks');
-  }
 
   onProgress?.(35, 'Replacing floor...');
 
@@ -1333,10 +1501,10 @@ export async function generateFloorReplacement(
   const result = await secureSubscribe(TOOL_MODEL_MAP['floor-replacement'], {
     input: {
       image_url: imageUrl,
-      mask_url: maskUrl,
       prompt,
+      guidance_scale: 3.5,
       num_inference_steps: 28,
-      guidance_scale: 7.5,
+      output_format: 'jpeg',
     },
     logs: true,
     onQueueUpdate: (update) => {
@@ -1348,8 +1516,9 @@ export async function generateFloorReplacement(
 
   onProgress?.(100, 'Complete');
 
-  const data = result.data as { images?: Array<{ url: string }> };
+  const data = result.data as { images?: Array<{ url: string }>; image?: { url: string } };
   if (data?.images?.[0]?.url) return data.images[0].url;
+  if (data?.image?.url) return data.image.url;
   throw new Error('No image returned from floor replacement');
 }
 
@@ -1376,10 +1545,9 @@ export async function generateRainToShine(
     input: {
       image_url: imageUrl,
       prompt,
-      strength: 0.62, // Conservative to preserve architecture
-      num_inference_steps: 32,
-      guidance_scale: 7,
-      num_images: 2, // Generate candidates
+      guidance_scale: 3.5,
+      num_inference_steps: 28,
+      output_format: 'jpeg',
     },
     logs: true,
     onQueueUpdate: (update) => {
@@ -1391,8 +1559,9 @@ export async function generateRainToShine(
 
   onProgress?.(100, 'Complete');
 
-  const data = result.data as { images?: Array<{ url: string }> };
+  const data = result.data as { images?: Array<{ url: string }>; image?: { url: string } };
   if (data?.images?.[0]?.url) return data.images[0].url;
+  if (data?.image?.url) return data.image.url;
   throw new Error('No image returned from rain to shine conversion');
 }
 
@@ -1419,10 +1588,9 @@ export async function generateNightToDay(
     input: {
       image_url: imageUrl,
       prompt,
-      strength: 0.68, // Slightly lower for better preservation
-      num_inference_steps: 36, // More steps for better quality
-      guidance_scale: 7.5,
-      num_images: 2, // Generate candidates
+      guidance_scale: 3.5,
+      num_inference_steps: 28,
+      output_format: 'jpeg',
     },
     logs: true,
     onQueueUpdate: (update) => {
@@ -1434,8 +1602,9 @@ export async function generateNightToDay(
 
   onProgress?.(100, 'Complete');
 
-  const data = result.data as { images?: Array<{ url: string }> };
+  const data = result.data as { images?: Array<{ url: string }>; image?: { url: string } };
   if (data?.images?.[0]?.url) return data.images[0].url;
+  if (data?.image?.url) return data.image.url;
   throw new Error('No image returned from night to day conversion');
 }
 
@@ -1457,17 +1626,14 @@ export async function generateChangingSeasons(
   onProgress?.(30, 'Changing seasons...');
 
   const prompt = buildChangingSeasonsPrompt(options);
-  // Lower strengths to avoid "too AI" look
-  const strengthMap = { 'subtle': 0.45, 'moderate': 0.55, 'dramatic': 0.65 };
 
   const result = await secureSubscribe(TOOL_MODEL_MAP['changing-seasons'], {
     input: {
       image_url: imageUrl,
       prompt,
-      strength: strengthMap[options.intensity],
-      num_inference_steps: 32,
-      guidance_scale: 6.5,
-      num_images: 2, // Generate candidates
+      guidance_scale: 3.5,
+      num_inference_steps: 28,
+      output_format: 'jpeg',
     },
     logs: true,
     onQueueUpdate: (update) => {
@@ -1479,8 +1645,9 @@ export async function generateChangingSeasons(
 
   onProgress?.(100, 'Complete');
 
-  const data = result.data as { images?: Array<{ url: string }> };
+  const data = result.data as { images?: Array<{ url: string }>; image?: { url: string } };
   if (data?.images?.[0]?.url) return data.images[0].url;
+  if (data?.image?.url) return data.image.url;
   throw new Error('No image returned from season change');
 }
 
@@ -1490,20 +1657,12 @@ export async function generateChangingSeasons(
 export async function generatePoolEnhancement(
   imageFile: File,
   options: PoolEnhancementOptions,
-  maskCanvas?: HTMLCanvasElement,
+  _maskCanvas?: HTMLCanvasElement,
   onProgress?: GenerationProgressCallback
 ): Promise<string> {
   onProgress?.(10, 'Uploading image...');
 
   const imageUrl = await uploadFile(imageFile, 'pool-enhancement');
-  let maskUrl: string | undefined;
-
-  if (maskCanvas) {
-    onProgress?.(20, 'Processing pool area...');
-    const maskBlob = await canvasMaskToBlob(maskCanvas);
-    const maskFile = new File([maskBlob], 'mask.png', { type: 'image/png' });
-    maskUrl = await uploadFile(maskFile, 'pool-masks');
-  }
 
   onProgress?.(35, 'Enhancing pool...');
 
@@ -1512,10 +1671,10 @@ export async function generatePoolEnhancement(
   const result = await secureSubscribe(TOOL_MODEL_MAP['pool-enhancement'], {
     input: {
       image_url: imageUrl,
-      mask_url: maskUrl,
       prompt,
+      guidance_scale: 3.5,
       num_inference_steps: 28,
-      guidance_scale: 7.5,
+      output_format: 'jpeg',
     },
     logs: true,
     onQueueUpdate: (update) => {
@@ -1527,9 +1686,93 @@ export async function generatePoolEnhancement(
 
   onProgress?.(100, 'Complete');
 
-  const data = result.data as { images?: Array<{ url: string }> };
+  const data = result.data as { images?: Array<{ url: string }>; image?: { url: string } };
   if (data?.images?.[0]?.url) return data.images[0].url;
+  if (data?.image?.url) return data.image.url;
   throw new Error('No image returned from pool enhancement');
+}
+
+/**
+ * Landscape Design Generation
+ */
+export async function generateLandscapeDesign(
+  imageFile: File,
+  options: LandscapeDesignOptions,
+  _maskCanvas?: HTMLCanvasElement,
+  onProgress?: GenerationProgressCallback
+): Promise<string> {
+  onProgress?.(10, 'Uploading image...');
+
+  const imageUrl = await uploadFile(imageFile, 'landscape-design');
+
+  onProgress?.(35, 'Designing landscape...');
+
+  const prompt = buildLandscapeDesignPrompt(options);
+
+  const result = await secureSubscribe(TOOL_MODEL_MAP['landscape-design'], {
+    input: {
+      image_url: imageUrl,
+      prompt,
+      guidance_scale: 3.5,
+      num_inference_steps: 28,
+      output_format: 'jpeg',
+    },
+    logs: true,
+    onQueueUpdate: (update) => {
+      if (update.status === 'IN_PROGRESS') {
+        onProgress?.(Math.round(50 + Math.random() * 30), 'Applying landscape design...');
+      }
+    },
+  });
+
+  onProgress?.(100, 'Complete');
+
+  const data = result.data as { images?: Array<{ url: string }>; image?: { url: string } };
+  if (data?.images?.[0]?.url) return data.images[0].url;
+  if (data?.image?.url) return data.image.url;
+  throw new Error('No image returned from landscape design');
+}
+
+/**
+ * Auto Declutter Generation
+ */
+export async function generateAutoDeclutter(
+  imageFile: File,
+  options: AutoDeclutterOptions,
+  _maskCanvas?: HTMLCanvasElement,
+  onProgress?: GenerationProgressCallback
+): Promise<string> {
+  onProgress?.(10, 'Uploading image...');
+
+  const imageUrl = await uploadFile(imageFile, 'auto-declutter');
+
+  onProgress?.(35, 'Removing clutter...');
+
+  const prompt = buildAutoDeclutterPrompt(options);
+
+  const result = await secureSubscribe(TOOL_MODEL_MAP['auto-declutter'], {
+    input: {
+      image_url: imageUrl,
+      prompt,
+      guidance_scale: 5,
+      num_inference_steps: 40,
+      output_format: 'jpeg',
+      safety_tolerance: '2',
+    },
+    logs: true,
+    onQueueUpdate: (update) => {
+      if (update.status === 'IN_PROGRESS') {
+        onProgress?.(Math.round(50 + Math.random() * 30), 'Decluttering room...');
+      }
+    },
+  });
+
+  onProgress?.(100, 'Complete');
+
+  const data = result.data as { images?: Array<{ url: string }>; image?: { url: string } };
+  if (data?.images?.[0]?.url) return data.images[0].url;
+  if (data?.image?.url) return data.image.url;
+  throw new Error('No image returned from auto declutter');
 }
 
 /**
@@ -1545,57 +1788,31 @@ export async function generateWatermarkRemoval(
 
   const imageUrl = await uploadFile(imageFile, 'watermark-removal');
 
-  if (options.autoDetect && !maskCanvas) {
-    // Auto-detect mode - use image-to-image to clean watermarks
-    onProgress?.(30, 'Auto-detecting watermarks...');
-    const result = await secureSubscribe('fal-ai/flux/dev/image-to-image', {
-      input: {
-        image_url: imageUrl,
-        prompt: 'Remove all watermarks, logos, and text overlays from this image. Restore the underlying image content, maintain quality, professional photograph',
-        strength: 0.3,
-        num_inference_steps: 28,
-      },
-      logs: true,
-      onQueueUpdate: (update) => {
-        if (update.status === 'IN_PROGRESS') {
-          onProgress?.(Math.round(50 + Math.random() * 30), 'Removing watermarks...');
-        }
-      },
-    });
+  onProgress?.(30, 'Removing watermarks...');
 
-    onProgress?.(100, 'Complete');
-    const data = result.data as { images?: Array<{ url: string }> };
-    if (data?.images?.[0]?.url) return data.images[0].url;
-    throw new Error('No image returned from auto watermark removal');
-  } else if (maskCanvas) {
-    // Manual mode with mask
-    onProgress?.(20, 'Processing watermark area...');
-    const maskBlob = await canvasMaskToBlob(maskCanvas);
-    const maskFile = new File([maskBlob], 'mask.png', { type: 'image/png' });
-    const maskUrl = await uploadFile(maskFile, 'watermark-masks');
+  const prompt = 'Remove all watermarks, logos, and text overlays from this image. Restore the underlying image content cleanly. Keep everything else exactly the same. Professional photograph, high quality.';
 
-    onProgress?.(40, 'Removing watermark...');
+  const result = await secureSubscribe(TOOL_MODEL_MAP['watermark-removal'], {
+    input: {
+      image_url: imageUrl,
+      prompt,
+      guidance_scale: 3.5,
+      num_inference_steps: 28,
+      output_format: 'jpeg',
+    },
+    logs: true,
+    onQueueUpdate: (update) => {
+      if (update.status === 'IN_PROGRESS') {
+        onProgress?.(Math.round(50 + Math.random() * 30), 'Removing watermarks...');
+      }
+    },
+  });
 
-    const result = await secureSubscribe(TOOL_MODEL_MAP['watermark-removal'], {
-      input: {
-        image_url: imageUrl,
-        mask_url: maskUrl,
-      },
-      logs: true,
-      onQueueUpdate: (update) => {
-        if (update.status === 'IN_PROGRESS') {
-          onProgress?.(Math.round(50 + Math.random() * 30), 'Erasing watermark...');
-        }
-      },
-    });
-
-    onProgress?.(100, 'Complete');
-    const data = result.data as { image?: { url: string } };
-    if (data?.image?.url) return data.image.url;
-    throw new Error('No image returned from watermark removal');
-  }
-
-  throw new Error('Either autoDetect or mask must be provided');
+  onProgress?.(100, 'Complete');
+  const data = result.data as { images?: Array<{ url: string }>; image?: { url: string } };
+  if (data?.images?.[0]?.url) return data.images[0].url;
+  if (data?.image?.url) return data.image.url;
+  throw new Error('No image returned from watermark removal');
 }
 
 /**
@@ -1696,15 +1913,14 @@ export async function generateFloorPlan(
   onProgress?.(30, 'Analyzing room layout...');
 
   const styleDescriptions: Record<string, string> = {
-    '2d-basic': 'simple 2D floor plan with basic room outlines',
-    '2d-detailed': 'detailed 2D floor plan with furniture placement and measurements',
-    '3d-isometric': '3D isometric floor plan view with furniture and fixtures',
+    '2d-basic': 'simple 2D room layout illustration with basic room outlines',
+    '2d-detailed': 'detailed 2D room layout illustration with furniture placement',
+    '3d-isometric': '3D isometric room layout illustration with furniture and fixtures',
   };
 
-  let prompt = `Generate a ${styleDescriptions[options.style]} from this room photo.`;
+  let prompt = `Generate a ${styleDescriptions[options.style]} based on this room photo. This is an artistic illustration, not an architectural blueprint.`;
   if (options.includeLabels) prompt += ' Include room labels.';
-  if (options.includeDimensions) prompt += ' Include approximate dimensions.';
-  prompt += ' Professional architectural drawing style, clean lines, accurate proportions.';
+  prompt += ' Clean professional illustration style, clear lines, visually appealing layout diagram.';
 
   const result = await secureSubscribe(TOOL_MODEL_MAP['floor-plan'], {
     input: {

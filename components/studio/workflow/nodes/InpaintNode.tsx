@@ -137,6 +137,19 @@ export const InpaintNode = memo(({ id, data, selected }: NodeProps) => {
           </div>
         </div>
 
+        {/* Negative Prompt */}
+        <div>
+          <label className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1">
+            Negative Prompt
+          </label>
+          <textarea
+            value={data.parameters?.negative_prompt || ''}
+            onChange={(e) => handleParameterChange('negative_prompt', e.target.value)}
+            placeholder="What to avoid..."
+            className="w-full h-16 px-3 py-2 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg text-sm text-zinc-900 dark:text-white placeholder:text-zinc-400 resize-none focus:outline-none focus:ring-2 focus:ring-amber-500/20"
+          />
+        </div>
+
         {/* Preview */}
         {data.output?.imageUrl && (
           <div className="mt-3">

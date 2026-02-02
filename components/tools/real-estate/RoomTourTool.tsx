@@ -14,11 +14,13 @@ import {
     Clock,
     Move,
     Check,
-    AlertCircle
+    AlertCircle,
+    BookmarkPlus
 } from 'lucide-react';
-import { NavigationRail, FlyoutType } from '../../dashboard/navigation/NavigationRail';
-import { FlyoutPanels } from '../../dashboard/navigation/FlyoutPanels';
+import { NavigationRail } from '../../dashboard/navigation/NavigationRail';
+import { AssetProvider, useAssets } from '@/lib/store/contexts/AssetContext';
 import { generateRoomTourVideo, isFalConfigured } from '@/lib/api/toolGeneration';
+import { downloadFile } from '@/lib/utils';
 import type { RoomTourOptions } from '@/lib/types/generation';
 
 // Motion styles
@@ -37,9 +39,9 @@ const DURATION_OPTIONS = [
     { id: '10', label: '10s', seconds: 10 },
 ];
 
-export const RoomTourTool: React.FC = () => {
+const RoomTourToolInner: React.FC = () => {
     const navigate = useNavigate();
-    const [activeFlyout, setActiveFlyout] = useState<FlyoutType>(null);
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     const [uploadedImage, setUploadedImage] = useState<File | null>(null);
     const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -51,6 +53,8 @@ export const RoomTourTool: React.FC = () => {
     const [generationProgress, setGenerationProgress] = useState(0);
     const [resultVideo, setResultVideo] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
+    const [savedToLibrary, setSavedToLibrary] = useState(false);
+    const { addAsset } = useAssets();
 
     // Check for pre-selected asset from library
     useEffect(() => {
@@ -108,16 +112,19 @@ export const RoomTourTool: React.FC = () => {
         setIsGenerating(true);
         setGenerationProgress(0);
         setError(null);
+        setSavedToLibrary(false);
 
         if (!isFalConfigured()) {
             const progressInterval = setInterval(() => {
                 setGenerationProgress(prev => prev >= 90 ? (clearInterval(progressInterval), 90) : prev + 5);
             }, 600);
 
-            setTimeout(() => {
+            setTimeout(async () => {
                 clearInterval(progressInterval);
                 setGenerationProgress(100);
-                setResultVideo('https://videos.pexels.com/video-files/5977249/5977249-uhd_2560_1440_30fps.mp4');
+                const mockUrl = 'https://videos.pexels.com/video-files/5977249/5977249-uhd_2560_1440_30fps.mp4';
+                setResultVideo(mockUrl);
+                try { await addAsset(mockUrl, 'video', 'Room Tour Video'); setSavedToLibrary(true); } catch {}
                 setIsGenerating(false);
             }, 6000);
             return;
@@ -139,6 +146,7 @@ export const RoomTourTool: React.FC = () => {
             );
 
             setResultVideo(resultUrl);
+            try { await addAsset(resultUrl, 'video', 'Room Tour Video'); setSavedToLibrary(true); } catch {}
         } catch (err) {
             console.error('Room tour video error:', err);
             setError(err instanceof Error ? err.message : 'Video generation failed. Please try again.');
@@ -151,15 +159,13 @@ export const RoomTourTool: React.FC = () => {
 
     return (
         <div className="h-screen flex bg-[#0a0a0b]">
-            <NavigationRail activeFlyout={activeFlyout} onFlyoutChange={setActiveFlyout} />
-            <FlyoutPanels activeFlyout={activeFlyout} onClose={() => setActiveFlyout(null)} />
-
-            <div className="flex-1 flex ml-56">
+            <NavigationRail isMobileOpen={mobileMenuOpen} onMobileClose={() => setMobileMenuOpen(false)} />
+<div className="flex-1 flex ml-0 lg:ml-16">
                 {/* Sidebar */}
-                <div className="w-[320px] flex-shrink-0 bg-[#111113] border-r border-white/5 flex flex-col">
+                <div className="w-[360px] flex-shrink-0 bg-[#111113] border-r border-white/5 flex flex-col">
                     <div className="p-4 border-b border-white/5">
                         <div className="flex items-center gap-3">
-                            <button onClick={() => navigate('/studio/apps/real-estate')} className="p-2 hover:bg-white/5 rounded-lg transition-colors">
+                            <button onClick={() => navigate('/studio/real-estate')} className="p-2 hover:bg-white/5 rounded-lg transition-colors">
                                 <ArrowLeft size={18} className="text-zinc-400" />
                             </button>
                             <h1 className="text-base font-semibold text-white flex items-center gap-2">
@@ -260,7 +266,12 @@ export const RoomTourTool: React.FC = () => {
                         {resultVideo && (
                             <div className="flex items-center gap-2">
                                 <button onClick={() => setResultVideo(null)} className="px-3 py-1.5 text-xs font-medium text-zinc-400 hover:text-white bg-white/5 hover:bg-white/10 rounded-lg transition-colors flex items-center gap-1.5"><RefreshCw size={14} />Regenerate</button>
-                                <button className="px-3 py-1.5 text-xs font-medium text-white bg-violet-600 hover:bg-violet-500 rounded-lg transition-colors flex items-center gap-1.5"><Download size={14} />Download MP4</button>
+                                {savedToLibrary ? (
+                                    <span className="px-3 py-1.5 text-xs font-medium text-emerald-400 bg-emerald-500/10 rounded-lg flex items-center gap-1.5"><BookmarkPlus size={14} />Saved to Library</span>
+                                ) : (
+                                    <button onClick={async () => { if (resultVideo) { try { await addAsset(resultVideo, 'video', 'Room Tour Video'); setSavedToLibrary(true); } catch {} } }} className="px-3 py-1.5 text-xs font-medium text-zinc-400 hover:text-white bg-white/5 hover:bg-white/10 rounded-lg transition-colors flex items-center gap-1.5"><BookmarkPlus size={14} />Save to Library</button>
+                                )}
+                                <button onClick={() => resultVideo && downloadFile(resultVideo, `room-tour-${Date.now()}.mp4`, 'mp4')} className="px-3 py-1.5 text-xs font-medium text-white bg-violet-600 hover:bg-violet-500 rounded-lg transition-colors flex items-center gap-1.5"><Download size={14} />Download MP4</button>
                             </div>
                         )}
                     </div>
@@ -329,3 +340,9 @@ export const RoomTourTool: React.FC = () => {
         </div>
     );
 };
+
+export const RoomTourTool: React.FC = () => (
+    <AssetProvider>
+        <RoomTourToolInner />
+    </AssetProvider>
+);

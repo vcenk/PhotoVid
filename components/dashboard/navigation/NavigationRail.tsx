@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import {
   Home,
   LayoutGrid,
@@ -16,17 +16,18 @@ import {
   HelpCircle,
   LogOut,
   Settings,
-  ChevronRight,
+  ChevronDown,
   Shield,
   Sparkles,
   Zap,
+  X,
+  FileText,
+  Film,
 } from 'lucide-react';
 import { cn } from '../../../lib/utils';
 import { useTheme } from '../../common/ThemeProvider';
 import { createClient } from '../../../lib/database/client';
 import { useCredits } from '@/lib/store/contexts/CreditsContext';
-
-export type FlyoutType = 'image' | 'video' | 'edit' | null;
 
 interface NavItem {
   id: string;
@@ -34,33 +35,27 @@ interface NavItem {
   icon: React.ElementType;
   path?: string;
   children?: NavItem[];
-  flyout?: FlyoutType;
 }
 
 interface NavigationRailProps {
-  activeFlyout: FlyoutType;
-  onFlyoutChange: (flyout: FlyoutType) => void;
+  isMobileOpen: boolean;
+  onMobileClose: () => void;
 }
 
-export function NavigationRail({ activeFlyout, onFlyoutChange }: NavigationRailProps) {
+export function NavigationRail({ isMobileOpen, onMobileClose }: NavigationRailProps) {
   const navigate = useNavigate();
   const location = useLocation();
   const { theme, toggleTheme } = useTheme();
   const supabase = createClient();
   const { balance, isAdmin } = useCredits();
+  const [isExpanded, setIsExpanded] = useState(false);
   const [activeSubmenu, setActiveSubmenu] = useState<string | null>(null);
-  const sidebarRef = useRef<HTMLDivElement>(null);
+  const railRef = useRef<HTMLDivElement>(null);
 
-  // Close submenu when clicking outside
+  // Close mobile drawer on route change
   useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (sidebarRef.current && !sidebarRef.current.contains(e.target as Node)) {
-        setActiveSubmenu(null);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+    onMobileClose();
+  }, [location.pathname]);
 
   const handleSignOut = async () => {
     if (supabase) {
@@ -69,19 +64,20 @@ export function NavigationRail({ activeFlyout, onFlyoutChange }: NavigationRailP
     navigate('/');
   };
 
-  // Navigation structure with nested items
   const navItems: NavItem[] = [
     { id: 'home', label: 'Home', icon: Home, path: '/studio' },
-    { id: 'apps', label: 'Apps', icon: LayoutGrid, path: '/studio/apps' },
+    { id: 'apps', label: 'Real Estate', icon: Building2, path: '/studio/real-estate' },
     {
       id: 'create',
       label: 'Create',
       icon: Sparkles,
       children: [
         { id: 'image', label: 'Image', icon: ImageIcon, path: '/studio/image' },
-        { id: 'video', label: 'Video', icon: Video, flyout: 'video' },
-        { id: 'edit', label: 'Edit', icon: Wand2, flyout: 'edit' },
+        { id: 'video', label: 'Video', icon: Video, path: '/studio/video' },
+        { id: 'edit', label: 'Edit', icon: Wand2, path: '/studio/edit' },
         { id: 'lipsync', label: 'Lipsync', icon: Mic2, path: '/studio/lipsync' },
+        { id: 'listing', label: 'Listing', icon: FileText, path: '/studio/listing' },
+        { id: 'video-editor', label: 'Video Editor', icon: Film, path: '/studio/real-estate/video-builder' },
       ],
     },
     {
@@ -99,219 +95,343 @@ export function NavigationRail({ activeFlyout, onFlyoutChange }: NavigationRailP
   const handleItemClick = (item: NavItem) => {
     if (item.children) {
       setActiveSubmenu(activeSubmenu === item.id ? null : item.id);
-    } else if (item.flyout) {
-      onFlyoutChange(activeFlyout === item.flyout ? null : item.flyout);
-      setActiveSubmenu(null);
     } else if (item.path) {
       navigate(item.path);
       setActiveSubmenu(null);
-      onFlyoutChange(null);
     }
   };
 
   const isItemActive = (item: NavItem): boolean => {
-    if (item.flyout) return activeFlyout === item.flyout;
     if (item.path) return location.pathname === item.path;
     if (item.children) {
-      return item.children.some(child =>
-        child.path === location.pathname ||
-        (child.flyout && activeFlyout === child.flyout)
-      );
+      return item.children.some(child => child.path === location.pathname);
     }
     return false;
   };
 
-  const isSubmenuItemActive = (item: NavItem): boolean => {
-    if (item.flyout) return activeFlyout === item.flyout;
-    if (item.path) return location.pathname === item.path;
-    return false;
-  };
+  const expanded = isExpanded || isMobileOpen;
 
-  return (
-    <div ref={sidebarRef} className="fixed left-0 top-0 bottom-0 w-56 bg-zinc-950 border-r border-white/5 flex flex-col z-50">
-      {/* Main Sidebar Content */}
-      <div className="flex-1 flex flex-col">
-        {/* Logo */}
-        <div className="h-14 flex items-center gap-2.5 px-4 border-b border-white/5">
-          <button
-            onClick={() => {
-              navigate('/studio');
-              setActiveSubmenu(null);
-              onFlyoutChange(null);
-            }}
-            className="flex items-center gap-2.5 hover:opacity-80 transition-opacity"
+  // Sidebar content (shared between desktop rail and mobile drawer)
+  const sidebarContent = (
+    <div className="flex-1 flex flex-col h-full">
+      {/* Logo */}
+      <div className="h-14 flex items-center gap-2.5 px-4 border-b border-white/5 shrink-0">
+        <button
+          onClick={() => {
+            navigate('/studio');
+            setActiveSubmenu(null);
+          }}
+          className="flex items-center gap-2.5 hover:opacity-80 transition-opacity min-w-0"
+        >
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center shrink-0">
+            <img
+              src="/photovid.svg"
+              alt="Photovid"
+              className="w-6 h-6 object-contain"
+              onError={(e) => {
+                (e.target as HTMLImageElement).style.display = 'none';
+              }}
+            />
+          </div>
+          <span
+            className={cn(
+              'text-sm font-semibold tracking-wide text-white whitespace-nowrap transition-opacity duration-200',
+              expanded ? 'opacity-100' : 'opacity-0 w-0 overflow-hidden'
+            )}
           >
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center">
-              <img
-                src="/photovid.svg"
-                alt="Photovid"
-                className="w-5 h-5 object-contain"
-                onError={(e) => {
-                  (e.target as HTMLImageElement).style.display = 'none';
-                }}
-              />
-            </div>
-            <span className="text-sm font-semibold tracking-wide text-white">PHOTOVID</span>
+            PHOTOVID
+          </span>
+        </button>
+
+        {/* Mobile close button */}
+        {isMobileOpen && (
+          <button
+            onClick={onMobileClose}
+            className="ml-auto p-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-white/5 transition-colors lg:hidden"
+          >
+            <X size={18} />
           </button>
-        </div>
+        )}
+      </div>
 
-        {/* Navigation */}
-        <div className="flex-1 flex flex-col py-3 px-3 overflow-y-auto">
-          {/* Main Nav Items */}
-          <div className="space-y-1">
-            {navItems.map((item) => {
-              const Icon = item.icon;
-              const active = isItemActive(item);
-              const hasChildren = !!item.children;
-              const isOpen = activeSubmenu === item.id;
+      {/* Navigation */}
+      <div className="flex-1 flex flex-col py-3 px-3 overflow-x-hidden overflow-y-auto scrollbar-none">
+        {/* Main Nav Items */}
+        <div className="space-y-1">
+          {navItems.map((item) => {
+            const Icon = item.icon;
+            const active = isItemActive(item);
+            const hasChildren = !!item.children;
+            const isOpen = activeSubmenu === item.id;
 
-              return (
+            return (
+              <div key={item.id}>
+                {/* Nav button */}
                 <button
-                  key={item.id}
                   onClick={() => handleItemClick(item)}
                   className={cn(
-                    'w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200',
+                    'w-full flex items-center gap-3 rounded-xl text-sm font-medium transition-all duration-200 relative group',
+                    expanded ? 'px-3 py-2.5 justify-between' : 'px-0 py-2.5 justify-center',
                     active
                       ? 'bg-violet-500/15 text-violet-400'
                       : 'text-zinc-400 hover:text-white hover:bg-white/5',
                     isOpen && 'bg-white/5 text-white'
                   )}
                 >
-                  <div className="flex items-center gap-3">
-                    <Icon size={18} strokeWidth={1.75} />
-                    <span>{item.label}</span>
+                  <div className={cn('flex items-center gap-3', !expanded && 'justify-center w-full')}>
+                    <Icon size={18} strokeWidth={1.75} className="shrink-0" />
+                    <span
+                      className={cn(
+                        'whitespace-nowrap transition-opacity duration-200',
+                        expanded ? 'opacity-100' : 'opacity-0 w-0 overflow-hidden'
+                      )}
+                    >
+                      {item.label}
+                    </span>
                   </div>
-                  {hasChildren && (
-                    <ChevronRight
+                  {hasChildren && expanded && (
+                    <ChevronDown
                       size={16}
                       className={cn(
-                        'text-zinc-500 transition-transform duration-200',
-                        isOpen && 'rotate-90 text-zinc-300'
+                        'text-zinc-500 transition-transform duration-200 shrink-0',
+                        isOpen && 'rotate-180 text-zinc-300'
                       )}
                     />
                   )}
+                  {/* Dot indicator for collapsed items with children */}
+                  {hasChildren && !expanded && (
+                    <span className="absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-zinc-500" />
+                  )}
+                  {/* Tooltip for collapsed state */}
+                  {!expanded && (
+                    <span className="absolute left-full ml-2 px-2 py-1 rounded-md bg-zinc-800 text-white text-xs font-medium whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-150 z-[60]">
+                      {item.label}
+                    </span>
+                  )}
                 </button>
-              );
-            })}
-          </div>
 
-          {/* Spacer */}
-          <div className="flex-1 min-h-8" />
+                {/* Accordion submenu */}
+                <AnimatePresence initial={false}>
+                  {hasChildren && isOpen && expanded && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: 'auto', opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.2, ease: 'easeInOut' }}
+                      className="overflow-hidden"
+                    >
+                      <div className="py-1 space-y-0.5">
+                        {item.children!.map((child) => {
+                          const ChildIcon = child.icon;
+                          const childActive = child.path === location.pathname;
 
-          {/* Bottom Section */}
-          <div className="space-y-1 pt-3 border-t border-white/5">
-            {/* Admin */}
-            {isAdmin && (
-              <button
-                onClick={() => navigate('/studio/admin')}
-                className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-amber-400/80 hover:text-amber-400 hover:bg-amber-500/10 transition-all duration-200"
-              >
-                <Shield size={18} strokeWidth={1.75} />
-                <span>Admin</span>
-              </button>
-            )}
-
-            {/* Credits */}
-            <button
-              onClick={() => navigate('/studio/credits')}
-              className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium text-zinc-400 hover:text-white hover:bg-white/5 transition-all duration-200"
-            >
-              <div className="flex items-center gap-3">
-                <Zap size={18} strokeWidth={1.75} className="text-yellow-500" />
-                <span>Credits</span>
+                          return (
+                            <button
+                              key={child.id}
+                              onClick={() => {
+                                if (child.path) navigate(child.path);
+                                setActiveSubmenu(null);
+                              }}
+                              className={cn(
+                                'w-full flex items-center gap-3 pl-10 pr-3 py-2 rounded-lg text-sm font-medium transition-all duration-150',
+                                childActive
+                                  ? 'bg-violet-500/15 text-violet-400'
+                                  : 'text-zinc-500 hover:text-white hover:bg-white/5'
+                              )}
+                            >
+                              <ChildIcon size={16} strokeWidth={1.75} />
+                              <span>{child.label}</span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
+            );
+          })}
+        </div>
+
+        {/* Spacer */}
+        <div className="flex-1 min-h-8" />
+
+        {/* Bottom Section */}
+        <div className="space-y-1 pt-3 border-t border-white/5">
+          {/* Admin */}
+          {isAdmin && (
+            <button
+              onClick={() => navigate('/studio/admin')}
+              className={cn(
+                'w-full flex items-center gap-3 rounded-xl text-sm font-medium text-amber-400/80 hover:text-amber-400 hover:bg-amber-500/10 transition-all duration-200 relative group',
+                expanded ? 'px-3 py-2.5' : 'px-0 py-2.5 justify-center'
+              )}
+            >
+              <Shield size={18} strokeWidth={1.75} className="shrink-0" />
+              <span
+                className={cn(
+                  'whitespace-nowrap transition-opacity duration-200',
+                  expanded ? 'opacity-100' : 'opacity-0 w-0 overflow-hidden'
+                )}
+              >
+                Admin
+              </span>
+              {!expanded && (
+                <span className="absolute left-full ml-2 px-2 py-1 rounded-md bg-zinc-800 text-amber-400 text-xs font-medium whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-150 z-[60]">
+                  Admin
+                </span>
+              )}
+            </button>
+          )}
+
+          {/* Credits */}
+          <button
+            onClick={() => navigate('/studio/credits')}
+            className={cn(
+              'w-full flex items-center gap-3 rounded-xl text-sm font-medium text-zinc-400 hover:text-white hover:bg-white/5 transition-all duration-200 relative group',
+              expanded ? 'px-3 py-2.5 justify-between' : 'px-0 py-2.5 justify-center'
+            )}
+          >
+            <div className={cn('flex items-center gap-3', !expanded && 'justify-center w-full')}>
+              <Zap size={18} strokeWidth={1.75} className="text-yellow-500 shrink-0" />
+              <span
+                className={cn(
+                  'whitespace-nowrap transition-opacity duration-200',
+                  expanded ? 'opacity-100' : 'opacity-0 w-0 overflow-hidden'
+                )}
+              >
+                Credits
+              </span>
+            </div>
+            {expanded && (
               <span className="px-2 py-0.5 rounded-full bg-violet-500/20 text-violet-400 text-xs font-semibold">
                 {balance}
               </span>
-            </button>
+            )}
+            {!expanded && (
+              <span className="absolute left-full ml-2 px-2 py-1 rounded-md bg-zinc-800 text-white text-xs font-medium whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-150 z-[60]">
+                Credits: {balance}
+              </span>
+            )}
+          </button>
 
-            {/* Settings */}
-            <button
-              onClick={() => navigate('/studio/settings')}
-              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-zinc-400 hover:text-white hover:bg-white/5 transition-all duration-200"
+          {/* Settings */}
+          <button
+            onClick={() => navigate('/studio/settings')}
+            className={cn(
+              'w-full flex items-center gap-3 rounded-xl text-sm font-medium text-zinc-400 hover:text-white hover:bg-white/5 transition-all duration-200 relative group',
+              expanded ? 'px-3 py-2.5' : 'px-0 py-2.5 justify-center'
+            )}
+          >
+            <Settings size={18} strokeWidth={1.75} className="shrink-0" />
+            <span
+              className={cn(
+                'whitespace-nowrap transition-opacity duration-200',
+                expanded ? 'opacity-100' : 'opacity-0 w-0 overflow-hidden'
+              )}
             >
-              <Settings size={18} strokeWidth={1.75} />
-              <span>Settings</span>
-            </button>
-          </div>
+              Settings
+            </span>
+            {!expanded && (
+              <span className="absolute left-full ml-2 px-2 py-1 rounded-md bg-zinc-800 text-white text-xs font-medium whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-150 z-[60]">
+                Settings
+              </span>
+            )}
+          </button>
+        </div>
 
-          {/* Footer */}
-          <div className="flex items-center justify-between pt-3 mt-3 border-t border-white/5">
-            <button
-              onClick={toggleTheme}
-              className="p-2.5 rounded-xl text-zinc-500 hover:text-white hover:bg-white/5 transition-all"
-              title={theme === 'dark' ? 'Light mode' : 'Dark mode'}
-            >
-              {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
-            </button>
-            <button
-              onClick={() => navigate('/studio/help')}
-              className="p-2.5 rounded-xl text-zinc-500 hover:text-white hover:bg-white/5 transition-all"
-              title="Help"
-            >
-              <HelpCircle size={18} />
-            </button>
-            <button
-              onClick={handleSignOut}
-              className="p-2.5 rounded-xl text-zinc-500 hover:text-red-400 hover:bg-red-500/10 transition-all"
-              title="Sign Out"
-            >
-              <LogOut size={18} />
-            </button>
-          </div>
+        {/* Footer */}
+        <div className={cn(
+          'pt-3 mt-3 border-t border-white/5',
+          expanded ? 'flex items-center justify-between' : 'flex flex-col items-center gap-1'
+        )}>
+          <button
+            onClick={toggleTheme}
+            className="p-2.5 rounded-xl text-zinc-500 hover:text-white hover:bg-white/5 transition-all relative group"
+            title={theme === 'dark' ? 'Light mode' : 'Dark mode'}
+          >
+            {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+            {!expanded && (
+              <span className="absolute left-full ml-2 px-2 py-1 rounded-md bg-zinc-800 text-white text-xs font-medium whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-150 z-[60]">
+                {theme === 'dark' ? 'Light mode' : 'Dark mode'}
+              </span>
+            )}
+          </button>
+          <button
+            onClick={() => navigate('/studio/help')}
+            className="p-2.5 rounded-xl text-zinc-500 hover:text-white hover:bg-white/5 transition-all relative group"
+            title="Help"
+          >
+            <HelpCircle size={18} />
+            {!expanded && (
+              <span className="absolute left-full ml-2 px-2 py-1 rounded-md bg-zinc-800 text-white text-xs font-medium whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-150 z-[60]">
+                Help
+              </span>
+            )}
+          </button>
+          <button
+            onClick={handleSignOut}
+            className="p-2.5 rounded-xl text-zinc-500 hover:text-red-400 hover:bg-red-500/10 transition-all relative group"
+            title="Sign Out"
+          >
+            <LogOut size={18} />
+            {!expanded && (
+              <span className="absolute left-full ml-2 px-2 py-1 rounded-md bg-zinc-800 text-white text-xs font-medium whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-150 z-[60]">
+                Sign Out
+              </span>
+            )}
+          </button>
         </div>
       </div>
+    </div>
+  );
 
-      {/* Flyout Submenu Popover */}
+  return (
+    <>
+      {/* Desktop Rail */}
+      <div
+        ref={railRef}
+        onMouseEnter={() => setIsExpanded(true)}
+        onMouseLeave={() => {
+          setIsExpanded(false);
+          if (!isMobileOpen) setActiveSubmenu(null);
+        }}
+        className={cn(
+          'fixed left-0 top-0 bottom-0 bg-zinc-950 border-r border-white/5 flex flex-col z-50 transition-all duration-300 ease-in-out hidden lg:flex',
+          isExpanded ? 'w-56' : 'w-16'
+        )}
+      >
+        {sidebarContent}
+      </div>
+
+      {/* Mobile Drawer Backdrop */}
       <AnimatePresence>
-        {activeSubmenu && (
+        {isMobileOpen && (
           <motion.div
-            initial={{ opacity: 0, x: -8, scale: 0.95 }}
-            animate={{ opacity: 1, x: 0, scale: 1 }}
-            exit={{ opacity: 0, x: -8, scale: 0.95 }}
-            transition={{ duration: 0.15, ease: 'easeOut' }}
-            className="absolute left-56 top-0 z-50"
-            style={{
-              top: (() => {
-                const index = navItems.findIndex(item => item.id === activeSubmenu);
-                // Logo height (56px) + padding (12px) + items above * item height (44px)
-                return 56 + 12 + (index * 44);
-              })(),
-            }}
-          >
-            <div className="bg-zinc-900 border border-white/10 rounded-xl shadow-2xl shadow-black/50 overflow-hidden min-w-[180px]">
-              {/* Submenu Items */}
-              <div className="py-2 px-2">
-                {navItems
-                  .find(item => item.id === activeSubmenu)
-                  ?.children?.map((child, index) => {
-                    const Icon = child.icon;
-                    const active = isSubmenuItemActive(child);
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 lg:hidden"
+            onClick={onMobileClose}
+          />
+        )}
+      </AnimatePresence>
 
-                    return (
-                      <motion.button
-                        key={child.id}
-                        initial={{ opacity: 0, x: -10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: index * 0.03 }}
-                        onClick={() => handleItemClick(child)}
-                        className={cn(
-                          'w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150',
-                          active
-                            ? 'bg-violet-500/15 text-violet-400'
-                            : 'text-zinc-400 hover:text-white hover:bg-white/10'
-                        )}
-                      >
-                        <Icon size={16} strokeWidth={1.75} />
-                        <span>{child.label}</span>
-                      </motion.button>
-                    );
-                  })}
-              </div>
-            </div>
+      {/* Mobile Drawer */}
+      <AnimatePresence>
+        {isMobileOpen && (
+          <motion.div
+            initial={{ x: '-100%' }}
+            animate={{ x: 0 }}
+            exit={{ x: '-100%' }}
+            transition={{ duration: 0.3, ease: 'easeInOut' }}
+            className="fixed left-0 top-0 bottom-0 w-56 bg-zinc-950 border-r border-white/5 flex flex-col z-[51] lg:hidden"
+          >
+            {sidebarContent}
           </motion.div>
         )}
       </AnimatePresence>
-    </div>
+    </>
   );
 }

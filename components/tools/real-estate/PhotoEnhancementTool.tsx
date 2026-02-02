@@ -14,10 +14,11 @@ import {
     Zap,
     Contrast,
     Palette,
-    AlertCircle
+    AlertCircle,
+    BookmarkPlus
 } from 'lucide-react';
-import { NavigationRail, FlyoutType } from '../../dashboard/navigation/NavigationRail';
-import { FlyoutPanels } from '../../dashboard/navigation/FlyoutPanels';
+import { NavigationRail } from '../../dashboard/navigation/NavigationRail';
+import { AssetProvider, useAssets } from '@/lib/store/contexts/AssetContext';
 import { BeforeAfterSlider } from '../../common/BeforeAfterSlider';
 import { generatePhotoEnhancement, isFalConfigured } from '@/lib/api/toolGeneration';
 import type { PhotoEnhancementOptions } from '@/lib/types/generation';
@@ -59,9 +60,9 @@ const ENHANCEMENT_PRESETS = [
     },
 ];
 
-export const PhotoEnhancementTool: React.FC = () => {
+const PhotoEnhancementToolInner: React.FC = () => {
     const navigate = useNavigate();
-    const [activeFlyout, setActiveFlyout] = useState<FlyoutType>(null);
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     const [uploadedImage, setUploadedImage] = useState<File | null>(null);
     const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -72,6 +73,29 @@ export const PhotoEnhancementTool: React.FC = () => {
     const [generationProgress, setGenerationProgress] = useState(0);
     const [resultImage, setResultImage] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
+    const [savedToLibrary, setSavedToLibrary] = useState(false);
+    const { addAsset } = useAssets();
+
+    // Download handler
+    const handleDownload = useCallback(async () => {
+        if (!resultImage) return;
+        try {
+            const response = await fetch(resultImage);
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `enhanced-photo-${Date.now()}.jpg`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        } catch (err) {
+            console.error('Download failed:', err);
+            // Fallback: open in new tab
+            window.open(resultImage, '_blank');
+        }
+    }, [resultImage]);
 
     // Check for pre-selected asset from library
     useEffect(() => {
@@ -129,16 +153,19 @@ export const PhotoEnhancementTool: React.FC = () => {
         setIsGenerating(true);
         setGenerationProgress(0);
         setError(null);
+        setSavedToLibrary(false);
 
         if (!isFalConfigured()) {
             const progressInterval = setInterval(() => {
                 setGenerationProgress(prev => prev >= 90 ? (clearInterval(progressInterval), 90) : prev + 15);
             }, 400);
 
-            setTimeout(() => {
+            setTimeout(async () => {
                 clearInterval(progressInterval);
                 setGenerationProgress(100);
-                setResultImage('https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1200&h=800&fit=crop');
+                const mockUrl = 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1200&h=800&fit=crop';
+                setResultImage(mockUrl);
+                try { await addAsset(mockUrl, 'image', 'Photo Enhancement Result'); setSavedToLibrary(true); } catch {}
                 setIsGenerating(false);
             }, 2500);
             return;
@@ -160,6 +187,7 @@ export const PhotoEnhancementTool: React.FC = () => {
             );
 
             setResultImage(resultUrl);
+            try { await addAsset(resultUrl, 'image', 'Photo Enhancement Result'); setSavedToLibrary(true); } catch {}
         } catch (err) {
             console.error('Photo enhancement error:', err);
             setError(err instanceof Error ? err.message : 'Enhancement failed. Please try again.');
@@ -170,15 +198,13 @@ export const PhotoEnhancementTool: React.FC = () => {
 
     return (
         <div className="h-screen flex bg-[#0a0a0b]">
-            <NavigationRail activeFlyout={activeFlyout} onFlyoutChange={setActiveFlyout} />
-            <FlyoutPanels activeFlyout={activeFlyout} onClose={() => setActiveFlyout(null)} />
-
-            <div className="flex-1 flex ml-56">
+            <NavigationRail isMobileOpen={mobileMenuOpen} onMobileClose={() => setMobileMenuOpen(false)} />
+<div className="flex-1 flex ml-0 lg:ml-16">
                 {/* Sidebar */}
-                <div className="w-[320px] flex-shrink-0 bg-[#111113] border-r border-white/5 flex flex-col">
+                <div className="w-[360px] flex-shrink-0 bg-[#111113] border-r border-white/5 flex flex-col">
                     <div className="p-4 border-b border-white/5">
                         <div className="flex items-center gap-3">
-                            <button onClick={() => navigate('/studio/apps/real-estate')} className="p-2 hover:bg-white/5 rounded-lg transition-colors">
+                            <button onClick={() => navigate('/studio/real-estate')} className="p-2 hover:bg-white/5 rounded-lg transition-colors">
                                 <ArrowLeft size={18} className="text-zinc-400" />
                             </button>
                             <h1 className="text-base font-semibold text-white flex items-center gap-2">
@@ -255,7 +281,12 @@ export const PhotoEnhancementTool: React.FC = () => {
                         {resultImage && (
                             <div className="flex items-center gap-2">
                                 <button onClick={() => setResultImage(null)} className="px-3 py-1.5 text-xs font-medium text-zinc-400 hover:text-white bg-white/5 hover:bg-white/10 rounded-lg transition-colors flex items-center gap-1.5"><RefreshCw size={14} />Try Again</button>
-                                <button className="px-3 py-1.5 text-xs font-medium text-white bg-amber-600 hover:bg-amber-500 rounded-lg transition-colors flex items-center gap-1.5"><Download size={14} />Download</button>
+                                {savedToLibrary ? (
+                                    <span className="px-3 py-1.5 text-xs font-medium text-emerald-400 bg-emerald-500/10 rounded-lg flex items-center gap-1.5"><BookmarkPlus size={14} />Saved to Library</span>
+                                ) : (
+                                    <button onClick={async () => { if (resultImage) { try { await addAsset(resultImage, 'image', 'Photo Enhancement Result'); setSavedToLibrary(true); } catch {} } }} className="px-3 py-1.5 text-xs font-medium text-zinc-400 hover:text-white bg-white/5 hover:bg-white/10 rounded-lg transition-colors flex items-center gap-1.5"><BookmarkPlus size={14} />Save to Library</button>
+                                )}
+                                <button onClick={handleDownload} className="px-3 py-1.5 text-xs font-medium text-white bg-amber-600 hover:bg-amber-500 rounded-lg transition-colors flex items-center gap-1.5"><Download size={14} />Download</button>
                             </div>
                         )}
                     </div>
@@ -310,3 +341,9 @@ export const PhotoEnhancementTool: React.FC = () => {
         </div>
     );
 };
+
+export const PhotoEnhancementTool: React.FC = () => (
+    <AssetProvider>
+        <PhotoEnhancementToolInner />
+    </AssetProvider>
+);

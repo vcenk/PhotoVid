@@ -14,8 +14,7 @@ import {
     Palette,
     Zap
 } from 'lucide-react';
-import { NavigationRail, FlyoutType } from '../dashboard/navigation/NavigationRail';
-import { FlyoutPanels } from '../dashboard/navigation/FlyoutPanels';
+import { NavigationRail } from '../dashboard/navigation/NavigationRail';
 
 // Auto Dealership specific tools/features
 const AUTO_TOOLS = [
@@ -91,7 +90,7 @@ const QUICK_WORKFLOWS = [
 ];
 
 export const AutoDealershipPage: React.FC = () => {
-    const [activeFlyout, setActiveFlyout] = useState<FlyoutType>(null);
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const navigate = useNavigate();
 
     const handleToolClick = (toolId: string) => {
@@ -115,13 +114,11 @@ export const AutoDealershipPage: React.FC = () => {
     return (
         <div className="h-screen flex bg-white dark:bg-[#09090b]">
             {/* Navigation Rail */}
-            <NavigationRail activeFlyout={activeFlyout} onFlyoutChange={setActiveFlyout} />
+            <NavigationRail isMobileOpen={mobileMenuOpen} onMobileClose={() => setMobileMenuOpen(false)} />
 
             {/* Flyout Panels */}
-            <FlyoutPanels activeFlyout={activeFlyout} onClose={() => setActiveFlyout(null)} />
-
-            {/* Main Content */}
-            <div className="flex-1 overflow-y-auto ml-56">
+{/* Main Content */}
+            <div className="flex-1 overflow-y-auto ml-0 lg:ml-16">
                 {/* Hero Section */}
                 <div className="relative bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900 overflow-hidden">
                     {/* Background Pattern */}

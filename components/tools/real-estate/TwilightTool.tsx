@@ -13,43 +13,55 @@ import {
     Sun,
     Lightbulb,
     Check,
-    AlertCircle
+    AlertCircle,
+    BookmarkPlus
 } from 'lucide-react';
-import { NavigationRail, FlyoutType } from '../../dashboard/navigation/NavigationRail';
-import { FlyoutPanels } from '../../dashboard/navigation/FlyoutPanels';
+import { NavigationRail } from '../../dashboard/navigation/NavigationRail';
+import { AssetProvider, useAssets } from '@/lib/store/contexts/AssetContext';
 import { BeforeAfterSlider } from '../../common/BeforeAfterSlider';
 import { generateTwilight, isFalConfigured } from '@/lib/api/toolGeneration';
+import { downloadFile } from '@/lib/utils';
 import type { TwilightOptions } from '@/lib/types/generation';
 
-// Twilight styles
+// Twilight styles with example images
 const TWILIGHT_STYLES = [
-    { id: 'blue-hour', name: 'Blue Hour', description: 'Deep blue sky, warm interior glow', color: 'from-blue-600 to-indigo-900' },
-    { id: 'golden-dusk', name: 'Golden Dusk', description: 'Warm orange sunset tones', color: 'from-orange-500 to-purple-700' },
-    { id: 'purple-twilight', name: 'Purple Twilight', description: 'Rich purple evening sky', color: 'from-purple-600 to-indigo-900' },
-    { id: 'dramatic', name: 'Dramatic Night', description: 'Dark sky, bright windows', color: 'from-slate-800 to-slate-950' },
+    { id: 'warm-sunset', name: 'Warm Sunset', description: 'Orange to coral sky, warm golden glow', image: 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=200&h=120&fit=crop' },
+    { id: 'blue-hour', name: 'Blue Hour', description: 'Deep cobalt sky, amber window glow', image: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=200&h=120&fit=crop' },
+    { id: 'golden-dusk', name: 'Golden Dusk', description: 'Rich golden-amber horizon fading to purple', image: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=200&h=120&fit=crop' },
+    { id: 'dramatic', name: 'Dramatic Night', description: 'Dark sky, bold bright windows', image: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=200&h=120&fit=crop' },
 ];
 
-// Window glow intensity
-const GLOW_OPTIONS = [
-    { id: 'subtle', name: 'Subtle', value: 30 },
-    { id: 'medium', name: 'Medium', value: 60 },
-    { id: 'bright', name: 'Bright', value: 100 },
+// Window brightness options
+const WINDOW_BRIGHTNESS_OPTIONS = [
+    { id: 'subtle', name: 'Subtle' },
+    { id: 'normal', name: 'Normal' },
+    { id: 'bright', name: 'Bright' },
 ];
 
-export const TwilightTool: React.FC = () => {
+// Sky intensity options
+const SKY_INTENSITY_OPTIONS = [
+    { id: 'muted', name: 'Muted' },
+    { id: 'normal', name: 'Normal' },
+    { id: 'vivid', name: 'Vivid' },
+];
+
+const TwilightToolInner: React.FC = () => {
     const navigate = useNavigate();
-    const [activeFlyout, setActiveFlyout] = useState<FlyoutType>(null);
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     const [uploadedImage, setUploadedImage] = useState<File | null>(null);
     const [imagePreview, setImagePreview] = useState<string | null>(null);
     const [isDragging, setIsDragging] = useState(false);
-    const [selectedStyle, setSelectedStyle] = useState('blue-hour');
-    const [glowIntensity, setGlowIntensity] = useState('medium');
+    const [selectedStyle, setSelectedStyle] = useState('warm-sunset');
+    const [windowBrightness, setWindowBrightness] = useState('normal');
+    const [skyIntensity, setSkyIntensity] = useState('normal');
 
     const [isGenerating, setIsGenerating] = useState(false);
     const [generationProgress, setGenerationProgress] = useState(0);
     const [resultImage, setResultImage] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
+    const [savedToLibrary, setSavedToLibrary] = useState(false);
+    const { addAsset } = useAssets();
 
     // Check for pre-selected asset from library
     useEffect(() => {
@@ -107,27 +119,29 @@ export const TwilightTool: React.FC = () => {
         setIsGenerating(true);
         setGenerationProgress(0);
         setError(null);
+        setSavedToLibrary(false);
 
         if (!isFalConfigured()) {
             const progressInterval = setInterval(() => {
                 setGenerationProgress(prev => prev >= 90 ? (clearInterval(progressInterval), 90) : prev + 10);
             }, 500);
 
-            setTimeout(() => {
+            setTimeout(async () => {
                 clearInterval(progressInterval);
                 setGenerationProgress(100);
-                setResultImage('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1200&h=800&fit=crop');
+                const mockUrl = 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1200&h=800&fit=crop';
+                setResultImage(mockUrl);
+                try { await addAsset(mockUrl, 'image', 'Twilight Result'); setSavedToLibrary(true); } catch {}
                 setIsGenerating(false);
             }, 3500);
             return;
         }
 
         try {
-            const glowValue = GLOW_OPTIONS.find(g => g.id === glowIntensity)?.value || 60;
-
             const options: TwilightOptions = {
                 style: selectedStyle as TwilightOptions['style'],
-                glowIntensity: glowValue as TwilightOptions['glowIntensity'],
+                windowBrightness: windowBrightness as TwilightOptions['windowBrightness'],
+                skyIntensity: skyIntensity as TwilightOptions['skyIntensity'],
             };
 
             const resultUrl = await generateTwilight(
@@ -140,6 +154,7 @@ export const TwilightTool: React.FC = () => {
             );
 
             setResultImage(resultUrl);
+            try { await addAsset(resultUrl, 'image', 'Twilight Result'); setSavedToLibrary(true); } catch {}
         } catch (err) {
             console.error('Twilight conversion error:', err);
             setError(err instanceof Error ? err.message : 'Twilight conversion failed. Please try again.');
@@ -152,15 +167,13 @@ export const TwilightTool: React.FC = () => {
 
     return (
         <div className="h-screen flex bg-[#0a0a0b]">
-            <NavigationRail activeFlyout={activeFlyout} onFlyoutChange={setActiveFlyout} />
-            <FlyoutPanels activeFlyout={activeFlyout} onClose={() => setActiveFlyout(null)} />
-
-            <div className="flex-1 flex ml-56">
+            <NavigationRail isMobileOpen={mobileMenuOpen} onMobileClose={() => setMobileMenuOpen(false)} />
+<div className="flex-1 flex ml-0 lg:ml-16">
                 {/* Sidebar */}
-                <div className="w-[320px] flex-shrink-0 bg-[#111113] border-r border-white/5 flex flex-col">
+                <div className="w-[360px] flex-shrink-0 bg-[#111113] border-r border-white/5 flex flex-col">
                     <div className="p-4 border-b border-white/5">
                         <div className="flex items-center gap-3">
-                            <button onClick={() => navigate('/studio/apps/real-estate')} className="p-2 hover:bg-white/5 rounded-lg transition-colors">
+                            <button onClick={() => navigate('/studio/real-estate')} className="p-2 hover:bg-white/5 rounded-lg transition-colors">
                                 <ArrowLeft size={18} className="text-zinc-400" />
                             </button>
                             <h1 className="text-base font-semibold text-white flex items-center gap-2">
@@ -203,7 +216,7 @@ export const TwilightTool: React.FC = () => {
                                         onClick={() => setSelectedStyle(style.id)}
                                         className={`w-full p-3 rounded-xl text-left transition-all flex items-center gap-3 ${selectedStyle === style.id ? 'bg-indigo-600/20 border border-indigo-500/50' : 'bg-white/[0.02] border border-transparent hover:bg-white/[0.05]'}`}
                                     >
-                                        <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${style.color}`} />
+                                        <img src={style.image} alt={style.name} className="w-10 h-10 rounded-lg object-cover" />
                                         <div className="flex-1">
                                             <p className={`text-sm font-medium ${selectedStyle === style.id ? 'text-indigo-300' : 'text-zinc-300'}`}>{style.name}</p>
                                             <p className="text-xs text-zinc-500">{style.description}</p>
@@ -214,18 +227,37 @@ export const TwilightTool: React.FC = () => {
                             </div>
                         </div>
 
-                        {/* Window Glow */}
+                        {/* Window Brightness */}
                         <div>
                             <label className="text-xs font-medium text-zinc-400 uppercase tracking-wide mb-3 block flex items-center gap-2">
                                 <Lightbulb size={14} />
-                                Window Glow
+                                Window Brightness
                             </label>
                             <div className="flex gap-2">
-                                {GLOW_OPTIONS.map((option) => (
+                                {WINDOW_BRIGHTNESS_OPTIONS.map((option) => (
                                     <button
                                         key={option.id}
-                                        onClick={() => setGlowIntensity(option.id)}
-                                        className={`flex-1 py-2 px-3 rounded-lg text-xs font-medium transition-all ${glowIntensity === option.id ? 'bg-indigo-600 text-white' : 'bg-white/5 text-zinc-400 hover:bg-white/10'}`}
+                                        onClick={() => setWindowBrightness(option.id)}
+                                        className={`flex-1 py-2 px-3 rounded-lg text-xs font-medium transition-all ${windowBrightness === option.id ? 'bg-indigo-600 text-white' : 'bg-white/5 text-zinc-400 hover:bg-white/10'}`}
+                                    >
+                                        {option.name}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Sky Intensity */}
+                        <div>
+                            <label className="text-xs font-medium text-zinc-400 uppercase tracking-wide mb-3 block flex items-center gap-2">
+                                <Sun size={14} />
+                                Sky Intensity
+                            </label>
+                            <div className="flex gap-2">
+                                {SKY_INTENSITY_OPTIONS.map((option) => (
+                                    <button
+                                        key={option.id}
+                                        onClick={() => setSkyIntensity(option.id)}
+                                        className={`flex-1 py-2 px-3 rounded-lg text-xs font-medium transition-all ${skyIntensity === option.id ? 'bg-indigo-600 text-white' : 'bg-white/5 text-zinc-400 hover:bg-white/10'}`}
                                     >
                                         {option.name}
                                     </button>
@@ -252,7 +284,12 @@ export const TwilightTool: React.FC = () => {
                         {resultImage && (
                             <div className="flex items-center gap-2">
                                 <button onClick={() => setResultImage(null)} className="px-3 py-1.5 text-xs font-medium text-zinc-400 hover:text-white bg-white/5 hover:bg-white/10 rounded-lg transition-colors flex items-center gap-1.5"><RefreshCw size={14} />Try Again</button>
-                                <button className="px-3 py-1.5 text-xs font-medium text-white bg-indigo-600 hover:bg-indigo-500 rounded-lg transition-colors flex items-center gap-1.5"><Download size={14} />Download</button>
+                                {savedToLibrary ? (
+                                    <span className="px-3 py-1.5 text-xs font-medium text-emerald-400 bg-emerald-500/10 rounded-lg flex items-center gap-1.5"><BookmarkPlus size={14} />Saved to Library</span>
+                                ) : (
+                                    <button onClick={async () => { if (resultImage) { try { await addAsset(resultImage, 'image', 'Twilight Result'); setSavedToLibrary(true); } catch {} } }} className="px-3 py-1.5 text-xs font-medium text-zinc-400 hover:text-white bg-white/5 hover:bg-white/10 rounded-lg transition-colors flex items-center gap-1.5"><BookmarkPlus size={14} />Save to Library</button>
+                                )}
+                                <button onClick={() => resultImage && downloadFile(resultImage, `twilight-${Date.now()}.jpg`)} className="px-3 py-1.5 text-xs font-medium text-white bg-indigo-600 hover:bg-indigo-500 rounded-lg transition-colors flex items-center gap-1.5"><Download size={14} />Download</button>
                             </div>
                         )}
                     </div>
@@ -308,3 +345,9 @@ export const TwilightTool: React.FC = () => {
         </div>
     );
 };
+
+export const TwilightTool: React.FC = () => (
+    <AssetProvider>
+        <TwilightToolInner />
+    </AssetProvider>
+);

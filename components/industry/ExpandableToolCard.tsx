@@ -13,7 +13,12 @@ interface ExpandableToolCardProps {
 }
 
 // Before/After Comparison Slider Component
-const BeforeAfterSlider: React.FC<{ beforeImage: string; afterImage: string; }> = ({ beforeImage, afterImage }) => {
+const BeforeAfterSlider: React.FC<{
+    beforeImage: string;
+    afterImage: string;
+    compact?: boolean;
+    className?: string;
+}> = ({ beforeImage, afterImage, compact = false, className = '' }) => {
     const [sliderPosition, setSliderPosition] = useState(50);
     const containerRef = useRef<HTMLDivElement>(null);
     const [isDragging, setIsDragging] = useState(false);
@@ -37,12 +42,13 @@ const BeforeAfterSlider: React.FC<{ beforeImage: string; afterImage: string; }> 
     return (
         <div
             ref={containerRef}
-            className="relative w-full aspect-[4/3] rounded-xl overflow-hidden cursor-ew-resize select-none"
-            onMouseDown={() => setIsDragging(true)}
+            className={`relative w-full overflow-hidden cursor-ew-resize select-none ${compact ? 'h-full' : 'aspect-[4/3] rounded-xl'} ${className}`}
+            onMouseDown={(e) => { e.stopPropagation(); setIsDragging(true); }}
             onMouseUp={() => setIsDragging(false)}
             onMouseLeave={() => setIsDragging(false)}
             onMouseMove={handleMouseMove}
             onTouchMove={handleTouchMove}
+            onClick={(e) => e.stopPropagation()}
         >
             {/* After Image (Background) */}
             <img src={afterImage} alt="After" className="absolute inset-0 w-full h-full object-cover" />
@@ -61,16 +67,16 @@ const BeforeAfterSlider: React.FC<{ beforeImage: string; afterImage: string; }> 
                 style={{ left: `${sliderPosition}%` }}
             >
                 {/* Slider Handle */}
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center">
-                    <ArrowLeftRight size={18} className="text-zinc-700" />
+                <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white rounded-full shadow-lg flex items-center justify-center ${compact ? 'w-7 h-7' : 'w-10 h-10'}`}>
+                    <ArrowLeftRight size={compact ? 14 : 18} className="text-zinc-700" />
                 </div>
             </div>
 
             {/* Labels */}
-            <div className="absolute top-3 left-3 px-2 py-1 bg-black/60 backdrop-blur-sm rounded text-xs text-white font-medium">
+            <div className={`absolute left-2 bg-black/60 backdrop-blur-sm rounded text-white font-medium ${compact ? 'top-2 px-1.5 py-0.5 text-[10px]' : 'top-3 px-2 py-1 text-xs'}`}>
                 Before
             </div>
-            <div className="absolute top-3 right-3 px-2 py-1 bg-black/60 backdrop-blur-sm rounded text-xs text-white font-medium">
+            <div className={`absolute right-2 bg-black/60 backdrop-blur-sm rounded text-white font-medium ${compact ? 'top-2 px-1.5 py-0.5 text-[10px]' : 'top-3 px-2 py-1 text-xs'}`}>
                 After
             </div>
         </div>
@@ -226,33 +232,35 @@ export const ExpandableToolCard: React.FC<ExpandableToolCardProps> = ({
                         transition={{ duration: 0.15 }}
                         className="group"
                     >
-                        {/* Image */}
+                        {/* Image or Before/After Slider */}
                         <div className="relative h-40 overflow-hidden">
-                            <img
-                                src={tool.image}
-                                alt={tool.name}
-                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                            />
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                            {hasBeforeAfter ? (
+                                <BeforeAfterSlider
+                                    beforeImage={tool.beforeImage!}
+                                    afterImage={tool.afterImage!}
+                                    compact
+                                />
+                            ) : (
+                                <img
+                                    src={tool.image}
+                                    alt={tool.name}
+                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                />
+                            )}
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent pointer-events-none" />
 
                             {/* Tags */}
-                            <div className="absolute top-3 right-3 flex gap-2">
+                            <div className="absolute top-3 right-3 flex gap-2 pointer-events-none">
                                 {tool.isPremium && (
                                     <span className="px-2 py-1 bg-gradient-to-r from-amber-400 to-yellow-500 text-black text-[10px] font-bold uppercase rounded-full flex items-center gap-1">
                                         <Crown size={10} />
                                         Pro
                                     </span>
                                 )}
-                                {hasBeforeAfter && (
-                                    <span className="px-2 py-1 bg-white/90 text-zinc-800 text-[10px] font-bold uppercase rounded-full flex items-center gap-1">
-                                        <ArrowLeftRight size={10} />
-                                        Compare
-                                    </span>
-                                )}
                             </div>
 
                             {/* Title overlay on image */}
-                            <div className="absolute bottom-0 left-0 right-0 p-4">
+                            <div className="absolute bottom-0 left-0 right-0 p-4 pointer-events-none">
                                 <div className="flex gap-2 mb-2">
                                     {tool.tags?.slice(0, 1).map((tag) => (
                                         <span

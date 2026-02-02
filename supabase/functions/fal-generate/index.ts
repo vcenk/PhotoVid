@@ -8,6 +8,7 @@
 // - bria/eraser: https://fal.ai/models/fal-ai/bria/eraser/api
 // - kling-video: https://fal.ai/models/fal-ai/kling-video/v1.5/pro/image-to-video
 // - flux-pro/v1/fill: https://fal.ai/models/fal-ai/flux-pro/v1/fill/api
+// - flux-pro/kontext: https://fal.ai/models/fal-ai/flux-pro/kontext/api
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
@@ -25,18 +26,19 @@ const TOOL_MODEL_MAP: Record<string, string> = {
   'photo-relight': 'fal-ai/iclight-v2', // ICLight for relighting (bright/hdr presets)
   'sky-segmentation': 'fal-ai/birefnet', // Background removal for sky mask
   'sky-replacement': 'fal-ai/flux-pro/v1/fill',
-  'twilight': 'fal-ai/flux/dev/image-to-image',
+  'twilight': 'fal-ai/flux-pro/kontext',
   'item-removal': 'fal-ai/bria/eraser',
-  'lawn-enhancement': 'fal-ai/flux/dev/image-to-image',
+  'lawn-enhancement': 'fal-ai/flux-pro/kontext',
   'room-tour': 'fal-ai/kling-video/v1.5/pro/image-to-video',
   'declutter': 'fal-ai/bria/eraser',
-  'virtual-renovation': 'fal-ai/flux-pro/v1/fill',
-  'wall-color': 'fal-ai/flux-pro/v1/fill',
-  'floor-replacement': 'fal-ai/flux-pro/v1/fill',
-  'rain-to-shine': 'fal-ai/flux/dev/image-to-image',
-  'night-to-day': 'fal-ai/flux/dev/image-to-image',
+  'auto-declutter': 'fal-ai/image-editing/object-removal',
+  'virtual-renovation': 'fal-ai/flux-pro/kontext',
+  'wall-color': 'fal-ai/flux-pro/kontext',
+  'floor-replacement': 'fal-ai/flux-pro/kontext',
+  'rain-to-shine': 'fal-ai/flux-pro/kontext',
+  'night-to-day': 'fal-ai/flux-pro/kontext',
   'changing-seasons': 'fal-ai/flux/dev/image-to-image',
-  'pool-enhancement': 'fal-ai/flux-pro/v1/fill',
+  'pool-enhancement': 'fal-ai/flux-pro/kontext',
   'watermark-removal': 'fal-ai/bria/eraser',
   'headshot-retouching': 'fal-ai/flux/dev/image-to-image',
   'hdr-merge': 'fal-ai/clarity-upscaler',
@@ -290,6 +292,41 @@ serve(async (req) => {
       }
       if (options.negative_prompt) {
         falInput.negative_prompt = options.negative_prompt
+      }
+    }
+    else if (model.includes('image-editing/object-removal')) {
+      // Image Editing Object Removal - https://fal.ai/models/fal-ai/image-editing/object-removal/api
+      // Parameters: image_url, prompt (objects to remove), guidance_scale, num_inference_steps, output_format, safety_tolerance
+      if (!imageUrl) {
+        return new Response(
+          JSON.stringify({ error: 'imageUrl is required for object removal' }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        )
+      }
+      falInput = {
+        image_url: imageUrl,
+        prompt: prompt || options.prompt || 'clutter, personal items, mess',
+        guidance_scale: options.guidance_scale ?? 5,
+        num_inference_steps: options.num_inference_steps ?? 40,
+        output_format: options.output_format || 'jpeg',
+        safety_tolerance: options.safety_tolerance || '2',
+      }
+    }
+    else if (model.includes('kontext')) {
+      // FLUX Kontext Pro - https://fal.ai/models/fal-ai/flux-pro/kontext/api
+      // Parameters: prompt, image_url, guidance_scale, num_inference_steps, output_format
+      if (!imageUrl) {
+        return new Response(
+          JSON.stringify({ error: 'imageUrl is required for Kontext tools' }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        )
+      }
+      falInput = {
+        image_url: imageUrl,
+        prompt: prompt || options.prompt || '',
+        guidance_scale: options.guidance_scale ?? 3.5,
+        num_inference_steps: options.num_inference_steps ?? 28,
+        output_format: options.output_format || 'jpeg',
       }
     }
     else if (model.includes('image-to-image')) {

@@ -306,15 +306,36 @@ async function executeTextToImage(
 ): Promise<{ image: string }> {
   console.log('Executing Text-to-Image:', { prompt, parameters });
 
+  // Map width/height to image_size enum if possible, or fallback to default
+  let imageSize = "landscape_16_9";
+  const width = parseInt(parameters.width || "1024");
+  const height = parseInt(parameters.height || "1024");
+
+  if (width === height) imageSize = "square_hd";
+  else if (width > height) imageSize = "landscape_16_9";
+  else imageSize = "portrait_16_9";
+
+  // Map model ID to endpoint
+  const modelMap: Record<string, string> = {
+    'flux-dev': 'fal-ai/flux/dev',
+    'flux-pro': 'fal-ai/flux-pro',
+    'flux-schnell': 'fal-ai/flux/schnell'
+  };
+  const modelEndpoint = modelMap[parameters.model] || 'fal-ai/flux/dev';
+
   try {
     const result = await secureFalCall({
       tool: 'text-to-image',
       prompt: prompt,
       options: {
-        image_size: parameters.size || "landscape_16_9",
+        image_size: imageSize,
         num_inference_steps: parameters.steps || 28,
+        guidance_scale: 3.5,
         num_images: 1,
-        model_endpoint: 'fal-ai/flux/dev',
+        seed: parameters.seed,
+        negative_prompt: parameters.negative_prompt,
+        enable_safety_checker: true,
+        model_endpoint: modelEndpoint,
       },
     });
 
@@ -342,6 +363,7 @@ async function executeImageToVideo(
       options: {
         duration: parameters.duration || "5",
         aspect_ratio: parameters.aspect_ratio || "16:9",
+        negative_prompt: parameters.negative_prompt,
         model_endpoint: 'fal-ai/kling-video/v1.5/pro/image-to-video',
       },
     });
@@ -407,6 +429,7 @@ async function executeInpaint(
         strength: parameters.strength || 0.8,
         guidance_scale: parameters.guidance_scale || 7.5,
         num_inference_steps: 28,
+        negative_prompt: parameters.negative_prompt,
         model_endpoint: 'fal-ai/flux/dev/inpainting',
       },
     });

@@ -3,15 +3,16 @@
 import React, { useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
 import {
-  Wand2,
-  Film,
-  Music,
-  Palette,
-  Zap,
-  Globe,
-  Layers,
+  Sofa,
+  CloudSun,
+  SunMedium,
+  ImagePlus,
+  Eraser,
+  PaintBucket,
   Sparkles,
   ArrowRight,
+  Layers,
+  TreePine,
 } from 'lucide-react';
 
 interface FeatureCardProps {
@@ -20,7 +21,7 @@ interface FeatureCardProps {
   icon: React.ElementType;
   gradient: string;
   size: 'small' | 'medium' | 'large';
-  preview?: string;
+  image?: string;
   delay?: number;
 }
 
@@ -30,7 +31,7 @@ const FeatureCard: React.FC<FeatureCardProps> = ({
   icon: Icon,
   gradient,
   size,
-  preview,
+  image,
   delay = 0,
 }) => {
   const ref = useRef<HTMLDivElement>(null);
@@ -49,7 +50,7 @@ const FeatureCard: React.FC<FeatureCardProps> = ({
       animate={isInView ? { opacity: 1, y: 0 } : {}}
       transition={{ delay, duration: 0.5 }}
       whileHover={{ y: -5, scale: 1.01 }}
-      className={`${sizeClasses[size]} group relative overflow-hidden rounded-3xl bg-white dark:bg-zinc-900/50 border border-zinc-200 dark:border-white/10 p-6 md:p-8 transition-all duration-500 hover:border-zinc-300 dark:hover:border-white/20 hover:shadow-2xl hover:shadow-indigo-500/5`}
+      className={`${sizeClasses[size]} group relative overflow-hidden rounded-3xl bg-zinc-900/50 border border-white/10 p-6 md:p-8 transition-all duration-500 hover:border-white/20 hover:shadow-2xl hover:shadow-indigo-500/5`}
     >
       {/* Background gradient on hover */}
       <div className={`absolute inset-0 bg-gradient-to-br ${gradient} opacity-0 group-hover:opacity-5 transition-opacity duration-500`} />
@@ -64,30 +65,29 @@ const FeatureCard: React.FC<FeatureCardProps> = ({
           whileHover={{ rotate: [0, -10, 10, 0] }}
           transition={{ duration: 0.5 }}
           className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${gradient} flex items-center justify-center mb-4 shadow-lg`}
-          style={{ boxShadow: `0 8px 32px -8px var(--tw-shadow-color)` }}
         >
           <Icon className="w-6 h-6 text-white" />
         </motion.div>
 
         {/* Title */}
-        <h3 className="text-xl font-bold text-zinc-900 dark:text-white mb-2 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+        <h3 className="text-xl font-bold text-white mb-2 group-hover:text-indigo-400 transition-colors">
           {title}
         </h3>
 
         {/* Description */}
-        <p className="text-zinc-500 dark:text-zinc-400 text-sm leading-relaxed flex-grow">
+        <p className="text-zinc-400 text-sm leading-relaxed flex-grow">
           {description}
         </p>
 
         {/* Preview image for large cards */}
-        {preview && size === 'large' && (
+        {image && size === 'large' && (
           <div className="mt-6 -mx-2 -mb-2 relative overflow-hidden rounded-2xl">
             <img
-              src={preview}
+              src={image}
               alt={title}
               className="w-full h-48 object-cover transition-transform duration-700 group-hover:scale-105"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-zinc-900/60 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-zinc-900/80 to-transparent" />
           </div>
         )}
 
@@ -95,9 +95,9 @@ const FeatureCard: React.FC<FeatureCardProps> = ({
         <motion.div
           initial={{ opacity: 0, x: -10 }}
           whileHover={{ x: 5 }}
-          className="mt-4 flex items-center gap-2 text-sm font-semibold text-indigo-500 opacity-0 group-hover:opacity-100 transition-opacity"
+          className="mt-4 flex items-center gap-2 text-sm font-semibold text-indigo-400 opacity-0 group-hover:opacity-100 transition-opacity"
         >
-          Learn more <ArrowRight size={14} />
+          Try it free <ArrowRight size={14} />
         </motion.div>
       </div>
 
@@ -109,52 +109,52 @@ const FeatureCard: React.FC<FeatureCardProps> = ({
 
 const FEATURES: FeatureCardProps[] = [
   {
-    title: "AI Image Generation",
-    description: "Create stunning visuals from text prompts. Our models understand composition, lighting, and style to deliver professional-grade imagery.",
-    icon: Wand2,
+    title: "Virtual Staging",
+    description: "Stage any empty room with designer furniture in seconds. Choose from modern, traditional, Scandinavian, and more — no photographer required.",
+    icon: Sofa,
     gradient: "from-violet-500 to-purple-600",
     size: "large",
-    preview: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=600&auto=format&fit=crop",
+    image: "/showcase/real-estate/after/virtual-staging.jpg",
   },
   {
-    title: "Video Synthesis",
-    description: "Transform static images into cinematic motion with AI-powered video generation.",
-    icon: Film,
+    title: "Sky Replacement",
+    description: "Swap overcast skies for perfect blue, golden hour, or dramatic sunset in one click.",
+    icon: CloudSun,
     gradient: "from-blue-500 to-cyan-500",
     size: "small",
   },
   {
-    title: "Audio Composition",
-    description: "Generate context-aware soundscapes and music that perfectly complement your visuals.",
-    icon: Music,
-    gradient: "from-pink-500 to-rose-500",
-    size: "small",
-  },
-  {
-    title: "Style Transfer",
-    description: "Apply artistic styles to any content. Transform photos into paintings, sketches, or custom aesthetics with one click.",
-    icon: Palette,
-    gradient: "from-amber-500 to-orange-500",
-    size: "medium",
-  },
-  {
-    title: "Real-time Processing",
-    description: "Lightning-fast generation powered by optimized GPU infrastructure.",
-    icon: Zap,
-    gradient: "from-yellow-500 to-amber-500",
-    size: "small",
-  },
-  {
-    title: "Multi-language Support",
-    description: "Create content in 40+ languages with native-quality AI voices.",
-    icon: Globe,
+    title: "Photo Enhancement",
+    description: "HDR merge, color correction, and lens fix — make every listing photo look professionally shot.",
+    icon: ImagePlus,
     gradient: "from-emerald-500 to-teal-500",
     size: "small",
   },
   {
-    title: "Layered Editing",
-    description: "Professional compositing tools with AI-assisted masking and object isolation.",
-    icon: Layers,
+    title: "Item Removal & Declutter",
+    description: "Remove personal items, clutter, power lines, or unwanted objects. AI fills in the background seamlessly so the space looks clean and inviting.",
+    icon: Eraser,
+    gradient: "from-pink-500 to-rose-500",
+    size: "medium",
+  },
+  {
+    title: "Twilight Conversion",
+    description: "Transform daytime exteriors into stunning dusk shots with warm interior glow.",
+    icon: SunMedium,
+    gradient: "from-amber-500 to-orange-500",
+    size: "small",
+  },
+  {
+    title: "Lawn & Landscape",
+    description: "Green up patchy lawns, add seasonal landscaping, and enhance curb appeal instantly.",
+    icon: TreePine,
+    gradient: "from-green-500 to-emerald-500",
+    size: "small",
+  },
+  {
+    title: "AI Renovation & Wall Colors",
+    description: "Preview kitchen remodels, bathroom upgrades, or fresh wall paint colors — help buyers see the potential before any construction begins.",
+    icon: PaintBucket,
     gradient: "from-indigo-500 to-violet-500",
     size: "medium",
   },
@@ -170,10 +170,10 @@ export const FeatureGrid: React.FC = () => {
       className="relative py-24 md:py-32 overflow-hidden"
     >
       {/* Background */}
-      <div className="absolute inset-0 bg-gradient-to-b from-white via-zinc-50 to-white dark:from-zinc-950 dark:via-zinc-900 dark:to-zinc-950" />
+      <div className="absolute inset-0 bg-gradient-to-b from-zinc-950 via-zinc-900 to-zinc-950" />
 
       {/* Grid pattern */}
-      <div className="absolute inset-0 bg-[linear-gradient(rgba(0,0,0,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(0,0,0,0.02)_1px,transparent_1px)] dark:bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:50px_50px]" />
+      <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:50px_50px]" />
 
       <div className="relative max-w-7xl mx-auto px-6">
         {/* Header */}
@@ -186,21 +186,21 @@ export const FeatureGrid: React.FC = () => {
             initial={{ opacity: 0, scale: 0.9 }}
             animate={isInView ? { opacity: 1, scale: 1 } : {}}
             transition={{ delay: 0.1 }}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-indigo-500/10 to-violet-500/10 text-indigo-600 dark:text-indigo-400 text-xs font-bold uppercase tracking-widest mb-6 border border-indigo-500/20"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-zinc-400 text-xs font-bold uppercase tracking-widest mb-6"
           >
-            <Sparkles size={14} />
-            Powerful Features
+            <Layers size={14} />
+            25+ AI Tools
           </motion.span>
 
-          <h2 className="text-3xl md:text-5xl font-bold text-zinc-900 dark:text-white tracking-tight mb-4">
-            Everything you need to{' '}
-            <span className="bg-gradient-to-r from-indigo-500 to-violet-500 bg-clip-text text-transparent">
-              create
+          <h2 className="text-3xl md:text-5xl font-bold text-white tracking-tight mb-4">
+            Every tool a listing{' '}
+            <span className="bg-gradient-to-r from-indigo-400 to-violet-400 bg-clip-text text-transparent">
+              needs
             </span>
           </h2>
 
-          <p className="text-lg text-zinc-500 dark:text-zinc-400 max-w-2xl mx-auto">
-            A complete suite of AI-powered tools designed for professional content creation
+          <p className="text-lg text-zinc-400 max-w-2xl mx-auto">
+            Professional-grade real estate photo editing powered by AI. No design skills required.
           </p>
         </motion.div>
 
@@ -228,7 +228,7 @@ export const FeatureGrid: React.FC = () => {
             className="inline-flex items-center gap-3 px-8 py-4 rounded-full bg-gradient-to-r from-indigo-500 to-violet-500 text-white font-bold shadow-lg shadow-indigo-500/30 hover:shadow-xl hover:shadow-indigo-500/40 transition-shadow"
           >
             <Sparkles size={18} />
-            Explore All Features
+            Explore All Tools
             <ArrowRight size={18} />
           </motion.button>
         </motion.div>

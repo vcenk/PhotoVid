@@ -3,28 +3,27 @@ import { StudioProvider, useStudio } from '../../lib/store/contexts/StudioContex
 import { WizardProvider } from '../../lib/store/contexts/WizardContext';
 import { ProjectProvider, useProjects } from '../../lib/store/contexts/ProjectContext';
 import { AssetProvider } from '../../lib/store/contexts/AssetContext';
-import { WorkflowGrid } from '../studio/shared/WorkflowGrid';
 import { WizardContainer } from '../studio/wizard/WizardContainer';
 import { AssetLibrary } from '../studio/shared/AssetLibrary';
-import { TemplateGallery } from '../studio/shared/TemplateGallery';
-import { NavigationRail, FlyoutType } from '../dashboard/navigation/NavigationRail';
-import { FlyoutPanels } from '../dashboard/navigation/FlyoutPanels';
+import { NavigationRail } from '../dashboard/navigation/NavigationRail';
 import { DashboardTopbar } from '../dashboard/navigation/DashboardTopbar';
-import { ChevronLeft, Sparkles } from 'lucide-react';
+import { ChevronLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { HeroComposer } from '../dashboard/home/HeroComposer';
 import { RecentActivity } from '../dashboard/home/RecentActivity';
 import { DashboardStats } from '../dashboard/home/DashboardStats';
 import { IndustryFeaturedTools } from '../dashboard/home/IndustryFeaturedTools';
+import { CategoryBrowser } from '../dashboard/home/CategoryBrowser';
+import { AppGrid } from '../dashboard/home/AppGrid';
 import { Template } from '../../lib/types/studio';
 
 const StudioContent: React.FC = () => {
   const { currentView, selectedWorkflow, selectedTemplate, goHome, openWizardWithTemplate } = useStudio();
   const { projects } = useProjects();
   const navigate = useNavigate();
-  const [activeFlyout, setActiveFlyout] = useState<FlyoutType>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [activeCategory, setActiveCategory] = useState<string | null>(null);
 
   const handleTemplateSelect = (template: Template) => {
     openWizardWithTemplate(template);
@@ -34,21 +33,12 @@ const StudioContent: React.FC = () => {
     <div className="flex h-screen bg-white dark:bg-[#09090b] text-zinc-900 dark:text-white font-sans overflow-hidden">
       {/* Navigation Rail - Left Sidebar */}
       <NavigationRail
-        activeFlyout={activeFlyout}
-        onFlyoutChange={setActiveFlyout}
-      />
-
-      {/* Flyout Panels */}
-      <FlyoutPanels
-        activeFlyout={activeFlyout}
-        onClose={() => setActiveFlyout(null)}
+        isMobileOpen={mobileMenuOpen}
+        onMobileClose={() => setMobileMenuOpen(false)}
       />
 
       {/* Main Content Area */}
-      <div
-        className="flex-1 flex flex-col min-w-0 overflow-hidden"
-        style={{ marginLeft: '224px' }}
-      >
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden ml-0 lg:ml-16">
         {/* Topbar */}
         <DashboardTopbar onMenuClick={() => setMobileMenuOpen(true)} />
 
@@ -65,33 +55,27 @@ const StudioContent: React.FC = () => {
             >
               {currentView === 'dashboard' && (
                 <>
+                  {/* Compact Hero Banner */}
                   <HeroComposer />
 
-                  {/* Industry Featured Tools - Main Feature Section */}
-                  <IndustryFeaturedTools />
-
-                  {/* Dashboard Stats */}
-                  <div className="max-w-7xl mx-auto px-6 mb-8">
+                  <div className="max-w-7xl mx-auto px-6 space-y-8 pb-16">
+                    {/* Quick Stats */}
                     <DashboardStats />
-                  </div>
 
-                  {/* Recent Activity */}
-                  <div className="max-w-7xl mx-auto px-6 mb-8">
+                    {/* Featured Applications Carousel */}
+                    <IndustryFeaturedTools />
+
+                    {/* Browse by Category */}
+                    <CategoryBrowser
+                      activeCategory={activeCategory}
+                      onCategoryChange={setActiveCategory}
+                    />
+
+                    {/* All Apps Grid */}
+                    <AppGrid category={activeCategory} />
+
+                    {/* Recent Work */}
                     <RecentActivity />
-                  </div>
-
-                  {/* Template Gallery */}
-                  <div className="max-w-7xl mx-auto px-6 mb-8">
-                    <TemplateGallery onSelectTemplate={handleTemplateSelect} />
-                  </div>
-
-                  {/* Workflow Grid */}
-                  <div className="max-w-7xl mx-auto px-6 mt-8 pb-16">
-                    <h2 className="text-lg font-bold text-zinc-900 dark:text-white mb-4 flex items-center gap-2">
-                      <Sparkles size={18} className="text-indigo-500" />
-                      Available Workflows
-                    </h2>
-                    <WorkflowGrid />
                   </div>
                 </>
               )}

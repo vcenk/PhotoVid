@@ -15,8 +15,7 @@ import {
     Sofa,
     Sun
 } from 'lucide-react';
-import { NavigationRail, FlyoutType } from '../dashboard/navigation/NavigationRail';
-import { FlyoutPanels } from '../dashboard/navigation/FlyoutPanels';
+import { NavigationRail } from '../dashboard/navigation/NavigationRail';
 
 // Real Estate specific tools/features
 const REAL_ESTATE_TOOLS = [
@@ -92,14 +91,14 @@ const QUICK_WORKFLOWS = [
 ];
 
 export const RealEstatePage: React.FC = () => {
-    const [activeFlyout, setActiveFlyout] = useState<FlyoutType>(null);
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const navigate = useNavigate();
 
     const handleToolClick = (toolId: string) => {
         // Navigate to appropriate tool page based on tool
         switch (toolId) {
             case 'virtual-staging':
-                navigate('/studio/apps/real-estate/virtual-staging');
+                navigate('/studio/real-estate/virtual-staging');
                 break;
             case 'room-tour':
                 navigate('/studio');
@@ -119,13 +118,11 @@ export const RealEstatePage: React.FC = () => {
     return (
         <div className="h-screen flex bg-white dark:bg-[#09090b]">
             {/* Navigation Rail */}
-            <NavigationRail activeFlyout={activeFlyout} onFlyoutChange={setActiveFlyout} />
+            <NavigationRail isMobileOpen={mobileMenuOpen} onMobileClose={() => setMobileMenuOpen(false)} />
 
             {/* Flyout Panels */}
-            <FlyoutPanels activeFlyout={activeFlyout} onClose={() => setActiveFlyout(null)} />
-
-            {/* Main Content */}
-            <div className="flex-1 overflow-y-auto ml-56">
+{/* Main Content */}
+            <div className="flex-1 overflow-y-auto ml-0 lg:ml-16">
                 {/* Hero Section */}
                 <div className="relative bg-gradient-to-br from-blue-600 via-indigo-600 to-violet-700 overflow-hidden">
                     {/* Background Pattern */}
