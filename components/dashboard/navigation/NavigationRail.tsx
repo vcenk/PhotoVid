@@ -7,7 +7,7 @@ import {
   Image as ImageIcon,
   Video,
   Wand2,
-  Mic2,
+  Languages,
   Workflow,
   FolderOpen,
   Building2,
@@ -23,6 +23,7 @@ import {
   X,
   FileText,
   Film,
+  Clapperboard,
 } from 'lucide-react';
 import { cn } from '../../../lib/utils';
 import { useTheme } from '../../common/ThemeProvider';
@@ -75,9 +76,10 @@ export function NavigationRail({ isMobileOpen, onMobileClose }: NavigationRailPr
         { id: 'image', label: 'Image', icon: ImageIcon, path: '/studio/image' },
         { id: 'video', label: 'Video', icon: Video, path: '/studio/video' },
         { id: 'edit', label: 'Edit', icon: Wand2, path: '/studio/edit' },
-        { id: 'lipsync', label: 'Lipsync', icon: Mic2, path: '/studio/lipsync' },
+        { id: 'dubbing', label: 'Dubbing', icon: Languages, path: '/studio/dubbing' },
         { id: 'listing', label: 'Listing', icon: FileText, path: '/studio/listing' },
         { id: 'video-editor', label: 'Video Editor', icon: Film, path: '/studio/real-estate/video-builder' },
+        { id: 'quick-video', label: 'Quick Video', icon: Clapperboard, path: '/studio/real-estate/quick-video' },
       ],
     },
     {

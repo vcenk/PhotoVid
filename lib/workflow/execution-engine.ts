@@ -237,15 +237,12 @@ export async function executeNode(
         output = await executeInpaint(inputs.image, inputs.prompt || '', parameters);
         break;
 
-      case 'gen-lipsync':
-        // Lipsync generation
-        if (!inputs.audio) {
-          throw new Error('Audio is required for lipsync');
+      case 'gen-dubbing':
+        // AI Dubbing (video translation)
+        if (!inputs.video) {
+          throw new Error('Video is required for dubbing');
         }
-        if (!inputs.image && !inputs.video) {
-          throw new Error('Image or video is required for lipsync');
-        }
-        output = await executeLipsync(inputs.image, inputs.video, inputs.audio, parameters);
+        output = await executeDubbing(inputs.video, parameters);
         break;
 
       case 'output-preview':
@@ -443,40 +440,42 @@ async function executeInpaint(
   }
 }
 
-async function executeLipsync(
-  imageUrl: string | null,
-  videoUrl: string | null,
-  audioUrl: string,
+async function executeDubbing(
+  videoUrl: string,
   parameters: any
 ): Promise<{ video: string }> {
-  console.log('Executing Lipsync:', { imageUrl, videoUrl, audioUrl, parameters });
+  console.log('Executing AI Dubbing:', { videoUrl, parameters });
 
   try {
-    const model = parameters.model === 'kling-lipsync'
-      ? 'fal-ai/kling-video/v1/standard/lipsync'
-      : 'fal-ai/sync-labs/2.0';
+    // Import dubbing API
+    const { createDubbing, waitForDubbing, downloadDubbedContent } = await import('../api/dubbing');
 
-    const options: any = {
-      audio_url: audioUrl,
-      model_endpoint: model,
-    };
-
-    // Use video OR image
-    if (videoUrl) {
-      options.video_url = videoUrl;
-    }
-
-    const result = await secureFalCall({
-      tool: 'lipsync',
-      imageUrl: imageUrl || undefined,
-      options,
+    // Create dubbing project
+    const result = await createDubbing(videoUrl, {
+      targetLanguage: parameters.targetLanguage || 'es',
+      preserveOriginalVoice: true,
     });
 
+    // Wait for completion
+    await waitForDubbing(result.dubbingId);
+
+    // Download result
+    const downloadResult = await downloadDubbedContent(result.dubbingId, parameters.targetLanguage || 'es');
+
+    // Convert base64 to blob URL
+    const binaryString = atob(downloadResult.data);
+    const bytes = new Uint8Array(binaryString.length);
+    for (let i = 0; i < binaryString.length; i++) {
+      bytes[i] = binaryString.charCodeAt(i);
+    }
+    const blob = new Blob([bytes], { type: downloadResult.contentType });
+    const url = URL.createObjectURL(blob);
+
     return {
-      video: result?.video?.url
+      video: url
     };
   } catch (error) {
-    console.error('Lipsync failed:', error);
+    console.error('Dubbing failed:', error);
     throw error;
   }
 }

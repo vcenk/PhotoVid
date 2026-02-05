@@ -10,7 +10,6 @@ import {
   useCurrentFrame,
   useVideoConfig,
   spring,
-  Img,
 } from 'remotion';
 import { MODERN_COLORS, MODERN_FONTS } from '../templates/ModernTemplate';
 import type { AgentBranding } from '../../../lib/types/video-project';
@@ -106,8 +105,9 @@ export const AgentCard: React.FC<AgentCardProps> = ({ agentBranding }) => {
           }}
         >
           {agentBranding.photoUrl ? (
-            <Img
+            <img
               src={agentBranding.photoUrl}
+              alt=""
               style={{
                 width: '100%',
                 height: '100%',

@@ -125,7 +125,7 @@ const ChangingSeasonsToolInner: React.FC = () => {
                 setGenerationProgress(prev => prev >= 90 ? (clearInterval(progressInterval), 90) : prev + 10);
             }, 400);
 
-            setTimeout(() => {
+            setTimeout(async () => {
                 clearInterval(progressInterval);
                 setGenerationProgress(100);
                 const mockUrl = 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=1200&h=800&fit=crop';

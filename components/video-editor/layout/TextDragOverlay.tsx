@@ -117,16 +117,14 @@ export const TextDragOverlay: React.FC = () => {
                 />
               )}
 
+              {/* Invisible hit area - text is rendered by the composition, not here */}
               <div
                 className="px-2 py-1"
                 style={{
                   fontSize: Math.max(10, content.fontSize * 0.22),
                   fontWeight: content.fontWeight,
                   fontFamily: content.fontFamily,
-                  color: isSelected ? content.color : 'transparent',
-                  backgroundColor: isSelected && content.backgroundColor ? content.backgroundColor : undefined,
-                  borderRadius: content.backgroundColor ? 4 : undefined,
-                  textShadow: isSelected && !content.backgroundColor ? '0 2px 8px rgba(0,0,0,0.6)' : undefined,
+                  color: 'transparent', // Always transparent - composition renders the actual text
                   minWidth: 40,
                   minHeight: 20,
                   textAlign: content.alignment || 'center',

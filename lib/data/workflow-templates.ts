@@ -8,7 +8,7 @@ import {
   Play,
   Maximize2,
   Paintbrush,
-  Mic2
+  Languages
 } from 'lucide-react';
 
 /**
@@ -133,41 +133,30 @@ export const WORKFLOW_TEMPLATES: WorkflowTemplate[] = [
     ]
   },
   {
-    id: 'talking-head',
-    name: 'Talking Head Video',
-    description: 'Create a lipsync video from a portrait and audio',
+    id: 'video-dubbing',
+    name: 'Video Dubbing',
+    description: 'Translate a video to another language with voice cloning',
     category: 'video-creation',
-    icon: Mic2,
+    icon: Languages,
     nodes: [
       {
-        id: 'image-input-1',
-        type: 'input-image',
-        position: { x: 50, y: 150 },
+        id: 'video-input-1',
+        type: 'input-video',
+        position: { x: 50, y: 250 },
         data: {
-          label: 'Portrait Image',
+          label: 'Source Video',
           parameters: {},
           status: 'idle',
           onChange: () => {}
         }
       },
       {
-        id: 'audio-input-1',
-        type: 'input-audio',
-        position: { x: 50, y: 350 },
-        data: {
-          label: 'Audio Input',
-          parameters: {},
-          status: 'idle',
-          onChange: () => {}
-        }
-      },
-      {
-        id: 'lipsync-1',
-        type: 'gen-lipsync',
+        id: 'dubbing-1',
+        type: 'gen-dubbing',
         position: { x: 400, y: 250 },
         data: {
-          label: 'Lipsync',
-          parameters: { model: 'sync-labs' },
+          label: 'AI Dubbing',
+          parameters: { targetLanguage: 'es' },
           status: 'idle',
           onChange: () => {}
         }
@@ -185,9 +174,8 @@ export const WORKFLOW_TEMPLATES: WorkflowTemplate[] = [
       }
     ],
     edges: [
-      { id: 'e1-3', source: 'image-input-1', target: 'lipsync-1', sourceHandle: 'image', targetHandle: 'image' },
-      { id: 'e2-3', source: 'audio-input-1', target: 'lipsync-1', sourceHandle: 'audio', targetHandle: 'audio' },
-      { id: 'e3-4', source: 'lipsync-1', target: 'preview-1', sourceHandle: 'video', targetHandle: 'video' }
+      { id: 'e1-2', source: 'video-input-1', target: 'dubbing-1', sourceHandle: 'video', targetHandle: 'video' },
+      { id: 'e2-3', source: 'dubbing-1', target: 'preview-1', sourceHandle: 'video', targetHandle: 'video' }
     ]
   },
   {
@@ -251,7 +239,7 @@ export const WORKFLOW_TEMPLATES: WorkflowTemplate[] = [
   {
     id: 'complete-video-pipeline',
     name: 'Complete Video Pipeline',
-    description: 'Full pipeline: prompt → image → upscale → video → lipsync',
+    description: 'Full pipeline: prompt → image → upscale → video',
     category: 'advanced',
     icon: Wand2,
     nodes: [
@@ -261,7 +249,7 @@ export const WORKFLOW_TEMPLATES: WorkflowTemplate[] = [
         position: { x: 50, y: 200 },
         data: {
           label: 'Scene Prompt',
-          parameters: { text: 'Professional headshot of a business woman' },
+          parameters: { text: 'Cinematic shot of a luxury modern home exterior' },
           status: 'idle',
           onChange: () => {}
         }
@@ -272,7 +260,7 @@ export const WORKFLOW_TEMPLATES: WorkflowTemplate[] = [
         position: { x: 350, y: 200 },
         data: {
           label: 'Generate Image',
-          parameters: { model: 'flux-dev', size: 'portrait_4_3', steps: 28 },
+          parameters: { model: 'flux-dev', size: 'landscape_16_9', steps: 28 },
           status: 'idle',
           onChange: () => {}
         }
@@ -289,23 +277,12 @@ export const WORKFLOW_TEMPLATES: WorkflowTemplate[] = [
         }
       },
       {
-        id: 'audio-input-1',
-        type: 'input-audio',
-        position: { x: 650, y: 400 },
+        id: 'video-1',
+        type: 'gen-image-to-video',
+        position: { x: 950, y: 200 },
         data: {
-          label: 'Voice Audio',
-          parameters: {},
-          status: 'idle',
-          onChange: () => {}
-        }
-      },
-      {
-        id: 'lipsync-1',
-        type: 'gen-lipsync',
-        position: { x: 950, y: 300 },
-        data: {
-          label: 'Add Lipsync',
-          parameters: { model: 'sync-labs' },
+          label: 'Generate Video',
+          parameters: { duration: 5, motion: 'smooth' },
           status: 'idle',
           onChange: () => {}
         }
@@ -313,7 +290,7 @@ export const WORKFLOW_TEMPLATES: WorkflowTemplate[] = [
       {
         id: 'preview-1',
         type: 'output-preview',
-        position: { x: 1250, y: 300 },
+        position: { x: 1250, y: 200 },
         data: {
           label: 'Final Preview',
           parameters: {},
@@ -325,9 +302,8 @@ export const WORKFLOW_TEMPLATES: WorkflowTemplate[] = [
     edges: [
       { id: 'e1-2', source: 'prompt-1', target: 'text-to-image-1', sourceHandle: 'prompt', targetHandle: 'prompt' },
       { id: 'e2-3', source: 'text-to-image-1', target: 'upscale-1', sourceHandle: 'image', targetHandle: 'image' },
-      { id: 'e3-5', source: 'upscale-1', target: 'lipsync-1', sourceHandle: 'image', targetHandle: 'image' },
-      { id: 'e4-5', source: 'audio-input-1', target: 'lipsync-1', sourceHandle: 'audio', targetHandle: 'audio' },
-      { id: 'e5-6', source: 'lipsync-1', target: 'preview-1', sourceHandle: 'video', targetHandle: 'video' }
+      { id: 'e3-4', source: 'upscale-1', target: 'video-1', sourceHandle: 'image', targetHandle: 'image' },
+      { id: 'e4-5', source: 'video-1', target: 'preview-1', sourceHandle: 'video', targetHandle: 'video' }
     ]
   }
 ];

@@ -312,7 +312,7 @@ const ExteriorPaintToolInner: React.FC = () => {
                 setGenerationProgress(prev => prev >= 90 ? (clearInterval(progressInterval), 90) : prev + 10);
             }, 400);
 
-            setTimeout(() => {
+            setTimeout(async () => {
                 clearInterval(progressInterval);
                 setGenerationProgress(100);
                 const mockUrl = 'https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=1200&h=800&fit=crop';

@@ -13,8 +13,21 @@ interface AssetContextType {
   assets: Asset[];
   loading: boolean;
   addAsset: (url: string, type: 'image' | 'video', name?: string) => Promise<void>;
-  deleteAsset: (id: string) => Promise<void>;
+  deleteAsset: (id: string) => Promise<boolean>;
+  renameAsset: (id: string, name: string) => Promise<void>;
   fetchAssets: () => Promise<void>;
+}
+
+// Check if a blob URL is still valid
+function isBlobUrlValid(url: string): boolean {
+  if (!url.startsWith('blob:')) return true;
+  // Blob URLs are never valid after page refresh
+  return false;
+}
+
+// Filter out stale blob URLs from assets
+function filterStaleAssets(assets: Asset[]): Asset[] {
+  return assets.filter(asset => isBlobUrlValid(asset.url));
 }
 
 const AssetContext = createContext<AssetContextType | undefined>(undefined);
@@ -25,7 +38,14 @@ const LOCAL_STORAGE_KEY = 'photovid_assets';
 function getLocalAssets(): Asset[] {
   try {
     const stored = localStorage.getItem(LOCAL_STORAGE_KEY);
-    return stored ? JSON.parse(stored) : [];
+    const assets = stored ? JSON.parse(stored) : [];
+    // Filter out stale blob URLs
+    const validAssets = filterStaleAssets(assets);
+    // Save back if we filtered any
+    if (validAssets.length !== assets.length) {
+      saveLocalAssets(validAssets);
+    }
+    return validAssets;
   } catch {
     return [];
   }
@@ -148,11 +168,14 @@ export function AssetProvider({ children }: { children: ReactNode }) {
   }, [supabase, fetchAssets]);
 
   // ============================================
-  // SECURE: Delete asset via Edge Function
+  // SECURE: Rename asset
   // ============================================
-  const deleteAsset = useCallback(async (id: string) => {
+  const renameAsset = useCallback(async (id: string, name: string) => {
     if (!supabase) {
-      const localAssets = getLocalAssets().filter(a => a.id !== id);
+      // Fallback for demo without Supabase
+      const localAssets = getLocalAssets().map(a =>
+        a.id === id ? { ...a, name } : a
+      );
       saveLocalAssets(localAssets);
       setAssets(localAssets);
       return;
@@ -161,30 +184,113 @@ export function AssetProvider({ children }: { children: ReactNode }) {
     try {
       const { data: userData } = await supabase.auth.getUser();
       if (!userData.user) {
-        const localAssets = getLocalAssets().filter(a => a.id !== id);
+        // Not logged in, use local
+        const localAssets = getLocalAssets().map(a =>
+          a.id === id ? { ...a, name } : a
+        );
         saveLocalAssets(localAssets);
         setAssets(localAssets);
         return;
       }
 
-      // SECURE: Call Edge Function instead of direct database delete
-      const { data: response, error } = await supabase.functions.invoke('delete-asset', {
-        body: { id },
-      });
+      // Update in database (RLS will verify ownership)
+      const { error } = await supabase
+        .from('assets')
+        .update({ name })
+        .eq('id', id)
+        .eq('user_id', userData.user.id);
 
       if (error) {
-        console.error('Error deleting asset via Edge Function:', error);
+        console.error('Error renaming asset:', error);
         return;
       }
 
-      if (response?.success) {
-        // Update local state
-        setAssets(prev => prev.filter(a => a.id !== id));
+      // Update local state
+      setAssets(prev => prev.map(a => a.id === id ? { ...a, name } : a));
+    } catch (error) {
+      console.error('Error renaming asset:', error);
+    }
+  }, [supabase]);
+
+  // ============================================
+  // SECURE: Delete asset via Edge Function
+  // ============================================
+  const deleteAsset = useCallback(async (id: string): Promise<boolean> => {
+    if (!supabase) {
+      const localAssets = getLocalAssets().filter(a => a.id !== id);
+      saveLocalAssets(localAssets);
+      setAssets(localAssets);
+      return true;
+    }
+
+    try {
+      const { data: userData } = await supabase.auth.getUser();
+      if (!userData.user) {
+        const localAssets = getLocalAssets().filter(a => a.id !== id);
+        saveLocalAssets(localAssets);
+        setAssets(localAssets);
+        return true;
+      }
+
+      // Optimistically remove from UI first
+      const previousAssets = assets;
+      setAssets(prev => prev.filter(a => a.id !== id));
+
+      try {
+        // SECURE: Call Edge Function instead of direct database delete
+        const { data: response, error } = await supabase.functions.invoke('delete-asset', {
+          body: { id },
+        });
+
+        if (error) {
+          console.error('Error deleting asset via Edge Function:', error);
+          // Restore on failure
+          setAssets(previousAssets);
+
+          // If edge function fails, try direct delete with RLS
+          const { error: directError } = await supabase
+            .from('assets')
+            .delete()
+            .eq('id', id)
+            .eq('user_id', userData.user.id);
+
+          if (directError) {
+            console.error('Direct delete also failed:', directError);
+            return false;
+          }
+
+          // Direct delete succeeded
+          setAssets(prev => prev.filter(a => a.id !== id));
+          return true;
+        }
+
+        if (response?.success) {
+          return true;
+        }
+
+        // Restore if not successful
+        setAssets(previousAssets);
+        return false;
+      } catch (funcError) {
+        console.error('Edge function call failed:', funcError);
+        // Try direct delete as fallback
+        const { error: directError } = await supabase
+          .from('assets')
+          .delete()
+          .eq('id', id)
+          .eq('user_id', userData.user.id);
+
+        if (!directError) {
+          return true;
+        }
+        setAssets(previousAssets);
+        return false;
       }
     } catch (error) {
       console.error('Error deleting asset:', error);
+      return false;
     }
-  }, [supabase]);
+  }, [supabase, assets]);
 
   useEffect(() => {
     fetchAssets();
@@ -196,6 +302,7 @@ export function AssetProvider({ children }: { children: ReactNode }) {
       loading,
       addAsset,
       deleteAsset,
+      renameAsset,
       fetchAssets
     }}>
       {children}

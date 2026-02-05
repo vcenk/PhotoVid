@@ -117,11 +117,24 @@ export function VideoEditorProvider({ children }: { children: React.ReactNode })
     }
   }, [undoRedo, project]);
 
-  // Save to localStorage on changes
+  // Save to localStorage on changes (debounced to avoid performance issues during playback)
+  const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(project));
+      // Clear previous timeout
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
+      }
+      // Debounce save by 500ms
+      saveTimeoutRef.current = setTimeout(() => {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(project));
+      }, 500);
     }
+    return () => {
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
+      }
+    };
   }, [project]);
 
   // Helper to update project with timestamp
@@ -258,8 +271,8 @@ export function VideoEditorProvider({ children }: { children: React.ReactNode })
   }, [updateProject]);
 
   const addAssets = useCallback(async (files: File[]): Promise<EditorAsset[]> => {
-    const assets = await Promise.all(files.map(addAsset));
-    return assets;
+    const assets = await Promise.all(files.map(file => addAsset(file)));
+    return assets as EditorAsset[];
   }, [addAsset]);
 
   const removeAsset = useCallback((id: string) => {
@@ -267,7 +280,7 @@ export function VideoEditorProvider({ children }: { children: React.ReactNode })
       const { [id]: removed, ...remainingAssets } = prev.assets;
 
       // Also remove any clips using this asset
-      const clipsToRemove = Object.values(prev.clips)
+      const clipsToRemove = (Object.values(prev.clips) as TimelineClip[])
         .filter(clip => clip.assetId === id)
         .map(clip => clip.id);
 
@@ -383,7 +396,7 @@ export function VideoEditorProvider({ children }: { children: React.ReactNode })
     durationFrames?: number
   ): string => {
     const id = crypto.randomUUID();
-    pushUndo();
+    console.log('[VideoEditor] Adding clip:', { assetId, trackId, startFrame, id });
 
     setProject(prev => {
       const asset = prev.assets[assetId];
@@ -397,7 +410,7 @@ export function VideoEditorProvider({ children }: { children: React.ReactNode })
         durationFrames: duration,
         effects: [],
         kenBurns: asset?.type === 'image' ? { direction: 'zoom-in', intensity: 0.1 } : undefined,
-        volume: asset?.type === 'audio' ? 100 : undefined,
+        volume: asset?.type === 'video' || asset?.type === 'audio' ? 100 : undefined,
       };
 
       // Add clip to track
@@ -412,11 +425,14 @@ export function VideoEditorProvider({ children }: { children: React.ReactNode })
       const clipEnd = clip.startFrame + clip.durationFrames;
       const newDuration = Math.max(prev.totalDurationFrames, clipEnd + 30);
 
+      console.log('[VideoEditor] Clip added, tracks updated:', updatedTracks.map(t => ({ id: t.id, clips: t.clips })));
+
       return {
         ...prev,
         clips: { ...prev.clips, [id]: clip },
         tracks: updatedTracks,
         totalDurationFrames: newDuration,
+        selectedClipId: id, // Auto-select the new clip
         updatedAt: new Date(),
       };
     });
@@ -430,7 +446,7 @@ export function VideoEditorProvider({ children }: { children: React.ReactNode })
     content: TextClipContent
   ): string => {
     const id = crypto.randomUUID();
-    pushUndo();
+    console.log('[VideoEditor] Adding text clip:', { trackId, startFrame, id });
 
     setProject(prev => {
       const clip: TimelineClip = {
@@ -458,6 +474,7 @@ export function VideoEditorProvider({ children }: { children: React.ReactNode })
         clips: { ...prev.clips, [id]: clip },
         tracks: updatedTracks,
         totalDurationFrames: newDuration,
+        selectedClipId: id, // Auto-select the new clip
         updatedAt: new Date(),
       };
     });
@@ -466,8 +483,13 @@ export function VideoEditorProvider({ children }: { children: React.ReactNode })
   }, []);
 
   const removeClip = useCallback((id: string) => {
-    pushUndo();
+    console.log('[VideoEditor] Removing clip:', id);
     updateProject(prev => {
+      if (!prev.clips[id]) {
+        console.warn('[VideoEditor] Clip not found:', id);
+        return prev;
+      }
+
       const { [id]: removed, ...remainingClips } = prev.clips;
 
       // Remove from track
@@ -478,11 +500,13 @@ export function VideoEditorProvider({ children }: { children: React.ReactNode })
 
       // Remove transitions involving this clip
       const remainingTransitions = { ...prev.transitions };
-      Object.entries(prev.transitions).forEach(([transId, trans]) => {
+      (Object.entries(prev.transitions) as [string, ClipTransition][]).forEach(([transId, trans]) => {
         if (trans.fromClipId === id || trans.toClipId === id) {
           delete remainingTransitions[transId];
         }
       });
+
+      console.log('[VideoEditor] Clip removed, remaining clips:', Object.keys(remainingClips).length);
 
       return {
         clips: remainingClips,
@@ -651,6 +675,8 @@ export function VideoEditorProvider({ children }: { children: React.ReactNode })
       durationFrames,
     };
 
+    console.log('[VideoEditor] Adding transition:', { id, type, fromClipId, toClipId, durationFrames });
+
     updateProject(prev => ({
       transitions: { ...prev.transitions, [id]: transition },
     }));
@@ -771,10 +797,15 @@ export function VideoEditorProvider({ children }: { children: React.ReactNode })
   }, [updateProject]);
 
   const seekTo = useCallback((frame: number) => {
-    updateProject(prev => ({
-      currentFrame: Math.max(0, Math.min(frame, prev.totalDurationFrames)),
-    }));
-  }, [updateProject]);
+    setProject(prev => {
+      const newFrame = Math.max(0, Math.min(frame, prev.totalDurationFrames));
+      return {
+        ...prev,
+        currentFrame: newFrame,
+        updatedAt: new Date(),
+      };
+    });
+  }, []);
 
   const seekToStart = useCallback(() => {
     updateProject({ currentFrame: 0 });
@@ -822,6 +853,7 @@ export function VideoEditorProvider({ children }: { children: React.ReactNode })
   // ============================================
 
   const selectClip = useCallback((id: string | null) => {
+    console.log('[VideoEditor] Selecting clip:', id);
     updateProject({ selectedClipId: id });
   }, [updateProject]);
 
@@ -862,7 +894,7 @@ export function VideoEditorProvider({ children }: { children: React.ReactNode })
 
   const recalculateDuration = useCallback(() => {
     let maxEnd = 0;
-    for (const clip of Object.values(project.clips)) {
+    for (const clip of Object.values(project.clips) as TimelineClip[]) {
       maxEnd = Math.max(maxEnd, clip.startFrame + clip.durationFrames);
     }
     updateProject({ totalDurationFrames: Math.max(maxEnd + 30, 900) }); // Minimum 30 seconds

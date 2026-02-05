@@ -4,7 +4,7 @@ import { ThemeProvider } from './components/common/ThemeProvider';
 import { CreditsProvider } from './lib/store/contexts/CreditsContext';
 import { LandingPage } from './components/pages/LandingPage';
 import { StudioPage } from './components/pages/StudioPage';
-import { LipsyncPage } from './components/pages/LipsyncPage';
+import { DubbingPage } from './components/pages/DubbingPage';
 import { ImagePage } from './components/pages/ImagePage';
 import { AppsPage } from './components/pages/AppsPage';
 import { WorkflowPage } from './components/pages/WorkflowPage';
@@ -24,6 +24,7 @@ import { RainToShineTool } from './components/tools/real-estate/RainToShineTool'
 import { NightToDayTool } from './components/tools/real-estate/NightToDayTool';
 import { ChangingSeasonsTool } from './components/tools/real-estate/ChangingSeasonsTool';
 import { PoolEnhancementTool } from './components/tools/real-estate/PoolEnhancementTool';
+import { SocialMediaPosterToolV2 as SocialMediaPosterTool } from './components/tools/real-estate/SocialMediaPosterToolV2';
 import { WatermarkRemovalTool } from './components/tools/real-estate/WatermarkRemovalTool';
 import { HeadshotRetouchingTool } from './components/tools/real-estate/HeadshotRetouchingTool';
 // Auto Dealership Tools
@@ -51,7 +52,9 @@ import { VideoEditorPage } from './components/video-editor/VideoEditorPage';
 import { ExteriorPaintTool } from './components/tools/real-estate/ExteriorPaintTool';
 import { LandscapeDesignTool } from './components/tools/real-estate/LandscapeDesignTool';
 import { AutoDeclutterTool } from './components/tools/real-estate/AutoDeclutterTool';
+import { PropertyRevealTool } from './components/tools/real-estate/PropertyRevealTool';
 import { RealEstatePageV2 } from './components/pages/RealEstatePageV2';
+import { QuickVideoPage } from './components/quick-video/QuickVideoPage';
 import { AuthPage } from './components/pages/AuthPage';
 import { AuthCallbackPage } from './components/pages/AuthCallbackPage';
 import { ResetPasswordPage } from './components/pages/ResetPasswordPage';
@@ -129,14 +132,17 @@ const App: React.FC = () => {
             <Route path="/studio/real-estate/exterior-paint" element={<ExteriorPaintTool />} />
             <Route path="/studio/real-estate/landscape-design" element={<LandscapeDesignTool />} />
             <Route path="/studio/real-estate/auto-declutter" element={<AutoDeclutterTool />} />
+            <Route path="/studio/real-estate/property-reveal" element={<PropertyRevealTool />} />
             <Route path="/studio/real-estate/floor-replacement" element={<FloorReplacementTool />} />
             <Route path="/studio/real-estate/rain-to-shine" element={<RainToShineTool />} />
             <Route path="/studio/real-estate/night-to-day" element={<NightToDayTool />} />
             <Route path="/studio/real-estate/changing-seasons" element={<ChangingSeasonsTool />} />
             <Route path="/studio/real-estate/pool-enhancement" element={<PoolEnhancementTool />} />
+            <Route path="/studio/real-estate/social-media-poster" element={<SocialMediaPosterTool />} />
             <Route path="/studio/edit/headshot-retouching" element={<HeadshotRetouchingTool />} />
             <Route path="/studio/real-estate/storyboard" element={<StoryboardPage />} />
             <Route path="/studio/real-estate/video-builder" element={<VideoEditorPage />} />
+            <Route path="/studio/real-estate/quick-video" element={<QuickVideoPage />} />
             <Route path="/studio/real-estate/text-to-video" element={<TextToVideoPage />} />
             <Route path="/studio/apps/auto" element={<IndustryPage industryId="auto" />} />
             <Route path="/studio/apps/auto/background-swap" element={<BackgroundSwapTool />} />
@@ -158,7 +164,7 @@ const App: React.FC = () => {
             <Route path="/studio/apps/auto/damage-detection" element={<DamageDetectionTool />} />
             <Route path="/studio/apps/auto/storyboard" element={<AutoStoryboardPage />} />
             <Route path="/studio/listing" element={<ListingPage />} />
-            <Route path="/studio/lipsync" element={<LipsyncPage />} />
+            <Route path="/studio/dubbing" element={<DubbingPage />} />
             <Route path="/studio/image" element={<ImagePage />} />
             <Route path="/studio/edit" element={<EditPage />} />
             <Route path="/studio/edit/watermark-removal" element={<WatermarkRemovalTool />} />
@@ -167,7 +173,7 @@ const App: React.FC = () => {
             <Route path="/studio/credits" element={<CreditsPage />} />
             {/* Redirect old dashboard routes to studio */}
             <Route path="/dashboard" element={<Navigate to="/studio" replace />} />
-            <Route path="/dashboard/lipsync" element={<Navigate to="/studio/lipsync" replace />} />
+            <Route path="/dashboard/lipsync" element={<Navigate to="/studio/dubbing" replace />} />
             <Route path="/dashboard/*" element={<Navigate to="/studio" replace />} />
             <Route path="/auth" element={<AuthPage />} />
             <Route path="/auth/callback" element={<AuthCallbackPage />} />

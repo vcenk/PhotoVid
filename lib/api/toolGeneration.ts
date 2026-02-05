@@ -61,6 +61,13 @@ import {
   SocialClipsOptions,
   DamageDetectionOptions,
   GenerationProgressCallback,
+  SocialMediaPosterOptions,
+  SocialMediaPlatform,
+  DesignStyle,
+  ColorTheme,
+  PosterType,
+  RecraftStyle,
+  RecraftImageSize,
 } from "../types/generation";
 
 // ============ SECURE API HELPERS ============
@@ -104,16 +111,13 @@ export async function fetchAsBlob(remoteUrl: string, retries = 3): Promise<strin
 }
 
 /**
- * Try to convert a FAL media URL to a blob URL with fallback
- * Returns the original URL if conversion fails
+ * Returns the image URL directly (FAL URLs are public and load fine)
+ * Previously tried to convert to blob URL which caused loading issues
  */
 export async function safeImageUrl(remoteUrl: string): Promise<string> {
-  try {
-    return await fetchAsBlob(remoteUrl, 2);
-  } catch (error) {
-    console.warn('Could not convert to blob URL, using original:', error);
-    return remoteUrl;
-  }
+  // FAL URLs are public and load fine - just return directly
+  // Blob conversion was causing black screen issues in BeforeAfterSlider
+  return remoteUrl;
 }
 
 // Call FAL generate Edge Function (secure - no API key exposure)
@@ -2978,6 +2982,365 @@ export async function generateDamageDetection(
   throw new Error('No image returned from damage detection');
 }
 
+// ============ SOCIAL MEDIA POSTER (Recraft V3) ============
+
+// Platform to Recraft size mapping
+const PLATFORM_SIZE_MAP: Record<SocialMediaPlatform, RecraftImageSize> = {
+  'instagram-square': 'square_hd',
+  'instagram-portrait': 'portrait_4_3',
+  'instagram-story': 'portrait_16_9',
+  'facebook-post': 'landscape_16_9',
+  'facebook-story': 'portrait_16_9',
+  'linkedin-post': 'landscape_16_9',
+  'pinterest-pin': 'portrait_4_3',
+  'youtube-thumbnail': 'landscape_16_9',
+};
+
+// Design style to Recraft style mapping
+const DESIGN_STYLE_MAP: Record<DesignStyle, RecraftStyle> = {
+  'modern-minimal': 'realistic_image',
+  'luxury-elegant': 'realistic_image',
+  'bold-colorful': 'digital_illustration',
+  'clean-professional': 'realistic_image',
+  'vector-flat': 'vector_illustration',
+};
+
+// Color theme presets
+const COLOR_THEME_MAP: Record<ColorTheme, string[]> = {
+  'classic-black': ['#000000', '#FFFFFF', '#333333'],
+  'navy-gold': ['#1a365d', '#d4af37', '#FFFFFF'],
+  'modern-blue': ['#2563eb', '#1e40af', '#FFFFFF'],
+  'elegant-green': ['#065f46', '#10b981', '#FFFFFF'],
+  'warm-red': ['#dc2626', '#7f1d1d', '#FFFFFF'],
+  'purple-luxury': ['#7c3aed', '#4c1d95', '#FFFFFF'],
+  'sunset-orange': ['#ea580c', '#f59e0b', '#FFFFFF'],
+  'custom': [],
+};
+
+// Poster type headline templates
+const POSTER_TYPE_HEADLINES: Record<PosterType, string> = {
+  'just-listed': 'JUST LISTED',
+  'open-house': 'OPEN HOUSE',
+  'price-reduced': 'PRICE REDUCED',
+  'sold': 'SOLD',
+  'coming-soon': 'COMING SOON',
+  'new-listing': 'NEW LISTING',
+  'featured': 'FEATURED',
+  'luxury': 'LUXURY LIVING',
+  'investment': 'INVESTMENT OPPORTUNITY',
+  'custom': '',
+};
+
+// Design style descriptions for prompt building
+const STYLE_DESCRIPTIONS: Record<DesignStyle, string> = {
+  'modern-minimal': 'clean minimalist design, lots of white space, modern typography, sleek and contemporary',
+  'luxury-elegant': 'luxury high-end design, gold accents, elegant serif fonts, sophisticated and premium feel',
+  'bold-colorful': 'bold vibrant design, eye-catching colors, strong contrast, dynamic composition',
+  'clean-professional': 'professional real estate marketing design, clean layout, trustworthy and polished',
+  'vector-flat': 'flat vector illustration style, geometric shapes, modern icons, clean lines',
+};
+
+// Color theme descriptions for prompt building
+const COLOR_THEME_DESCRIPTIONS: Record<ColorTheme, string> = {
+  'classic-black': 'Use black and white color scheme with elegant contrast',
+  'navy-gold': 'Use navy blue and gold color scheme for a luxurious feel',
+  'modern-blue': 'Use modern blue tones for a professional tech-forward look',
+  'elegant-green': 'Use elegant green tones for an eco-friendly premium feel',
+  'warm-red': 'Use warm red tones for an energetic impactful design',
+  'purple-luxury': 'Use purple and violet tones for a luxury creative feel',
+  'sunset-orange': 'Use warm orange and sunset tones for a welcoming vibrant feel',
+  'custom': 'Use the specified custom colors',
+};
+
+// Helper to get color description for prompt
+function getColorDescription(colorTheme: ColorTheme, customColors?: string[]): string {
+  if (colorTheme === 'custom' && customColors && customColors.length > 0) {
+    return `Use these specific colors for text and graphics: ${customColors.join(', ')}`;
+  }
+  return COLOR_THEME_DESCRIPTIONS[colorTheme] || COLOR_THEME_DESCRIPTIONS['classic-black'];
+}
+
+// Property type descriptions for prompt
+const PROPERTY_TYPE_DESCRIPTIONS: Record<string, string> = {
+  'house': 'beautiful modern house exterior with landscaping',
+  'condo': 'luxury condominium building with city views',
+  'apartment': 'stylish apartment interior or building',
+  'townhouse': 'elegant townhouse with architectural details',
+  'land': 'scenic vacant land with natural features',
+  'commercial': 'professional commercial property',
+};
+
+/**
+ * Build a prompt for the social media poster
+ */
+function buildPosterPrompt(options: SocialMediaPosterOptions): string {
+  const {
+    posterType,
+    designStyle,
+    colorTheme,
+    customColors,
+    propertyType,
+    headline,
+    subtext,
+    price,
+    address,
+    agentName,
+    propertyImageUrl,
+  } = options;
+
+  // Get color description for prompt
+  const colorDescription = getColorDescription(colorTheme, customColors);
+
+  let prompt: string;
+
+  // Different prompt based on whether user uploaded a property image
+  if (propertyImageUrl) {
+    // Image-to-image with Flux Kontext: Add marketing text overlay to the existing photo
+    prompt = `Add professional real estate marketing text overlay to this property photo. ${colorDescription}. Add a stylish banner or text box with`;
+
+    // Add the headline text
+    const headlineText = headline || POSTER_TYPE_HEADLINES[posterType];
+    if (headlineText) {
+      prompt += ` bold text saying "${headlineText}"`;
+    }
+
+    // Add price if provided
+    if (price) {
+      prompt += `, price "${price}"`;
+    }
+
+    // Add address if provided
+    if (address) {
+      prompt += `, location "${address}"`;
+    }
+
+    prompt += `. Keep the original property photo clearly visible. ${STYLE_DESCRIPTIONS[designStyle] || STYLE_DESCRIPTIONS['clean-professional']}.`;
+    return prompt;
+  } else {
+    // Text-to-image: Generate a new poster from scratch
+    prompt = `Professional real estate social media marketing poster. ${STYLE_DESCRIPTIONS[designStyle] || STYLE_DESCRIPTIONS['clean-professional']}. ${colorDescription}.`;
+
+    // Add property visualization only when not using uploaded image
+    if (propertyType) {
+      prompt += ` Features ${PROPERTY_TYPE_DESCRIPTIONS[propertyType] || 'attractive property image'}.`;
+    }
+  }
+
+  // Use custom headline or default from poster type
+  const headlineText = headline || POSTER_TYPE_HEADLINES[posterType];
+  if (headlineText) {
+    prompt += ` Bold headline text at the top says "${headlineText}" in large, prominent letters.`;
+  }
+
+  // Add price
+  if (price) {
+    prompt += ` Price "${price}" displayed prominently.`;
+  }
+
+  // Add address/location
+  if (address) {
+    prompt += ` Address or location text "${address}" shown clearly.`;
+  }
+
+  // Add subtext
+  if (subtext) {
+    prompt += ` Subtext reads "${subtext}".`;
+  }
+
+  // Add agent branding
+  if (agentName) {
+    prompt += ` Agent name "${agentName}" at the bottom.`;
+  }
+
+  // Standard quality tags
+  prompt += ' High-quality marketing material, professional typography, balanced composition, visually appealing layout.';
+
+  return prompt;
+}
+
+/**
+ * Build prompt optimized for Ideogram V2 Edit (image-to-image with text)
+ * Ideogram excels at rendering clean, readable text on images
+ */
+function buildIdeogramPosterPrompt(options: SocialMediaPosterOptions): string {
+  const {
+    posterType,
+    designStyle,
+    colorTheme,
+    customColors,
+    headline,
+    subtext,
+    price,
+    address,
+    agentName,
+    brokerageName,
+  } = options;
+
+  // Get the headline text
+  const headlineText = headline || POSTER_TYPE_HEADLINES[posterType] || 'JUST LISTED';
+
+  // Get color description
+  const colorDescription = getColorDescription(colorTheme, customColors);
+
+  // Build a clear, specific prompt for Ideogram - emphasize NOT changing the image
+  let prompt = `IMPORTANT: Do NOT modify or change the property/building in any way. Only add text overlays. Add professional real estate marketing text overlay to this exact property photo without altering the building, colors, or scene.`;
+
+  // Main headline - be very specific about the text
+  prompt += ` Add a prominent banner or text box at the top with the text "${headlineText}" in bold, large letters.`;
+
+  // Price - if provided
+  if (price) {
+    prompt += ` Display the price "${price}" prominently below the headline.`;
+  }
+
+  // Address - if provided
+  if (address) {
+    prompt += ` Show the address "${address}" in a readable font.`;
+  }
+
+  // Subtext - property details
+  if (subtext) {
+    prompt += ` Include property details: "${subtext}".`;
+  }
+
+  // Agent branding
+  if (agentName || brokerageName) {
+    const branding = [agentName, brokerageName].filter(Boolean).join(' | ');
+    prompt += ` Add agent branding at the bottom: "${branding}".`;
+  }
+
+  // Style and color guidance
+  prompt += ` ${colorDescription}.`;
+  prompt += ` ${STYLE_DESCRIPTIONS[designStyle] || 'Clean professional design'}.`;
+
+  // Key instruction: preserve the property photo exactly
+  prompt += ` CRITICAL: The property photo must remain EXACTLY as-is - same building, same colors, same architecture. Only add text elements as overlays. Do not modify the house or property.`;
+
+  return prompt;
+}
+
+/**
+ * Generate a social media marketing poster using Recraft V3
+ * Model: fal-ai/recraft-v3
+ */
+export async function generateSocialMediaPoster(
+  options: SocialMediaPosterOptions,
+  maskDataUrl?: string,
+  onProgress?: GenerationProgressCallback
+): Promise<string> {
+  onProgress?.(0, 'Preparing poster generation...');
+
+  // Build prompt
+  const prompt = buildPosterPrompt(options);
+
+  // Use different models based on whether an image is provided
+  if (options.propertyImageUrl) {
+    // IMAGE-TO-IMAGE: Use Ideogram V2 Remix for clean text rendering on images
+    onProgress?.(20, 'Adding marketing text to your photo with Ideogram...');
+
+    // Build a prompt optimized for Ideogram text rendering
+    const ideogramPrompt = buildIdeogramPosterPrompt(options);
+
+    const result = await callFalGenerate({
+      tool: 'social-media-poster-overlay',
+      imageUrl: options.propertyImageUrl,
+      prompt: ideogramPrompt,
+      options: {
+        image_weight: 95, // High value to preserve the original property photo
+        magic_prompt_option: 'OFF', // Disable magic prompt to prevent unwanted modifications
+        style_type: 'DESIGN', // DESIGN style works well for marketing materials
+        negative_prompt: 'change building, modify house, alter property, different architecture, new structure, redesign exterior, change colors of building, modify landscape',
+      },
+    });
+
+    onProgress?.(60, 'Processing result...');
+
+    // Poll for completion if needed - use statusUrl and responseUrl from the API response
+    if (result.requestId && !result.data?.images?.[0]?.url) {
+      const model = 'fal-ai/ideogram/v2/remix';
+      const finalResult = await pollFalStatus(
+        result.requestId,
+        model,
+        result.statusUrl,
+        result.responseUrl
+      );
+      onProgress?.(95, 'Finalizing...');
+      const imageUrl = finalResult?.images?.[0]?.url || finalResult?.image?.url;
+      if (imageUrl) {
+        onProgress?.(100, 'Poster complete!');
+        return await safeImageUrl(imageUrl);
+      }
+      throw new Error('No image in generation result');
+    }
+
+    // Direct result
+    const imageUrl = result.data?.images?.[0]?.url || result.data?.image?.url;
+    if (imageUrl) {
+      onProgress?.(100, 'Poster complete!');
+      return await safeImageUrl(imageUrl);
+    }
+
+    throw new Error('No image in generation result');
+  }
+
+  // TEXT-TO-IMAGE: Use Recraft V3 for excellent text rendering
+  // Get platform size
+  const size = PLATFORM_SIZE_MAP[options.platform] || 'square_hd';
+
+  // Get design style
+  const style = DESIGN_STYLE_MAP[options.designStyle] || 'realistic_image';
+
+  // Get colors
+  let colors: string[] = [];
+  if (options.colorTheme === 'custom' && options.customColors) {
+    colors = options.customColors;
+  } else {
+    colors = COLOR_THEME_MAP[options.colorTheme] || [];
+  }
+
+  onProgress?.(20, 'Generating poster design...');
+
+  // Call FAL API through secure Edge Function
+  const result = await callFalGenerate({
+    tool: 'social-media-poster',
+    prompt,
+    options: {
+      style,
+      size,
+      colors: colors.length > 0 ? colors : undefined,
+    },
+  });
+
+  onProgress?.(60, 'Processing result...');
+
+  // Poll for completion if needed - use statusUrl and responseUrl from API response
+  if (result.requestId && !result.data?.images?.[0]?.url) {
+    const model = TOOL_MODEL_MAP['social-media-poster'];
+    const finalResult = await pollFalStatus(
+      result.requestId,
+      model,
+      result.statusUrl,
+      result.responseUrl
+    );
+    onProgress?.(95, 'Finalizing...');
+    const imageUrl = finalResult?.images?.[0]?.url || finalResult?.image?.url;
+    if (imageUrl) {
+      onProgress?.(100, 'Poster complete!');
+      return await safeImageUrl(imageUrl);
+    }
+    throw new Error('No image in generation result');
+  }
+
+  // Direct result
+  const imageUrl = result.data?.images?.[0]?.url || result.data?.image?.url;
+  if (imageUrl) {
+    onProgress?.(100, 'Poster complete!');
+    return await safeImageUrl(imageUrl);
+  }
+
+  throw new Error('No image in generation result');
+}
+
 /**
  * Get credits cost for a tool
  */
@@ -2999,4 +3362,292 @@ export function isFalConfigured(): boolean {
  */
 export function isSecureGenerationAvailable(): boolean {
   return isFalConfigured();
+}
+
+// ============= PROPERTY REVEAL VIDEOS =============
+
+import type {
+  AnimationType,
+  AnimationStyle,
+  PropertyRevealOptions,
+  PropertyRevealResult,
+} from '@/lib/types/property-reveal';
+
+import {
+  STYLE_MAPS,
+  getStyle,
+} from '@/lib/types/property-reveal';
+
+/**
+ * Build prompt for Room Staging animation
+ */
+function buildRoomStagingPrompt(style: AnimationStyle): string {
+  return `
+This exact room from the photo. Maintain all architecture, walls, windows, flooring, and lighting exactly as shown.
+
+A wooden crate appears in the center of the room. The box trembles, then the lid slowly opens.
+
+Furniture and decor rise gracefully from the box: ${style.elements.join(', ')}.
+
+Each piece floats smoothly through the air to its position, then gently settles into place. The movement is choreographed like a ballet - smooth, graceful, and rhythmic. Items appear one by one, not all at once.
+
+The room transforms from empty to a beautifully staged ${style.label}.
+
+CRITICAL REQUIREMENTS:
+- Camera remains COMPLETELY STATIC throughout
+- Preserve the exact room architecture from the photo
+- Keep the same lighting and color temperature
+- Furniture should look realistic and properly scaled
+- Movement should be slow, elegant, and satisfying
+- Final frame looks like professional real estate staging
+`.trim();
+}
+
+/**
+ * Build prompt for Lot to House animation
+ */
+function buildLotToHousePrompt(style: AnimationStyle): string {
+  return `
+This empty lot from the photo. Maintain exact terrain, trees, neighboring properties, and surroundings.
+
+A large wooden construction crate sits on the lot. The crate trembles and opens dramatically.
+
+House components rise and fly into position in construction sequence:
+${style.elements.map((el, i) => `${i + 1}. ${el}`).join('\n')}
+
+Each component floats gracefully through the air and locks into place. Foundation forms first, then walls rise, structure builds upward, roof sections connect, exterior finishes attach, windows and doors install, final details appear.
+
+The empty lot transforms into a beautiful ${style.label} home.
+
+CRITICAL REQUIREMENTS:
+- Camera remains COMPLETELY STATIC throughout
+- Preserve exact lot boundaries and surrounding environment
+- Components assemble in logical construction order
+- Movement is smooth, satisfying, ballet-like choreography
+- Final frame looks like a professional real estate listing photo
+- House should be properly scaled to the lot
+`.trim();
+}
+
+/**
+ * Build prompt for Exterior Renovation animation
+ */
+function buildExteriorRenovationPrompt(style: AnimationStyle): string {
+  return `
+This house from the photo. Keep exact structure, roof shape, and surroundings.
+
+A renovation crate appears in the driveway. It opens and transformation begins.
+
+Renovation elements emerge and apply themselves:
+${style.elements.join(', ')}.
+
+Old finishes dissolve away as new materials fly in and attach. Paint spreads smoothly across surfaces, new fixtures mount themselves, upgrades install with satisfying precision.
+
+The dated house transforms into a stunning ${style.label} home.
+
+CRITICAL REQUIREMENTS:
+- Camera remains COMPLETELY STATIC
+- Preserve exact house structure and footprint
+- Old elements fade/dissolve as new ones appear
+- Movement is smooth and satisfying
+- Transformation feels magical but believable
+- Final frame looks like professional after photo
+`.trim();
+}
+
+/**
+ * Build prompt for Landscaping animation
+ */
+function buildLandscapingPrompt(style: AnimationStyle): string {
+  return `
+This house with bare yard from the photo. Keep house exactly as shown.
+
+A landscaping crate sits on the bare lawn. It opens and nature emerges.
+
+Landscaping elements float out and arrange themselves:
+${style.elements.join(', ')}.
+
+Grass rolls out like carpet, plants rise from the ground and arrange themselves, trees grow into position, pathways assemble stone by stone, lighting stakes into the ground, decorative elements float to their spots.
+
+The bare yard transforms into magazine-worthy ${style.label} curb appeal.
+
+CRITICAL REQUIREMENTS:
+- Camera remains COMPLETELY STATIC
+- House stays exactly as shown in photo
+- Plants and elements properly scaled to yard
+- Movement is organic and nature-inspired
+- Elements arrange with satisfying choreography
+- Final frame looks like professional landscaping photo
+`.trim();
+}
+
+/**
+ * Build prompt for Pool Installation animation
+ */
+function buildPoolInstallationPrompt(style: AnimationStyle): string {
+  return `
+This backyard from the photo. Keep house and existing structures exactly as shown.
+
+A large construction crate appears in the yard. It opens dramatically.
+
+Pool and outdoor living elements emerge and construct themselves:
+${style.elements.join(', ')}.
+
+The ground opens for the pool, water fills it crystal blue, deck surfaces pour and set, furniture floats into position, plants arrange themselves, lighting installs, water features activate.
+
+The basic backyard transforms into a stunning ${style.label} outdoor oasis.
+
+CRITICAL REQUIREMENTS:
+- Camera remains COMPLETELY STATIC
+- House and existing structures unchanged
+- Pool properly scaled to yard size
+- Water appears crystal clear and inviting
+- Furniture and decor properly arranged
+- Final frame looks like luxury real estate listing
+`.trim();
+}
+
+/**
+ * Build prompt for Interior Renovation animation
+ */
+function buildInteriorRenovationPrompt(style: AnimationStyle): string {
+  return `
+This dated room from the photo. Keep room dimensions and window positions.
+
+A renovation crate appears. It opens and transformation begins.
+
+New finishes and fixtures emerge and install themselves:
+${style.elements.join(', ')}.
+
+Old surfaces fade away as new materials fly in. Cabinets mount themselves, countertops lower into place, fixtures install, finishes spread across surfaces, lighting illuminates.
+
+The outdated space transforms into a beautiful ${style.label}.
+
+CRITICAL REQUIREMENTS:
+- Camera remains COMPLETELY STATIC
+- Room structure stays the same
+- Old finishes dissolve/fade tastefully
+- New elements install in logical order
+- Movement is smooth and satisfying
+- Final frame looks like renovation after photo
+`.trim();
+}
+
+/**
+ * Build prompt for Seasonal Transform animation
+ */
+function buildSeasonalPrompt(style: AnimationStyle): string {
+  return `
+This house from the photo. Keep house exactly as shown.
+
+A festive crate appears. It opens with magical sparkle.
+
+Seasonal decorations float out and arrange themselves:
+${style.elements.join(', ')}.
+
+Lights string themselves around the house, decorations fly to their spots, plants bloom instantly, the atmosphere transforms with magical seasonal spirit.
+
+The house transforms into a beautiful ${style.label} display.
+
+CRITICAL REQUIREMENTS:
+- Camera remains COMPLETELY STATIC
+- House structure unchanged
+- Decorations properly scaled and placed
+- Magical, whimsical movement
+- Festive and inviting atmosphere
+- Final frame looks like holiday card photo
+`.trim();
+}
+
+// Prompt builder map
+const CONSTRUCTION_PROMPT_BUILDERS: Record<AnimationType, (style: AnimationStyle) => string> = {
+  'room-staging': buildRoomStagingPrompt,
+  'lot-to-house': buildLotToHousePrompt,
+  'exterior-renovation': buildExteriorRenovationPrompt,
+  'landscaping': buildLandscapingPrompt,
+  'pool-installation': buildPoolInstallationPrompt,
+  'interior-renovation': buildInteriorRenovationPrompt,
+  'seasonal-transform': buildSeasonalPrompt,
+};
+
+/**
+ * Generate Property Reveal Video
+ * Model: fal-ai/veo3/image-to-video (Google Veo 3.1)
+ */
+export async function generatePropertyReveal(
+  options: PropertyRevealOptions,
+  onProgress?: GenerationProgressCallback
+): Promise<PropertyRevealResult> {
+  onProgress?.(0, 'Preparing animation...');
+
+  // Get the style
+  const style = getStyle(options.animationType, options.styleId);
+  if (!style) {
+    throw new Error(`Invalid style: ${options.styleId} for type: ${options.animationType}`);
+  }
+
+  // Build the prompt
+  const promptBuilder = CONSTRUCTION_PROMPT_BUILDERS[options.animationType];
+  let prompt = promptBuilder(style);
+
+  // Add audio instructions if enabled
+  if (options.withAudio) {
+    prompt += '\n\nAudio: Include ambient sounds, construction/assembly sounds, and satisfying settling sounds. End with peaceful silence.';
+  }
+
+  onProgress?.(10, 'Starting video generation...');
+
+  // Call FAL API through secure Edge Function
+  const result = await callFalGenerate({
+    tool: 'property-reveal',
+    imageUrl: options.imageUrl,
+    prompt,
+    options: {
+      duration: options.duration,
+      generate_audio: options.withAudio,
+      aspect_ratio: '16:9',
+    },
+  });
+
+  onProgress?.(30, 'Processing video...');
+
+  // Poll for completion - video generation can take longer, use 120 attempts (6 min)
+  if (result.requestId && !result.data?.video?.url) {
+    const model = 'fal-ai/veo3/image-to-video';
+    const finalResult = await pollFalStatus(
+      result.requestId,
+      model,
+      result.statusUrl,
+      result.responseUrl,
+      120
+    );
+
+    onProgress?.(95, 'Finalizing...');
+
+    const videoUrl = finalResult?.video?.url;
+    if (videoUrl) {
+      onProgress?.(100, 'Animation complete!');
+      return {
+        videoUrl,
+        duration: options.duration,
+        hasAudio: options.withAudio,
+        animationType: options.animationType,
+      };
+    }
+    throw new Error('No video in generation result');
+  }
+
+  // Direct result
+  const videoUrl = result.data?.video?.url;
+  if (videoUrl) {
+    onProgress?.(100, 'Animation complete!');
+    return {
+      videoUrl,
+      duration: options.duration,
+      hasAudio: options.withAudio,
+      animationType: options.animationType,
+    };
+  }
+
+  throw new Error('No video in generation result');
 }

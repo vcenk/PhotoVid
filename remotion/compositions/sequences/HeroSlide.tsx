@@ -10,7 +10,6 @@ import {
   useCurrentFrame,
   useVideoConfig,
   spring,
-  Img,
 } from 'remotion';
 import { KenBurnsImage } from '../components/KenBurnsImage';
 import { MODERN_COLORS, MODERN_FONTS } from '../templates/ModernTemplate';

@@ -68,7 +68,13 @@
       "WebFetch(domain:blog.fal.ai)",
       "WebFetch(domain:gist.github.com)",
       "Bash(git rm:*)",
-      "Bash(del nul)"
+      "Bash(del nul)",
+      "Bash(grep:*)",
+      "WebFetch(domain:github.com)",
+      "Bash(npx skills:*)",
+      "Bash(npx remotion:*)",
+      "Bash(npm i:*)",
+      "Bash(exit:*)"
     ]
   }
 }

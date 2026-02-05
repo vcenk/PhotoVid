@@ -1,6 +1,9 @@
 /**
  * KenBurnsImage Component
  * Applies Ken Burns effect (zoom/pan) to images
+ *
+ * IMPORTANT: Uses plain <img> instead of Remotion's <Img> to support blob URLs.
+ * Remotion's <Img> uses delayRender internally which hangs forever with blob URLs.
  */
 
 import React from 'react';
@@ -9,7 +12,6 @@ import {
   interpolate,
   useCurrentFrame,
   useVideoConfig,
-  Img,
 } from 'remotion';
 
 export type KenBurnsDirection = 'zoom-in' | 'zoom-out' | 'pan-left' | 'pan-right';
@@ -68,8 +70,10 @@ export const KenBurnsImage: React.FC<KenBurnsImageProps> = ({
         overflow: 'hidden',
       }}
     >
-      <Img
+      {/* Using plain <img> instead of Remotion's <Img> to support blob URLs */}
+      <img
         src={src}
+        alt=""
         style={{
           position: 'absolute',
           top: '50%',

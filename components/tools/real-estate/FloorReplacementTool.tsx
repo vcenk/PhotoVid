@@ -137,7 +137,7 @@ const FloorReplacementToolInner: React.FC = () => {
                 setGenerationProgress(prev => prev >= 90 ? (clearInterval(progressInterval), 90) : prev + 10);
             }, 400);
 
-            setTimeout(() => {
+            setTimeout(async () => {
                 clearInterval(progressInterval);
                 setGenerationProgress(100);
                 const mockUrl = 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=1200&h=800&fit=crop';

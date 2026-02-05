@@ -1,7 +1,11 @@
 /**
  * DynamicTimeline Composition
  * Renders the video editor timeline dynamically based on project state
- * Uses plain HTML elements instead of Remotion's <Img>/<Video>/<Audio>
+ *
+ * Uses @remotion/transitions for professional scene transitions
+ * Uses @remotion/light-leaks for cinematic overlay effects
+ *
+ * IMPORTANT: Uses plain HTML elements instead of Remotion's <Img>/<Video>/<Audio>
  * to avoid delayRender hangs with blob URLs
  */
 
@@ -14,6 +18,7 @@ import {
   interpolate,
   spring,
 } from 'remotion';
+import { LightLeak } from '@remotion/light-leaks';
 import type {
   VideoEditorProject,
   TimelineClip,
@@ -29,7 +34,7 @@ interface DynamicTimelineProps {
 }
 
 export const DynamicTimeline: React.FC<DynamicTimelineProps> = ({ project }) => {
-  const { clips, tracks, assets, transitions } = project;
+  const { clips, tracks, assets, transitions, isPlaying } = project;
 
   // Build a lookup: clipId → incoming transition (where this clip is toClipId)
   const incomingTransitions: Record<string, ClipTransition> = {};
@@ -54,7 +59,7 @@ export const DynamicTimeline: React.FC<DynamicTimelineProps> = ({ project }) => 
 
         return (
           <AbsoluteFill key={track.id} style={{ zIndex: trackIndex }}>
-            {track.clips.map((clipId) => {
+            {track.clips.map((clipId, clipIndex) => {
               const clip = clips[clipId];
               if (!clip) return null;
 
@@ -62,11 +67,27 @@ export const DynamicTimeline: React.FC<DynamicTimelineProps> = ({ project }) => 
               const incoming = incomingTransitions[clipId];
               const outgoing = outgoingTransitions[clipId];
 
+              // Adjust sequence timing for transitions
+              // If there's an incoming transition, start earlier to overlap with previous clip
+              let seqFrom = clip.startFrame;
+              let seqDuration = clip.durationFrames;
+
+              if (incoming) {
+                // Start earlier by transition duration to overlap
+                seqFrom = Math.max(0, clip.startFrame - incoming.durationFrames);
+                seqDuration += incoming.durationFrames;
+              }
+
+              if (outgoing) {
+                // Extend duration to overlap with next clip
+                seqDuration += outgoing.durationFrames;
+              }
+
               return (
                 <Sequence
                   key={clip.id}
-                  from={clip.startFrame}
-                  durationInFrames={clip.durationFrames}
+                  from={seqFrom}
+                  durationInFrames={seqDuration}
                 >
                   <ClipRenderer
                     clip={clip}
@@ -76,6 +97,10 @@ export const DynamicTimeline: React.FC<DynamicTimelineProps> = ({ project }) => 
                     incomingTransition={incoming}
                     outgoingTransition={outgoing}
                     allClips={clips}
+                    isPlaying={isPlaying}
+                    originalStartFrame={clip.startFrame}
+                    originalDuration={clip.durationFrames}
+                    sequenceOffset={clip.startFrame - seqFrom}
                   />
                 </Sequence>
               );
@@ -99,6 +124,10 @@ interface ClipRendererProps {
   incomingTransition?: ClipTransition;
   outgoingTransition?: ClipTransition;
   allClips: Record<string, TimelineClip>;
+  isPlaying?: boolean;
+  originalStartFrame?: number;
+  originalDuration?: number;
+  sequenceOffset?: number; // How much earlier the sequence started for incoming transition
 }
 
 const ClipRenderer: React.FC<ClipRendererProps> = ({
@@ -109,23 +138,31 @@ const ClipRenderer: React.FC<ClipRendererProps> = ({
   incomingTransition,
   outgoingTransition,
   allClips,
+  isPlaying = false,
+  originalStartFrame,
+  originalDuration,
+  sequenceOffset = 0,
 }) => {
   const frame = useCurrentFrame();
   const { durationInFrames, fps } = useVideoConfig();
 
-  // Calculate fade in/out
+  // Adjust frame for sequence offset (when sequence started earlier for incoming transition)
+  const adjustedFrame = frame - sequenceOffset;
+  const clipDuration = originalDuration || clip.durationFrames;
+
+  // Calculate fade in/out based on clip's actual frames
   const fadeInFrames = clip.fadeIn || 0;
   const fadeOutFrames = clip.fadeOut || 0;
 
   const fadeIn = fadeInFrames > 0
-    ? interpolate(frame, [0, fadeInFrames], [0, 1], { extrapolateRight: 'clamp' })
+    ? interpolate(adjustedFrame, [0, fadeInFrames], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' })
     : 1;
 
   const fadeOut = fadeOutFrames > 0
-    ? interpolate(frame, [durationInFrames - fadeOutFrames, durationInFrames], [1, 0], { extrapolateLeft: 'clamp' })
+    ? interpolate(adjustedFrame, [clipDuration - fadeOutFrames, clipDuration], [1, 0], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' })
     : 1;
 
-  let opacity = fadeIn * fadeOut;
+  let opacity = Math.max(0, Math.min(1, fadeIn * fadeOut));
 
   // Apply transition effects
   let transitionTransform = '';
@@ -133,12 +170,13 @@ const ClipRenderer: React.FC<ClipRendererProps> = ({
   let transitionFilter = '';
 
   // Incoming transition (this clip is "to" — it appears)
-  if (incomingTransition) {
+  // The transition happens during the sequenceOffset period (before clip's original start)
+  if (incomingTransition && sequenceOffset > 0) {
     const transDur = incomingTransition.durationFrames;
-    // The transition happens at the start of this clip
     if (frame < transDur) {
       const progress = interpolate(frame, [0, transDur], [0, 1], { extrapolateRight: 'clamp' });
-      const result = getTransitionStyle(incomingTransition.type, progress, 'in');
+      const easedProgress = easeInOutCubic(progress);
+      const result = getTransitionStyle(incomingTransition.type, easedProgress, 'in');
       opacity *= result.opacity;
       transitionTransform = result.transform;
       transitionClipPath = result.clipPath;
@@ -147,17 +185,29 @@ const ClipRenderer: React.FC<ClipRendererProps> = ({
   }
 
   // Outgoing transition (this clip is "from" — it disappears)
+  // The transition happens at the end of the clip's original duration
   if (outgoingTransition) {
     const transDur = outgoingTransition.durationFrames;
-    // The transition happens at the end of this clip
-    const transStart = durationInFrames - transDur;
-    if (frame >= transStart) {
-      const progress = interpolate(frame, [transStart, durationInFrames], [0, 1], { extrapolateRight: 'clamp' });
-      const result = getTransitionStyle(outgoingTransition.type, progress, 'out');
+    const transStart = sequenceOffset + clipDuration; // Start at end of original clip content
+    const transEnd = transStart + transDur;
+    if (frame >= transStart && frame < transEnd) {
+      const progress = interpolate(frame, [transStart, transEnd], [0, 1], { extrapolateRight: 'clamp' });
+      const easedProgress = easeInOutCubic(progress);
+      const result = getTransitionStyle(outgoingTransition.type, easedProgress, 'out');
       opacity *= result.opacity;
       transitionTransform = result.transform;
       transitionClipPath = result.clipPath;
       transitionFilter = result.filter;
+    }
+  }
+
+  // Hide clip outside its actual content range (but keep visible during transitions)
+  if (adjustedFrame < 0 || adjustedFrame >= clipDuration) {
+    // Only render during transition periods
+    const inTransitionPeriod = incomingTransition && frame < incomingTransition.durationFrames;
+    const outTransitionPeriod = outgoingTransition && frame >= (sequenceOffset + clipDuration);
+    if (!inTransitionPeriod && !outTransitionPeriod) {
+      return null;
     }
   }
 
@@ -171,7 +221,7 @@ const ClipRenderer: React.FC<ClipRendererProps> = ({
       return (
         <EffectWrapper effects={clip.effects}>
           <div style={{ ...transitionStyle, width: '100%', height: '100%' }}>
-            <VisualClip clip={clip} asset={asset} opacity={opacity} />
+            <VisualClip clip={clip} asset={asset} opacity={opacity} isPlaying={isPlaying} />
           </div>
         </EffectWrapper>
       );
@@ -199,6 +249,18 @@ const ClipRenderer: React.FC<ClipRendererProps> = ({
 };
 
 // ============================================
+// EASING FUNCTIONS
+// ============================================
+
+function easeInOutCubic(t: number): number {
+  return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+}
+
+function easeOutQuart(t: number): number {
+  return 1 - Math.pow(1 - t, 4);
+}
+
+// ============================================
 // TRANSITION STYLE CALCULATOR
 // ============================================
 
@@ -222,8 +284,13 @@ function getTransitionStyle(
 
   switch (type) {
     case 'fade':
-    case 'dissolve':
       result.opacity = p;
+      break;
+
+    case 'dissolve':
+      // Dissolve with slight blur
+      result.opacity = p;
+      result.filter = `blur(${(1 - p) * 3}px)`;
       break;
 
     case 'slide-left':
@@ -301,6 +368,83 @@ const HtmlAudio: React.FC<{ src: string; volume: number; startFrom: number }> = 
 };
 
 // ============================================
+// HTML VIDEO - synced with Remotion frame
+// ============================================
+
+interface HtmlVideoProps {
+  src: string;
+  style?: React.CSSProperties;
+  trimStartFrame?: number;
+  volume?: number; // 0-1
+  muted?: boolean;
+  isPlaying?: boolean;
+}
+
+const HtmlVideo: React.FC<HtmlVideoProps> = ({
+  src,
+  style,
+  trimStartFrame = 0,
+  volume = 1,
+  muted = false,
+  isPlaying = false,
+}) => {
+  const videoRef = React.useRef<HTMLVideoElement>(null);
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+
+  // Calculate target time based on current frame
+  const targetTime = (frame + trimStartFrame) / fps;
+
+  // Set volume
+  React.useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    video.volume = Math.max(0, Math.min(1, volume));
+  }, [volume]);
+
+  // Sync video playback with isPlaying state
+  React.useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    if (isPlaying) {
+      // Sync time and play
+      const drift = Math.abs(video.currentTime - targetTime);
+      if (drift > 0.15) {
+        video.currentTime = targetTime;
+      }
+      if (video.paused) {
+        video.play().catch(() => {});
+      }
+    } else {
+      // Pause and seek to exact frame
+      if (!video.paused) {
+        video.pause();
+      }
+      const drift = Math.abs(video.currentTime - targetTime);
+      if (drift > 0.03) {
+        video.currentTime = targetTime;
+      }
+    }
+  }, [isPlaying, frame, targetTime]);
+
+  return (
+    <video
+      ref={videoRef}
+      src={src}
+      muted={muted}
+      playsInline
+      style={{
+        width: '100%',
+        height: '100%',
+        objectFit: 'cover',
+        ...style,
+      }}
+    />
+  );
+};
+
+// ============================================
 // VISUAL CLIP (Images/Videos) - uses plain HTML
 // ============================================
 
@@ -308,9 +452,10 @@ interface VisualClipProps {
   clip: TimelineClip;
   asset: EditorAsset | null;
   opacity: number;
+  isPlaying?: boolean;
 }
 
-const VisualClip: React.FC<VisualClipProps> = ({ clip, asset, opacity }) => {
+const VisualClip: React.FC<VisualClipProps> = ({ clip, asset, opacity, isPlaying = false }) => {
   if (!asset?.url) return null;
 
   const frame = useCurrentFrame();
@@ -320,24 +465,26 @@ const VisualClip: React.FC<VisualClipProps> = ({ clip, asset, opacity }) => {
     // Ken Burns effect for images
     if (clip.kenBurns) {
       const progress = frame / Math.max(1, durationInFrames);
+      // Apply easing for smoother Ken Burns
+      const easedProgress = easeOutQuart(progress);
       const intensity = clip.kenBurns.intensity || 0.1;
       let transform = '';
 
       switch (clip.kenBurns.direction) {
         case 'zoom-in':
-          const scaleIn = 1 + progress * intensity;
+          const scaleIn = 1 + easedProgress * intensity;
           transform = `scale(${scaleIn})`;
           break;
         case 'zoom-out':
-          const scaleOut = 1 + intensity - progress * intensity;
+          const scaleOut = 1 + intensity - easedProgress * intensity;
           transform = `scale(${scaleOut})`;
           break;
         case 'pan-left':
-          const panL = progress * intensity * 100;
+          const panL = easedProgress * intensity * 100;
           transform = `scale(1.1) translateX(${panL}%)`;
           break;
         case 'pan-right':
-          const panR = -progress * intensity * 100;
+          const panR = -easedProgress * intensity * 100;
           transform = `scale(1.1) translateX(${panR}%)`;
           break;
       }
@@ -376,17 +523,16 @@ const VisualClip: React.FC<VisualClipProps> = ({ clip, asset, opacity }) => {
   }
 
   if (asset.type === 'video') {
+    // Get volume from clip (default 100%), convert to 0-1 range
+    const clipVolume = (clip.volume ?? 100) / 100;
     return (
       <AbsoluteFill style={{ opacity }}>
-        <video
+        <HtmlVideo
           src={asset.url}
-          muted
-          playsInline
-          style={{
-            width: '100%',
-            height: '100%',
-            objectFit: 'cover',
-          }}
+          trimStartFrame={clip.trimStartFrame}
+          volume={clipVolume * opacity}
+          muted={clipVolume === 0}
+          isPlaying={isPlaying}
         />
       </AbsoluteFill>
     );
@@ -396,7 +542,7 @@ const VisualClip: React.FC<VisualClipProps> = ({ clip, asset, opacity }) => {
 };
 
 // ============================================
-// TEXT CLIP
+// TEXT CLIP - with improved typewriter animation
 // ============================================
 
 interface TextClipProps {
@@ -406,7 +552,7 @@ interface TextClipProps {
 
 const TextClip: React.FC<TextClipProps> = ({ clip, opacity }) => {
   const frame = useCurrentFrame();
-  const { fps } = useVideoConfig();
+  const { fps, durationInFrames } = useVideoConfig();
   const content = clip.textContent;
 
   if (!content) return null;
@@ -417,6 +563,7 @@ const TextClip: React.FC<TextClipProps> = ({ clip, opacity }) => {
 
   let transform = '';
   let animOpacity = 1;
+  let displayText = content.text;
 
   const progress = spring({
     frame: adjustedFrame,
@@ -441,6 +588,13 @@ const TextClip: React.FC<TextClipProps> = ({ clip, opacity }) => {
       animOpacity = progress;
       break;
     case 'typewriter':
+      // Typewriter effect using string slicing (best practice)
+      const charFrames = 2; // Frames per character
+      const typedChars = Math.min(
+        content.text.length,
+        Math.floor(adjustedFrame / charFrames)
+      );
+      displayText = content.text.slice(0, typedChars);
       animOpacity = 1;
       break;
     default:
@@ -503,9 +657,31 @@ const TextClip: React.FC<TextClipProps> = ({ clip, opacity }) => {
           textShadow: !content.backgroundColor ? '0 4px 12px rgba(0,0,0,0.5)' : undefined,
         }}
       >
-        {content.text}
+        {displayText}
+        {/* Blinking cursor for typewriter */}
+        {content.animation === 'typewriter' && displayText.length < content.text.length && (
+          <TypewriterCursor frame={adjustedFrame} />
+        )}
       </span>
     </div>
+  );
+};
+
+// ============================================
+// TYPEWRITER CURSOR
+// ============================================
+
+const TypewriterCursor: React.FC<{ frame: number }> = ({ frame }) => {
+  const blinkFrames = 16;
+  const cursorOpacity = interpolate(
+    frame % blinkFrames,
+    [0, blinkFrames / 2, blinkFrames],
+    [1, 0, 1],
+    { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' }
+  );
+
+  return (
+    <span style={{ opacity: cursorOpacity, marginLeft: 2 }}>|</span>
   );
 };
 
@@ -519,6 +695,9 @@ interface EffectWrapperProps {
 }
 
 const EffectWrapper: React.FC<EffectWrapperProps> = ({ effects, children }) => {
+  const frame = useCurrentFrame();
+  const { durationInFrames } = useVideoConfig();
+
   if (!effects || effects.length === 0) {
     return <>{children}</>;
   }
@@ -547,6 +726,8 @@ const EffectWrapper: React.FC<EffectWrapperProps> = ({ effects, children }) => {
 
   // Check for overlay effects
   const vignetteEffect = effects.find(e => e.type === 'vignette');
+  const lightLeakEffect = effects.find(e => e.type === 'light-leak');
+  const glitchEffect = effects.find(e => e.type === 'glitch');
 
   return (
     <AbsoluteFill style={{ filter: filters || undefined }}>
@@ -562,47 +743,33 @@ const EffectWrapper: React.FC<EffectWrapperProps> = ({ effects, children }) => {
         />
       )}
 
-      {/* Light leak overlay */}
-      {effects.some(e => e.type === 'light-leak') && (
-        <LightLeakOverlay
-          intensity={effects.find(e => e.type === 'light-leak')?.intensity || 50}
-        />
+      {/* Official Remotion Light Leak */}
+      {lightLeakEffect && (
+        <AbsoluteFill style={{ pointerEvents: 'none', mixBlendMode: 'screen' }}>
+          <LightLeak
+            durationInFrames={durationInFrames}
+            seed={Math.floor(lightLeakEffect.intensity / 10)}
+            hueShift={lightLeakEffect.intensity * 3.6}
+          />
+        </AbsoluteFill>
       )}
 
       {/* Glitch effect */}
-      {effects.some(e => e.type === 'glitch') && (
-        <GlitchOverlay
-          intensity={effects.find(e => e.type === 'glitch')?.intensity || 50}
-        />
+      {glitchEffect && (
+        <GlitchOverlay intensity={glitchEffect.intensity} />
       )}
     </AbsoluteFill>
   );
 };
 
 // ============================================
-// OVERLAY EFFECTS
+// GLITCH OVERLAY
 // ============================================
-
-const LightLeakOverlay: React.FC<{ intensity: number }> = ({ intensity }) => {
-  const frame = useCurrentFrame();
-  const opacity = (intensity / 100) * 0.4;
-
-  const x = interpolate(frame % 60, [0, 60], [-20, 120]);
-
-  return (
-    <AbsoluteFill
-      style={{
-        background: `linear-gradient(${45 + frame}deg, transparent ${x - 30}%, rgba(255, 200, 100, ${opacity}) ${x}%, transparent ${x + 30}%)`,
-        pointerEvents: 'none',
-        mixBlendMode: 'screen',
-      }}
-    />
-  );
-};
 
 const GlitchOverlay: React.FC<{ intensity: number }> = ({ intensity }) => {
   const frame = useCurrentFrame();
 
+  // Only show glitch on certain frames for effect
   if (frame % 7 !== 0 && frame % 13 !== 0) return null;
 
   const offset = (intensity / 100) * 10;

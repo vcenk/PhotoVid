@@ -9,6 +9,7 @@
 // - kling-video: https://fal.ai/models/fal-ai/kling-video/v1.5/pro/image-to-video
 // - flux-pro/v1/fill: https://fal.ai/models/fal-ai/flux-pro/v1/fill/api
 // - flux-pro/kontext: https://fal.ai/models/fal-ai/flux-pro/kontext/api
+// - recraft-v3: https://fal.ai/models/fal-ai/recraft-v3/api (best text rendering)
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
@@ -65,7 +66,11 @@ const TOOL_MODEL_MAP: Record<string, string> = {
   // General tools
   'text-to-image': 'fal-ai/flux/dev',
   'image-to-video': 'fal-ai/kling-video/v1.5/pro/image-to-video',
-  'lipsync': 'fal-ai/sync-lipsync/v2',
+  // Marketing tools
+  'social-media-poster': 'fal-ai/recraft-v3',
+  'social-media-poster-overlay': 'fal-ai/ideogram/v2/remix', // Ideogram remix for text on images (no mask needed)
+  // Property Reveal Videos (Veo 3.1)
+  'property-reveal': 'fal-ai/veo3/image-to-video',
 };
 
 interface GenerationRequest {
@@ -361,13 +366,69 @@ serve(async (req) => {
         falInput.seed = options.seed
       }
     }
-    else if (model.includes('lipsync')) {
-      // Sync Lipsync - https://fal.ai/models/fal-ai/sync-lipsync/v2
-      // Parameters: video_url, audio_url
+    else if (model.includes('ideogram') && model.includes('remix')) {
+      // Ideogram V2 Remix - https://fal.ai/models/fal-ai/ideogram/v2/remix
+      // Remix/modify existing images with excellent text rendering (no mask required)
+      // Parameters: image_url, prompt, image_weight (0-1), magic_prompt_option, style_type
+      if (!imageUrl) {
+        return new Response(
+          JSON.stringify({ error: 'imageUrl is required for Ideogram remix' }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        )
+      }
       falInput = {
-        video_url: options.video_url || imageUrl,
-        audio_url: options.audio_url,
-        ...options,
+        image_url: imageUrl,
+        prompt: prompt || options.prompt || '',
+        image_weight: options.image_weight ?? 80, // Higher = preserve more of original (0-100)
+        magic_prompt_option: options.magic_prompt_option || 'AUTO', // AUTO, ON, OFF
+        style_type: options.style_type || 'DESIGN', // AUTO, GENERAL, REALISTIC, DESIGN, RENDER_3D, ANIME
+      }
+    }
+    else if (model.includes('veo3')) {
+      // Google Veo 3.1 - https://fal.ai/models/fal-ai/veo3/image-to-video
+      // High-quality image-to-video with optional audio generation
+      // Parameters: image_url, prompt, duration, generate_audio, aspect_ratio
+      if (!imageUrl) {
+        return new Response(
+          JSON.stringify({ error: 'imageUrl is required for Veo video generation' }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        )
+      }
+      falInput = {
+        image_url: imageUrl,
+        prompt: prompt || options.prompt || '',
+        duration: options.duration || 8, // 8 or 10 seconds
+        generate_audio: options.generate_audio ?? false,
+        aspect_ratio: options.aspect_ratio || '16:9',
+      }
+    }
+    else if (model.includes('recraft')) {
+      // Recraft V3 - https://fal.ai/models/fal-ai/recraft-v3/api
+      // Best-in-class text rendering for marketing posters
+      // Parameters: prompt, style, size, colors (as RGB objects)
+      falInput = {
+        prompt: prompt || options.prompt || '',
+        style: options.style || 'realistic_image', // realistic_image, digital_illustration, vector_illustration
+        size: options.size || 'square_hd', // square_hd, portrait_4_3, portrait_16_9, landscape_4_3, landscape_16_9
+      }
+      // Add colors if provided - convert hex strings to RGB objects
+      // Recraft expects: [{ "rgb": [r, g, b] }, ...]
+      if (options.colors && Array.isArray(options.colors) && options.colors.length > 0) {
+        falInput.colors = options.colors.map((color: string) => {
+          // Convert hex to RGB
+          const hex = color.replace('#', '')
+          const r = parseInt(hex.substring(0, 2), 16)
+          const g = parseInt(hex.substring(2, 4), 16)
+          const b = parseInt(hex.substring(4, 6), 16)
+          return { rgb: [r, g, b] }
+        })
+      }
+      // Image-to-image mode - uses uploaded image as style reference
+      // Note: Recraft is a generative model, not a compositing tool
+      // strength 0.5-0.7 works best for using image as inspiration
+      if (imageUrl || options.image_url) {
+        falInput.image_url = imageUrl || options.image_url
+        falInput.strength = options.strength ?? 0.55
       }
     }
 

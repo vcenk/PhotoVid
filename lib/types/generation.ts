@@ -44,7 +44,9 @@ export type RealEstateToolType =
   | 'room-tour'
   // Advanced
   | 'floor-plan'
-  | '360-staging';
+  | '360-staging'
+  // Marketing
+  | 'social-media-poster';
 
 // Auto dealership tool identifiers
 export type AutoToolType =
@@ -117,6 +119,9 @@ export const TOOL_MODEL_MAP: Record<ToolType, string> = {
   'floor-plan': 'fal-ai/flux/dev',
   '360-staging': 'fal-ai/flux/dev/image-to-image',
 
+  // Marketing Tools
+  'social-media-poster': 'fal-ai/recraft-v3',
+
   // ============ AUTO DEALERSHIP TOOLS ============
   // Photo Enhancement
   'background-swap': 'fal-ai/flux-pro/v1/fill',
@@ -183,6 +188,9 @@ export const TOOL_CREDITS_MAP: Record<ToolType, number> = {
   // Advanced
   'floor-plan': 5,
   '360-staging': 5,
+
+  // Marketing
+  'social-media-poster': 1, // Standard: 1 credit, Vector: 2 credits
 
   // ============ AUTO DEALERSHIP ============
   // Photo Enhancement
@@ -258,6 +266,9 @@ export const TOOL_INFO: ToolInfo[] = [
   // Advanced
   { id: 'floor-plan', name: 'Floor Plan Generator', description: 'Create 2D floor plans from photos', category: 'advanced', isPremium: true },
   { id: '360-staging', name: '360° Virtual Staging', description: 'Stage panoramic VR photos', category: 'advanced', isPremium: true, isNew: true },
+
+  // Marketing
+  { id: 'social-media-poster', name: 'Social Media Poster', description: 'Generate professional marketing posters for all platforms', category: 'utility', isNew: true },
 
   // ============ AUTO DEALERSHIP TOOLS ============
   // Photo Enhancement
@@ -518,6 +529,89 @@ export interface Staging360Options {
   roomType: 'living-room' | 'bedroom' | 'kitchen' | 'bathroom';
 }
 
+// Social Media Poster Types
+export type SocialMediaPlatform =
+  | 'instagram-square'
+  | 'instagram-portrait'
+  | 'instagram-story'
+  | 'facebook-post'
+  | 'facebook-story'
+  | 'linkedin-post'
+  | 'pinterest-pin'
+  | 'youtube-thumbnail';
+
+export type RecraftImageSize =
+  | 'square_hd'
+  | 'square'
+  | 'portrait_4_3'
+  | 'portrait_16_9'
+  | 'landscape_4_3'
+  | 'landscape_16_9';
+
+export type PosterType =
+  | 'just-listed'
+  | 'open-house'
+  | 'price-reduced'
+  | 'sold'
+  | 'coming-soon'
+  | 'new-listing'
+  | 'featured'
+  | 'luxury'
+  | 'investment'
+  | 'custom';
+
+export type DesignStyle =
+  | 'modern-minimal'
+  | 'luxury-elegant'
+  | 'bold-colorful'
+  | 'clean-professional'
+  | 'vector-flat';
+
+export type RecraftStyle =
+  | 'realistic_image'
+  | 'digital_illustration'
+  | 'vector_illustration';
+
+export type ColorTheme =
+  | 'classic-black'
+  | 'navy-gold'
+  | 'modern-blue'
+  | 'elegant-green'
+  | 'warm-red'
+  | 'purple-luxury'
+  | 'sunset-orange'
+  | 'custom';
+
+export type PropertyType =
+  | 'house'
+  | 'condo'
+  | 'apartment'
+  | 'townhouse'
+  | 'land'
+  | 'commercial';
+
+export interface SocialMediaPosterOptions {
+  platform: SocialMediaPlatform;
+  posterType: PosterType;
+  designStyle: DesignStyle;
+  colorTheme: ColorTheme;
+  customColors?: string[];
+
+  // Content
+  headline: string;
+  subtext?: string;
+  price?: string;
+  address?: string;
+  propertyType?: PropertyType;
+
+  // Branding
+  agentName?: string;
+  brokerageName?: string;
+
+  // Optional: Use property image as reference
+  propertyImageUrl?: string;
+}
+
 // ============ AUTO DEALERSHIP TOOL OPTIONS ============
 
 export interface BackgroundSwapOptions {
@@ -654,6 +748,7 @@ export type ToolOptions =
   | RoomTourOptions
   | FloorPlanOptions
   | Staging360Options
+  | SocialMediaPosterOptions
   // Auto Dealership Tools
   | BackgroundSwapOptions
   | AutoEnhanceOptions

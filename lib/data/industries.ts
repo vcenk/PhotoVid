@@ -143,6 +143,17 @@ export const INDUSTRY_CONFIGS: Record<string, IndustryConfig> = {
         tools: [
             // Video Tools
             {
+                id: 'quick-video',
+                name: 'Quick Property Video',
+                description: 'Create professional listing videos in minutes',
+                icon: Video,
+                gradient: 'from-violet-500 to-fuchsia-600',
+                image: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=600&h=400&fit=crop',
+                isFeatured: true,
+                tags: ['New', 'Video'],
+                route: '/studio/real-estate/quick-video',
+            },
+            {
                 id: 'room-tour',
                 name: 'Room Tour Video',
                 description: 'Turn photos into smooth walkthrough videos',
@@ -274,6 +285,17 @@ export const INDUSTRY_CONFIGS: Record<string, IndustryConfig> = {
                 gradient: 'from-green-500 to-emerald-600',
                 image: 'https://images.unsplash.com/photo-1558036117-15d82a90b9b1?w=600&h=400&fit=crop',
                 route: '/studio/real-estate/lawn-enhancement',
+            },
+            // Marketing
+            {
+                id: 'social-media-poster',
+                name: 'Social Media Poster',
+                description: 'Generate professional marketing posters for all platforms',
+                icon: Share2,
+                gradient: 'from-pink-500 to-rose-600',
+                image: 'https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?w=600&h=400&fit=crop',
+                tags: ['New', 'Marketing'],
+                route: '/studio/real-estate/social-media-poster',
             },
         ],
         workflows: [

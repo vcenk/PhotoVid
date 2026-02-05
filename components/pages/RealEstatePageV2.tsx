@@ -28,6 +28,7 @@ import {
   Waves,
   Layers,
   Wand2,
+  Share2,
 } from 'lucide-react';
 import { NavigationRail } from '../dashboard/navigation/NavigationRail';
 
@@ -44,6 +45,7 @@ interface Tool {
   isNew?: boolean;
   beforeImage: string;
   afterImage: string;
+  showcaseType?: 'slider' | 'single'; // 'single' shows just the after image (for posters, etc.)
 }
 
 // ============ DATA ============
@@ -248,6 +250,31 @@ const TOOLS: Tool[] = [
     beforeImage: '/showcase/real-estate/before/auto-declutter.jpg',
     afterImage: '/showcase/real-estate/after/auto-declutter.jpg',
   },
+  {
+    id: 'social-media-poster',
+    name: 'Social Media Poster',
+    description: 'Instant marketing posters with professional templates',
+    icon: Share2,
+    gradient: 'from-pink-500 to-rose-600',
+    route: '/studio/real-estate/social-media-poster',
+    credits: 0,
+    isNew: true,
+    beforeImage: '/showcase/real-estate/before/social-media-poster.jpg',
+    afterImage: '/showcase/real-estate/after/social-media-poster.jpg',
+  },
+  {
+    id: 'property-reveal',
+    name: 'Property Reveal',
+    description: 'Stunning transformation videos - staging reveals, renovation before/after',
+    icon: Play,
+    gradient: 'from-amber-500 to-orange-600',
+    route: '/studio/real-estate/property-reveal',
+    credits: 40,
+    isPremium: true,
+    isNew: true,
+    beforeImage: '/showcase/real-estate/before/property-reveal.jpg',
+    afterImage: '/showcase/real-estate/after/property-reveal.mp4',
+  },
 ];
 
 const STEPS = [
@@ -364,20 +391,37 @@ const ToolCard: React.FC<{ tool: Tool; index: number }> = ({ tool, index }) => {
       whileHover={{ y: -6 }}
       className="group relative bg-[#121212] rounded-2xl overflow-hidden border border-white/5 hover:border-violet-500/50 hover:shadow-2xl hover:shadow-violet-500/10 transition-all duration-300 flex flex-col h-full"
     >
-      {/* Before/After Preview - Click propagation stopped to allow slider usage */}
+      {/* Preview - Slider for before/after or Single image for posters */}
       <div className="relative aspect-[16/10] overflow-hidden bg-zinc-900" onClick={(e) => e.stopPropagation()}>
-        <BeforeAfterSlider
-          before={tool.beforeImage}
-          after={tool.afterImage}
-          className="w-full h-full"
-        />
-        
-        {/* Hover Overlay for clicking the whole card (except slider handle which captures events) */}
-        <div 
-          className="absolute inset-0 cursor-pointer"
-          onClick={() => navigate(tool.route)}
-          style={{ pointerEvents: 'none' }} // Let clicks pass through to slider, but we handle navigation via the bottom part
-        />
+        {tool.showcaseType === 'single' ? (
+          /* Single Image Showcase (for posters, etc.) */
+          <div
+            className="w-full h-full flex items-center justify-center bg-gradient-to-br from-zinc-800 to-zinc-900 cursor-pointer"
+            onClick={() => navigate(tool.route)}
+          >
+            <img
+              src={tool.afterImage}
+              alt={tool.name}
+              className="max-w-full max-h-full object-contain rounded-lg shadow-lg"
+            />
+          </div>
+        ) : (
+          /* Before/After Slider */
+          <>
+            <BeforeAfterSlider
+              before={tool.beforeImage}
+              after={tool.afterImage}
+              className="w-full h-full"
+            />
+
+            {/* Hover Overlay for clicking the whole card (except slider handle which captures events) */}
+            <div
+              className="absolute inset-0 cursor-pointer"
+              onClick={() => navigate(tool.route)}
+              style={{ pointerEvents: 'none' }} // Let clicks pass through to slider, but we handle navigation via the bottom part
+            />
+          </>
+        )}
       </div>
 
       {/* Content */}

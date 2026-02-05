@@ -24,7 +24,7 @@ interface TimelineProps {
   onSeek: (frame: number) => void;
 }
 
-const TRACK_HEIGHT = 36;
+const TRACK_HEIGHT = 48;
 
 export const Timeline: React.FC<TimelineProps> = ({ onSeek }) => {
   const timelineRef = useRef<HTMLDivElement>(null);
@@ -110,6 +110,7 @@ export const Timeline: React.FC<TimelineProps> = ({ onSeek }) => {
 
   const handleClipClick = useCallback((clipId: string, e: React.MouseEvent) => {
     e.stopPropagation();
+    console.log('[Timeline] Clip clicked:', clipId);
     selectClip(clipId);
   }, [selectClip]);
 
@@ -130,52 +131,71 @@ export const Timeline: React.FC<TimelineProps> = ({ onSeek }) => {
 
   const trackIcon = (type: TrackType) => {
     switch (type) {
-      case 'visual': return <Film size={12} className="text-blue-400" />;
-      case 'audio': return <Music size={12} className="text-green-400" />;
-      case 'text': return <Type size={12} className="text-purple-400" />;
+      case 'visual': return <Film size={14} className="text-blue-400" />;
+      case 'audio': return <Music size={14} className="text-green-400" />;
+      case 'text': return <Type size={14} className="text-purple-400" />;
     }
   };
 
   return (
-    <div className="flex-shrink-0 bg-[#0d0d0f] flex flex-col" style={{ height: `${24 + project.tracks.length * TRACK_HEIGHT + 28}px`, minHeight: '140px', maxHeight: '260px' }}>
+    <div className="flex-shrink-0 bg-zinc-950/80 backdrop-blur-xl flex flex-col relative z-20" style={{ height: `${28 + project.tracks.length * TRACK_HEIGHT + 32}px`, minHeight: '200px', maxHeight: '360px' }}>
       {/* + Track button */}
-      <div className="flex items-center gap-2 px-2 py-1 border-b border-white/5">
+      <div className="flex items-center gap-4 px-4 py-2 border-b border-white/5 bg-white/5 shadow-lg relative z-30">
         <button
           onClick={() => addTrack('visual')}
-          className="flex items-center gap-1 px-2 py-0.5 text-[11px] text-zinc-400 hover:text-white hover:bg-white/5 rounded transition-colors"
+          className="flex items-center gap-1.5 px-3 py-1 bg-white/5 hover:bg-white/10 text-[10px] font-black uppercase tracking-widest text-zinc-400 hover:text-white rounded-lg border border-white/5 transition-all"
         >
-          <Plus size={11} /> Track
+          <Plus size={12} /> New Track
         </button>
+        
+        <div className="flex-1" />
+        
+        <div className="flex items-center gap-2">
+             <div className="w-2 h-2 rounded-full bg-purple-500 animate-pulse" />
+             <span className="text-[10px] font-black text-purple-400 uppercase tracking-widest">Live Timeline</span>
+        </div>
       </div>
 
       {/* Timeline body */}
-      <div className="flex-1 flex overflow-hidden min-h-0">
+      <div className="flex-1 flex overflow-hidden min-h-0 relative">
         {/* Track Labels */}
-        <div className="w-[120px] flex-shrink-0 bg-[#0d0d0f] border-r border-white/5 overflow-y-auto">
-          <div className="h-5 border-b border-white/5" />
+        <div className="w-[140px] flex-shrink-0 bg-black/40 backdrop-blur-md border-r border-white/5 overflow-y-auto custom-scrollbar relative z-20">
+          <div className="h-6 border-b border-white/5 bg-black/20" />
           {project.tracks.map((track) => (
             <div
               key={track.id}
               onClick={() => selectTrack(track.id)}
-              className={`flex items-center gap-1.5 px-2 border-b border-white/5 cursor-pointer hover:bg-white/5 transition-colors ${
-                project.selectedTrackId === track.id ? 'bg-white/10' : ''
+              className={`flex items-center gap-2 px-3 border-b border-white/5 cursor-pointer transition-all duration-300 relative group ${
+                project.selectedTrackId === track.id ? 'bg-purple-600/20 shadow-inner' : 'hover:bg-white/5'
               }`}
               style={{ height: TRACK_HEIGHT }}
             >
-              {trackIcon(track.type)}
-              <span className="text-[11px] text-zinc-400 flex-1 truncate">{track.name}</span>
-              <button
-                onClick={(e) => { e.stopPropagation(); toggleTrackMute(track.id); }}
-                className={`p-0.5 rounded hover:bg-white/10 ${track.muted ? 'text-red-400' : 'text-zinc-600'}`}
-              >
-                {track.muted ? <VolumeX size={10} /> : <Volume2 size={10} />}
-              </button>
-              <button
-                onClick={(e) => { e.stopPropagation(); toggleTrackVisibility(track.id); }}
-                className={`p-0.5 rounded hover:bg-white/10 ${!track.visible ? 'text-red-400' : 'text-zinc-600'}`}
-              >
-                {track.visible ? <Eye size={10} /> : <EyeOff size={10} />}
-              </button>
+              {project.selectedTrackId === track.id && (
+                 <div className="absolute left-0 top-0 bottom-0 w-1 bg-purple-500 shadow-[0_0_10px_rgba(168,85,247,0.5)]" />
+              )}
+              
+              <div className="p-2 bg-white/5 rounded-lg group-hover:bg-white/10 transition-colors">
+                {trackIcon(track.type)}
+              </div>
+              
+              <span className={`text-xs font-bold uppercase tracking-tight flex-1 truncate ${project.selectedTrackId === track.id ? 'text-white' : 'text-zinc-500'}`}>
+                {track.name}
+              </span>
+              
+              <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                <button
+                    onClick={(e) => { e.stopPropagation(); toggleTrackMute(track.id); }}
+                    className={`p-1.5 rounded-md hover:bg-black/40 transition-colors ${track.muted ? 'text-red-400' : 'text-zinc-600'}`}
+                >
+                    {track.muted ? <VolumeX size={14} /> : <Volume2 size={14} />}
+                </button>
+                <button
+                    onClick={(e) => { e.stopPropagation(); toggleTrackVisibility(track.id); }}
+                    className={`p-1.5 rounded-md hover:bg-black/40 transition-colors ${!track.visible ? 'text-red-400' : 'text-zinc-600'}`}
+                >
+                    {track.visible ? <Eye size={14} /> : <EyeOff size={14} />}
+                </button>
+              </div>
             </div>
           ))}
         </div>
@@ -183,81 +203,106 @@ export const Timeline: React.FC<TimelineProps> = ({ onSeek }) => {
         {/* Timeline Scrollable Area */}
         <div
           ref={timelineRef}
-          className="flex-1 overflow-x-auto overflow-y-auto relative"
+          className="flex-1 overflow-x-auto overflow-y-auto relative custom-scrollbar bg-black/20"
           onClick={handleTimelineClick}
           onMouseMove={handleMouseMove}
         >
-          <div style={{ width: totalWidth, minWidth: '100%' }} className="relative">
+          <div style={{ width: totalWidth, minWidth: '100%' }} className="relative min-h-full">
             {/* Time Ruler */}
-            <div className="h-5 border-b border-white/5 relative sticky top-0 bg-[#0d0d0f] z-20">
+            <div className="h-6 border-b border-white/5 relative sticky top-0 bg-zinc-950/90 backdrop-blur-md z-40">
               {markers.map((frame) => (
                 <div
                   key={frame}
                   className="absolute top-0 h-full flex flex-col justify-end"
                   style={{ left: frame * pixelsPerFrame }}
                 >
-                  <div className="w-px h-2 bg-zinc-700" />
-                  <span className="text-[8px] text-zinc-600 ml-0.5 leading-none">
-                    {formatTimeSimple(frame, project.fps)}
-                  </span>
+                  <div className={`w-px transition-colors ${frame % (project.fps * 5) === 0 ? 'h-3 bg-zinc-400' : 'h-1.5 bg-zinc-700'}`} />
+                  {frame % project.fps === 0 && (
+                    <span className="text-[9px] font-bold text-zinc-500 ml-1 mb-1 tracking-tighter">
+                        {formatTimeSimple(frame, project.fps)}
+                    </span>
+                  )}
                 </div>
               ))}
             </div>
 
-            {/* Track Rows */}
-            {project.tracks.map((track) => (
-              <div
-                key={track.id}
-                className="border-b border-white/5 relative"
-                style={{ height: TRACK_HEIGHT }}
-              >
-                {track.clips.map((clipId) => {
-                  const clip = project.clips[clipId];
-                  if (!clip) return null;
-                  const asset = clip.assetId ? project.assets[clip.assetId] : null;
+            {/* Grid Lines Background */}
+            <div className="absolute inset-0 pointer-events-none opacity-[0.03]"
+                 style={{ 
+                    backgroundImage: `linear-gradient(to right, white 1px, transparent 1px)`,
+                    backgroundSize: `${project.fps * pixelsPerFrame}px 100%`
+                 }} 
+            />
 
-                  return (
-                    <TimelineClipComponent
-                      key={clipId}
-                      clip={clip}
-                      asset={asset}
-                      trackType={track.type}
-                      pixelsPerFrame={pixelsPerFrame}
-                      isSelected={project.selectedClipId === clipId}
-                      isDragging={draggingClip?.id === clipId}
-                      onDragStart={handleClipDragStart}
-                      onClick={handleClipClick}
-                      onSnapLine={setSnapLineFrame}
-                    />
-                  );
-                })}
-              </div>
-            ))}
+            {/* Track Rows */}
+            <div className="relative z-10">
+                {project.tracks.map((track) => (
+                <div
+                    key={track.id}
+                    className="border-b border-white/5 relative transition-colors duration-300"
+                    style={{ height: TRACK_HEIGHT }}
+                >
+                    {track.clips.map((clipId) => {
+                    const clip = project.clips[clipId];
+                    if (!clip) return null;
+                    const asset = clip.assetId ? project.assets[clip.assetId] : null;
+
+                    return (
+                        <TimelineClipComponent
+                        key={clipId}
+                        clip={clip}
+                        asset={asset}
+                        trackType={track.type}
+                        pixelsPerFrame={pixelsPerFrame}
+                        isSelected={project.selectedClipId === clipId}
+                        isDragging={draggingClip?.id === clipId}
+                        onDragStart={handleClipDragStart}
+                        onClick={handleClipClick}
+                        onSnapLine={setSnapLineFrame}
+                        />
+                    );
+                    })}
+                </div>
+                ))}
+            </div>
 
             {/* Snap line */}
             {snapLineFrame !== null && (
               <div
-                className="absolute top-0 bottom-0 w-px bg-cyan-400 z-40 pointer-events-none"
+                className="absolute top-0 bottom-0 w-px bg-cyan-400/50 shadow-[0_0_8px_rgba(34,211,238,0.5)] z-40 pointer-events-none"
                 style={{ left: snapLineFrame * pixelsPerFrame }}
               />
             )}
 
             {/* Playhead */}
             <div
-              className="absolute top-0 bottom-0 z-30 cursor-ew-resize"
+              className="absolute top-0 bottom-0 z-50 cursor-ew-resize group"
               style={{ left: project.currentFrame * pixelsPerFrame - 5, width: 11 }}
               onMouseDown={() => setIsDraggingPlayhead(true)}
             >
-              <div className="relative w-full h-full">
-                <div className="absolute left-[5px] top-0 bottom-0 w-px bg-red-500" />
-                <div className="absolute left-1/2 -translate-x-1/2 top-0 w-2.5 h-3 bg-red-500 rounded-b-sm" />
+              <div className="relative w-full h-full flex flex-col items-center">
+                <div className="w-0.5 h-full bg-white shadow-[0_0_10px_rgba(255,255,255,0.3)] group-hover:bg-purple-400 group-hover:w-1 transition-all" />
+                <div className="absolute top-0 w-4 h-4 bg-white rounded-sm rotate-45 -translate-y-1/2 shadow-lg group-hover:bg-purple-400 transition-colors" />
+                <div className="absolute top-0 px-2 py-0.5 bg-white text-black text-[9px] font-black rounded-full -translate-y-[140%] opacity-0 group-hover:opacity-100 transition-opacity shadow-xl">
+                    {formatTimeSimple(project.currentFrame, project.fps)}
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="h-4 border-t border-white/5 bg-[#0a0a0b]" />
+      {/* Bottom Status Bar */}
+      <div className="h-6 flex items-center justify-between px-4 bg-zinc-950 text-[9px] font-black uppercase tracking-widest text-zinc-600 border-t border-white/5">
+         <div className="flex gap-4">
+            <span>FPS: {project.fps}</span>
+            <span>ZOOM: {Math.round(project.zoom * 100)}%</span>
+         </div>
+         <div className="flex gap-4">
+            <span>CLIPS: {Object.keys(project.clips).length}</span>
+            <span>TRACKS: {project.tracks.length}</span>
+         </div>
+      </div>
     </div>
   );
 };

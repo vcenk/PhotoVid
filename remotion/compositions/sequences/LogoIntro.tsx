@@ -10,7 +10,6 @@ import {
   useCurrentFrame,
   useVideoConfig,
   spring,
-  Img,
 } from 'remotion';
 import { MODERN_COLORS, MODERN_FONTS } from '../templates/ModernTemplate';
 
@@ -73,10 +72,11 @@ export const LogoIntro: React.FC<LogoIntroProps> = ({
           transform: `scale(${0.8 + scale * 0.2})`,
         }}
       >
-        {/* Logo */}
+        {/* Logo - using plain img for blob URL support */}
         {logoUrl ? (
-          <Img
+          <img
             src={logoUrl}
+            alt=""
             style={{
               width: 160,
               height: 160,

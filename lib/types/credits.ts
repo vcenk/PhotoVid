@@ -102,6 +102,16 @@ export const CREDIT_COSTS = {
   'storyboard-scene': 5,
   'text-to-video': 10,
 
+  // Property Reveal Videos (40-100 credits based on duration/audio)
+  'property-reveal-8s': 40,
+  'property-reveal-8s-audio': 80,
+  'property-reveal-10s': 50,
+  'property-reveal-10s-audio': 100,
+
+  // Real Estate - Marketing (1-2 credits)
+  'social-media-poster': 1,
+  'social-media-poster-vector': 2,
+
   // Auto Dealership - Basic (1 credit)
   'auto-enhance': 1,
   'license-blur': 1,
@@ -135,7 +145,7 @@ export const CREDIT_COSTS = {
   'text-to-image': 2,
   'image-to-image': 2,
   'image-to-video': 5,
-  'lipsync': 10,
+  'dubbing': 15,
   'storyboard-export': 5,
 } as const;
 

@@ -37,7 +37,11 @@ import {
 } from 'lucide-react';
 import { useVideoEditor } from '../VideoEditorContext';
 import { TRANSITION_PRESETS, EFFECT_PRESETS, TEXT_PRESETS, createDefaultTextContent } from '@/lib/data/editor-presets';
-import type { TransitionType, EffectType, TrackType } from '@/lib/types/video-editor';
+import { MUSIC_LIBRARY, GENRE_COLORS, formatDuration as formatMusicDuration } from '@/lib/data/music-library';
+import { SFX_LIBRARY, CATEGORY_COLORS } from '@/lib/data/sfx-library';
+import type { TransitionType, EffectType, TrackType, EditorAsset } from '@/lib/types/video-editor';
+import type { MusicTrack } from '@/lib/data/music-library';
+import type { SoundEffect } from '@/lib/data/sfx-library';
 
 type TabId = 'media' | 'music' | 'sfx' | 'text' | 'transitions' | 'effects';
 
@@ -74,17 +78,15 @@ const GlassCard: React.FC<{
   <div
     onClick={disabled ? undefined : onClick}
     className={`
-      relative overflow-hidden rounded-xl
-      bg-white/[0.04] backdrop-blur-sm
-      border border-white/[0.08]
-      ${hover && !disabled ? 'hover:bg-white/[0.08] hover:border-purple-500/30 hover:shadow-lg hover:shadow-purple-500/5 cursor-pointer' : ''}
-      ${disabled ? 'opacity-40 cursor-not-allowed' : ''}
+      relative overflow-hidden rounded-2xl
+      bg-white/5 backdrop-blur-md
+      border border-white/5
+      ${hover && !disabled ? 'hover:bg-white/10 hover:border-purple-500/30 hover:shadow-xl hover:shadow-purple-900/10 cursor-pointer active:scale-[0.98]' : ''}
+      ${disabled ? 'opacity-30 cursor-not-allowed' : ''}
       transition-all duration-300
       ${className}
     `}
   >
-    {/* Glass highlight */}
-    <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
     {children}
   </div>
 );
@@ -97,36 +99,36 @@ export const AssetSidebar: React.FC = () => {
   const [activeTab, setActiveTab] = useState<TabId>('media');
 
   return (
-    <div className="w-[300px] flex-shrink-0 bg-[#0c0c0e]/80 backdrop-blur-xl border-r border-white/[0.06] flex flex-col">
+    <div className="w-[380px] flex-shrink-0 bg-zinc-950/40 backdrop-blur-2xl border-r border-white/5 flex flex-col relative z-20">
       {/* Tab Navigation */}
-      <div className="flex-shrink-0 border-b border-white/[0.06]">
-        <div className="flex px-1.5 py-1.5 gap-0.5 overflow-x-auto scrollbar-hide">
+      <div className="flex-shrink-0 p-3">
+        <div className="flex bg-black/40 rounded-2xl p-1.5 gap-1 overflow-x-auto scrollbar-hide border border-white/5 shadow-inner shadow-black/50">
           {TABS.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex flex-col items-center gap-1 px-2.5 py-2 rounded-lg transition-all flex-shrink-0 relative ${
+              className={`flex flex-col items-center justify-center gap-1.5 px-2 py-2.5 rounded-xl transition-all duration-300 flex-1 min-w-[50px] relative group ${
                 activeTab === tab.id
-                  ? 'text-purple-400'
-                  : 'text-zinc-500 hover:text-zinc-300 hover:bg-white/[0.04]'
+                  ? 'text-white'
+                  : 'text-zinc-500 hover:text-zinc-300'
               }`}
             >
               {activeTab === tab.id && (
                 <motion.div
-                  layoutId="activeTab"
-                  className="absolute inset-0 rounded-lg bg-purple-500/15 border border-purple-500/20"
-                  transition={{ type: 'spring', bounce: 0.15, duration: 0.4 }}
+                  layoutId="activeTabSidebar"
+                  className="absolute inset-0 rounded-xl bg-gradient-to-br from-purple-600 to-indigo-600 shadow-lg shadow-purple-900/30"
+                  transition={{ type: 'spring', bounce: 0.2, duration: 0.5 }}
                 />
               )}
-              <span className="relative z-10">{tab.icon}</span>
-              <span className="relative z-10 text-[9px] font-medium leading-none">{tab.label}</span>
+              <span className="relative z-10 transition-transform duration-300 group-hover:scale-110">{tab.icon}</span>
+              <span className="relative z-10 text-[9px] font-bold uppercase tracking-tighter leading-none">{tab.label}</span>
             </button>
           ))}
         </div>
       </div>
 
       {/* Tab Content */}
-      <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
+      <div className="flex-1 overflow-y-auto custom-scrollbar">
         <AnimatePresence mode="wait">
           {activeTab === 'media' && <MediaTab key="media" />}
           {activeTab === 'music' && <AudioTab key="music" type="music" />}
@@ -151,7 +153,8 @@ const MediaTab: React.FC = () => {
   const handleDrop = useCallback(async (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
-    const files = Array.from(e.dataTransfer.files).filter(
+    const allFiles: File[] = Array.from(e.dataTransfer.files);
+    const files = allFiles.filter(
       f => f.type.startsWith('image/') || f.type.startsWith('video/')
     );
     if (files.length > 0) {
@@ -160,14 +163,14 @@ const MediaTab: React.FC = () => {
   }, [addAssets]);
 
   const handleFileInput = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
+    const files = Array.from(e.target.files || []) as File[];
     if (files.length > 0) {
       await addAssets(files);
     }
     e.target.value = '';
   }, [addAssets]);
 
-  const mediaAssets = Object.values(project.assets).filter(
+  const mediaAssets = (Object.values(project.assets) as EditorAsset[]).filter(
     a => a.type === 'image' || a.type === 'video'
   );
 
@@ -196,80 +199,78 @@ const MediaTab: React.FC = () => {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -8 }}
-      transition={{ duration: 0.2 }}
-      className="p-3 space-y-3"
+      initial={{ opacity: 0, x: -10 }}
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0, x: -10 }}
+      transition={{ duration: 0.3 }}
+      className="p-4 space-y-6"
     >
       {/* Upload Zone */}
-      <GlassCard hover={false} className="!cursor-default">
-        <div
-          onDrop={handleDrop}
-          onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
-          onDragLeave={() => setIsDragging(false)}
-          className={`relative p-5 text-center transition-all cursor-pointer ${
-            isDragging ? 'bg-purple-500/10' : ''
-          }`}
-        >
-          <input
-            type="file"
-            accept="image/*,video/*"
-            multiple
-            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-            onChange={handleFileInput}
-          />
-          <div className={`w-10 h-10 mx-auto mb-2.5 rounded-full flex items-center justify-center transition-all ${
-            isDragging
-              ? 'bg-purple-500/20 border border-purple-500/40'
-              : 'bg-white/[0.06] border border-white/[0.08]'
-          }`}>
-            <Upload size={18} className={isDragging ? 'text-purple-400' : 'text-zinc-400'} />
-          </div>
-          <p className="text-sm font-medium text-zinc-300">Drop images or videos</p>
-          <p className="text-[11px] text-zinc-500 mt-1">or click to browse</p>
+      <div
+        onDrop={handleDrop}
+        onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
+        onDragLeave={() => setIsDragging(false)}
+        className={`relative p-8 text-center rounded-2xl border-2 border-dashed transition-all duration-300 group overflow-hidden ${
+          isDragging 
+            ? 'border-purple-500 bg-purple-600/10 scale-[1.02]' 
+            : 'border-white/10 bg-white/5 hover:border-white/20 hover:bg-white/10'
+        }`}
+      >
+        <input
+          type="file"
+          accept="image/*,video/*"
+          multiple
+          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+          onChange={handleFileInput}
+        />
+        <div className={`w-12 h-12 mx-auto mb-3 rounded-2xl flex items-center justify-center transition-all duration-300 ${
+          isDragging
+            ? 'bg-purple-600 text-white shadow-lg shadow-purple-900/40'
+            : 'bg-white/5 text-zinc-400 group-hover:bg-purple-600/20 group-hover:text-purple-300'
+        }`}>
+          <Upload size={20} />
         </div>
-      </GlassCard>
+        <p className="text-sm font-semibold text-white">Upload Assets</p>
+        <p className="text-[10px] text-zinc-500 mt-1 uppercase tracking-widest font-bold">Images & Videos</p>
+        
+        <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:12px_12px]" />
+      </div>
 
       {/* Uploaded Assets */}
       {mediaAssets.length > 0 && (
-        <div>
-          <div className="flex items-center justify-between mb-2 px-0.5">
-            <span className="text-[11px] font-medium text-zinc-400 uppercase tracking-wider">Your Media</span>
-            <span className="text-[10px] text-zinc-600">{mediaAssets.length} items</span>
+        <div className="space-y-3">
+          <div className="flex items-center justify-between px-1">
+            <span className="text-[10px] font-black text-zinc-500 uppercase tracking-widest">Your Gallery</span>
+            <span className="text-[10px] font-bold bg-white/5 px-2 py-0.5 rounded-full text-zinc-400">{mediaAssets.length}</span>
           </div>
-          <div className="grid grid-cols-3 gap-1.5">
+          <div className="grid grid-cols-2 gap-3">
             {mediaAssets.map((asset) => (
-              <GlassCard key={asset.id} className="!rounded-lg" onClick={() => handleAddToTimeline(asset.id)}>
-                <div className="relative aspect-square group">
+              <GlassCard key={asset.id} onClick={() => handleAddToTimeline(asset.id)}>
+                <div className="relative aspect-video group overflow-hidden">
                   {asset.type === 'image' ? (
                     <img
                       src={asset.url}
                       alt={asset.name}
-                      className="w-full h-full object-cover rounded-lg"
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                     />
                   ) : (
-                    <div className="w-full h-full bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-lg flex items-center justify-center">
-                      <FileVideo size={20} className="text-blue-400" />
+                    <div className="w-full h-full bg-gradient-to-br from-blue-500/20 to-purple-500/20 flex items-center justify-center">
+                      <FileVideo size={24} className="text-blue-400" />
                     </div>
                   )}
                   {/* Hover overlay */}
-                  <div className="absolute inset-0 rounded-lg bg-black/0 group-hover:bg-black/40 transition-all flex items-center justify-center opacity-0 group-hover:opacity-100">
-                    <Plus size={20} className="text-white" />
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-purple-600/40 transition-all flex items-center justify-center opacity-0 group-hover:opacity-100">
+                    <div className="bg-white text-black p-1.5 rounded-full shadow-lg">
+                        <Plus size={18} />
+                    </div>
                   </div>
                   {/* Delete button */}
                   <button
                     onClick={(e) => { e.stopPropagation(); removeAsset(asset.id); }}
-                    className="absolute top-1 right-1 p-0.5 rounded-md bg-black/60 backdrop-blur-sm border border-white/10 opacity-0 group-hover:opacity-100 hover:bg-red-500/80 transition-all"
+                    className="absolute top-2 right-2 p-1.5 rounded-xl bg-black/60 backdrop-blur-md border border-white/10 opacity-0 group-hover:opacity-100 hover:bg-red-500 transition-all"
                   >
-                    <Trash2 size={10} className="text-white" />
+                    <Trash2 size={12} className="text-white" />
                   </button>
-                  {/* Video badge */}
-                  {asset.type === 'video' && (
-                    <div className="absolute bottom-1 left-1 px-1 py-0.5 rounded bg-black/60 backdrop-blur-sm border border-white/10">
-                      <Play size={8} className="text-white" />
-                    </div>
-                  )}
                 </div>
               </GlassCard>
             ))}
@@ -278,31 +279,30 @@ const MediaTab: React.FC = () => {
       )}
 
       {/* Stock Photos Section */}
-      <div>
-        <div className="flex items-center justify-between mb-2 px-0.5">
-          <span className="text-[11px] font-medium text-zinc-400 uppercase tracking-wider">Stock Photos</span>
-          <span className="text-[10px] text-purple-400/70">Real Estate</span>
+      <div className="space-y-3">
+        <div className="flex items-center justify-between px-1">
+          <span className="text-[10px] font-black text-zinc-500 uppercase tracking-widest">Quick Templates</span>
+          <span className="text-[10px] font-bold text-purple-400">Premium</span>
         </div>
-        <div className="grid grid-cols-3 gap-1.5">
+        <div className="grid grid-cols-2 gap-3">
           {STOCK_IMAGES.map((stock) => (
-            <GlassCard key={stock.id} className="!rounded-lg" onClick={() => handleAddStock(stock)}>
-              <div className="relative aspect-square group">
+            <GlassCard key={stock.id} onClick={() => handleAddStock(stock)}>
+              <div className="relative aspect-square group overflow-hidden">
                 <img
                   src={stock.thumb}
                   alt={stock.name}
-                  className="w-full h-full object-cover rounded-lg"
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                   loading="lazy"
                 />
-                {/* Glass overlay on hover */}
-                <div className="absolute inset-0 rounded-lg bg-black/0 group-hover:bg-black/40 transition-all flex items-center justify-center opacity-0 group-hover:opacity-100">
-                  <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/20">
-                    <Plus size={12} className="text-white" />
-                    <span className="text-[10px] text-white font-medium">Add</span>
-                  </div>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-60 group-hover:opacity-20 transition-opacity" />
+                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all">
+                    <div className="bg-white/20 backdrop-blur-md border border-white/30 px-3 py-1.5 rounded-full flex items-center gap-1.5">
+                        <Plus size={14} className="text-white" />
+                        <span className="text-[10px] font-bold text-white uppercase tracking-wider">Use</span>
+                    </div>
                 </div>
-                {/* Name label */}
-                <div className="absolute bottom-0 inset-x-0 p-1.5 bg-gradient-to-t from-black/80 to-transparent rounded-b-lg">
-                  <p className="text-[9px] text-white/80 truncate">{stock.name}</p>
+                <div className="absolute bottom-2 left-2 right-2">
+                  <p className="text-[9px] font-bold text-white/90 truncate uppercase tracking-tighter">{stock.name}</p>
                 </div>
               </div>
             </GlassCard>
@@ -314,31 +314,34 @@ const MediaTab: React.FC = () => {
 };
 
 // ============================================
-// AUDIO TAB (Music/SFX)
+// AUDIO TAB (Music/SFX) - with built-in library
 // ============================================
 
 const AudioTab: React.FC<{ type: 'music' | 'sfx' }> = ({ type }) => {
-  const { project, addAssets, removeAsset, addClip } = useVideoEditor();
+  const { project, addAssets, addAsset, removeAsset, addClip } = useVideoEditor();
   const [isDragging, setIsDragging] = useState(false);
+  const [loadingTrack, setLoadingTrack] = useState<string | null>(null);
+  const [selectedGenre, setSelectedGenre] = useState<string | null>(null);
 
   const handleDrop = useCallback(async (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
-    const files = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('audio/'));
+    const allFiles: File[] = Array.from(e.dataTransfer.files);
+    const files = allFiles.filter(f => f.type.startsWith('audio/'));
     if (files.length > 0) {
       await addAssets(files);
     }
   }, [addAssets]);
 
   const handleFileInput = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
+    const files = Array.from(e.target.files || []) as File[];
     if (files.length > 0) {
       await addAssets(files);
     }
     e.target.value = '';
   }, [addAssets]);
 
-  const audioAssets = Object.values(project.assets).filter(a => a.type === 'audio');
+  const audioAssets = (Object.values(project.assets) as EditorAsset[]).filter(a => a.type === 'audio');
 
   const handleAddToTimeline = useCallback((assetId: string) => {
     const trackName = type === 'music' ? 'Music' : 'SFX';
@@ -348,6 +351,27 @@ const AudioTab: React.FC<{ type: 'music' | 'sfx' }> = ({ type }) => {
     }
   }, [project.tracks, project.currentFrame, addClip, type]);
 
+  // Add library track to timeline
+  const handleAddLibraryTrack = useCallback(async (track: MusicTrack | SoundEffect) => {
+    setLoadingTrack(track.id);
+    try {
+      const response = await fetch(track.url);
+      const blob = await response.blob();
+      const file = new File([blob], `${track.name}.mp3`, { type: 'audio/mpeg' });
+      const asset = await addAsset(file);
+
+      const trackName = type === 'music' ? 'Music' : 'SFX';
+      const audioTrack = project.tracks.find(t => t.type === 'audio' && t.name === trackName);
+      if (audioTrack) {
+        addClip(asset.id, audioTrack.id, project.currentFrame);
+      }
+    } catch (err) {
+      console.error('Failed to load track:', err);
+    } finally {
+      setLoadingTrack(null);
+    }
+  }, [addAsset, addClip, project.tracks, project.currentFrame, type]);
+
   const formatDuration = (frames?: number) => {
     if (!frames) return '--:--';
     const seconds = Math.floor(frames / 30);
@@ -356,21 +380,32 @@ const AudioTab: React.FC<{ type: 'music' | 'sfx' }> = ({ type }) => {
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
+  // Get library items based on type
+  const library = type === 'music' ? MUSIC_LIBRARY : SFX_LIBRARY;
+  const genres = type === 'music'
+    ? ['upbeat', 'elegant', 'cinematic', 'corporate', 'ambient', 'inspiring']
+    : ['whoosh', 'impact', 'transition', 'ui', 'nature', 'notification'];
+  const colorMap = type === 'music' ? GENRE_COLORS : CATEGORY_COLORS;
+
+  const filteredLibrary = selectedGenre
+    ? library.filter((item: any) => (type === 'music' ? item.genre : item.category) === selectedGenre)
+    : library;
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -8 }}
       transition={{ duration: 0.2 }}
-      className="p-3 space-y-3"
+      className="p-3 space-y-4"
     >
-      {/* Upload Zone */}
+      {/* Upload Zone - Compact */}
       <GlassCard hover={false}>
         <div
           onDrop={handleDrop}
           onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
           onDragLeave={() => setIsDragging(false)}
-          className={`relative p-5 text-center transition-all cursor-pointer ${
+          className={`relative p-3 text-center transition-all cursor-pointer ${
             isDragging ? 'bg-purple-500/10' : ''
           }`}
         >
@@ -381,61 +416,129 @@ const AudioTab: React.FC<{ type: 'music' | 'sfx' }> = ({ type }) => {
             className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
             onChange={handleFileInput}
           />
-          <div className={`w-10 h-10 mx-auto mb-2.5 rounded-full flex items-center justify-center transition-all ${
-            isDragging
-              ? 'bg-purple-500/20 border border-purple-500/40'
-              : 'bg-white/[0.06] border border-white/[0.08]'
-          }`}>
-            {type === 'music'
-              ? <Music size={18} className={isDragging ? 'text-purple-400' : 'text-zinc-400'} />
-              : <Volume2 size={18} className={isDragging ? 'text-purple-400' : 'text-zinc-400'} />
-            }
+          <div className="flex items-center justify-center gap-3">
+            <div className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all ${
+              isDragging ? 'bg-purple-500/20' : 'bg-white/[0.06]'
+            }`}>
+              <Upload size={14} className={isDragging ? 'text-purple-400' : 'text-zinc-400'} />
+            </div>
+            <div className="text-left">
+              <p className="text-[11px] font-medium text-zinc-300">Upload your own</p>
+              <p className="text-[9px] text-zinc-500">MP3, WAV, M4A</p>
+            </div>
           </div>
-          <p className="text-sm font-medium text-zinc-300">
-            Drop {type === 'music' ? 'music files' : 'sound effects'}
-          </p>
-          <p className="text-[11px] text-zinc-500 mt-1">MP3, WAV, M4A supported</p>
         </div>
       </GlassCard>
 
-      {/* Audio List */}
-      {audioAssets.length > 0 ? (
-        <div className="space-y-1.5">
-          {audioAssets.map((asset) => (
-            <GlassCard key={asset.id} onClick={() => handleAddToTimeline(asset.id)}>
-              <div className="flex items-center gap-3 p-3 group">
-                <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-purple-500/20 to-indigo-500/20 border border-purple-500/10 flex items-center justify-center flex-shrink-0">
-                  {type === 'music' ? <Music size={16} className="text-purple-400" /> : <Volume2 size={16} className="text-purple-400" />}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-[13px] text-white truncate">{asset.name}</p>
-                  <div className="flex items-center gap-1.5 mt-0.5">
-                    <Clock size={10} className="text-zinc-600" />
-                    <p className="text-[11px] text-zinc-500">{formatDuration(asset.duration)}</p>
+      {/* Uploaded Audio */}
+      {audioAssets.length > 0 && (
+        <div className="space-y-2">
+          <span className="text-[10px] font-black text-zinc-500 uppercase tracking-widest px-1">Your Files</span>
+          <div className="space-y-1">
+            {audioAssets.map((asset) => (
+              <GlassCard key={asset.id} onClick={() => handleAddToTimeline(asset.id)}>
+                <div className="flex items-center gap-2 p-2 group">
+                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500/20 to-indigo-500/20 flex items-center justify-center flex-shrink-0">
+                    {type === 'music' ? <Music size={14} className="text-purple-400" /> : <Volume2 size={14} className="text-purple-400" />}
                   </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[11px] text-white truncate">{asset.name}</p>
+                    <p className="text-[9px] text-zinc-500">{formatDuration(asset.duration)}</p>
+                  </div>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); removeAsset(asset.id); }}
+                    className="p-1 rounded-md opacity-0 group-hover:opacity-100 hover:bg-red-500/20 transition-all"
+                  >
+                    <Trash2 size={10} className="text-red-400" />
+                  </button>
                 </div>
-                <button
-                  onClick={(e) => { e.stopPropagation(); removeAsset(asset.id); }}
-                  className="p-1 rounded-md opacity-0 group-hover:opacity-100 hover:bg-red-500/20 transition-all"
-                >
-                  <Trash2 size={12} className="text-red-400" />
-                </button>
-              </div>
-            </GlassCard>
-          ))}
-        </div>
-      ) : (
-        <div className="text-center py-6">
-          <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-white/[0.04] border border-white/[0.06] flex items-center justify-center">
-            {type === 'music'
-              ? <Music size={20} className="text-zinc-600" />
-              : <Volume2 size={20} className="text-zinc-600" />
-            }
+              </GlassCard>
+            ))}
           </div>
-          <p className="text-sm text-zinc-500">No {type === 'music' ? 'music' : 'sound effects'} yet</p>
-          <p className="text-[11px] text-zinc-600 mt-1">Upload audio to add to your video</p>
         </div>
       )}
+
+      {/* Library Section */}
+      <div className="space-y-2">
+        <div className="flex items-center justify-between px-1">
+          <span className="text-[10px] font-black text-zinc-500 uppercase tracking-widest">
+            {type === 'music' ? 'Music Library' : 'Sound Effects'}
+          </span>
+          <span className="text-[9px] text-emerald-400 font-bold">FREE</span>
+        </div>
+
+        {/* Genre/Category Filter */}
+        <div className="flex flex-wrap gap-1">
+          <button
+            onClick={() => setSelectedGenre(null)}
+            className={`px-2 py-1 rounded-lg text-[9px] font-bold uppercase tracking-wider transition-all ${
+              selectedGenre === null
+                ? 'bg-purple-500/30 text-purple-300 border border-purple-500/30'
+                : 'bg-white/5 text-zinc-500 border border-white/5 hover:bg-white/10'
+            }`}
+          >
+            All
+          </button>
+          {genres.map((genre) => (
+            <button
+              key={genre}
+              onClick={() => setSelectedGenre(genre)}
+              className={`px-2 py-1 rounded-lg text-[9px] font-bold uppercase tracking-wider transition-all ${
+                selectedGenre === genre
+                  ? 'bg-purple-500/30 text-purple-300 border border-purple-500/30'
+                  : 'bg-white/5 text-zinc-500 border border-white/5 hover:bg-white/10'
+              }`}
+            >
+              {genre}
+            </button>
+          ))}
+        </div>
+
+        {/* Library Items */}
+        <div className="space-y-1.5 max-h-[400px] overflow-y-auto custom-scrollbar">
+          {filteredLibrary.map((item: any, i: number) => {
+            const genre = type === 'music' ? item.genre : item.category;
+            const gradientClass = colorMap[genre as keyof typeof colorMap] || 'from-purple-500/20 to-indigo-500/20';
+            const isLoading = loadingTrack === item.id;
+
+            return (
+              <motion.div
+                key={item.id}
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.02 }}
+              >
+                <GlassCard onClick={() => !isLoading && handleAddLibraryTrack(item)} disabled={isLoading}>
+                  <div className="flex items-center gap-3 p-2.5 group">
+                    <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${gradientClass} border border-white/5 flex items-center justify-center flex-shrink-0 relative overflow-hidden`}>
+                      {isLoading ? (
+                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      ) : (
+                        <>
+                          {type === 'music' ? <Music size={16} className="text-white/70" /> : <Volume2 size={16} className="text-white/70" />}
+                          <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                            <Plus size={16} className="text-white" />
+                          </div>
+                        </>
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[12px] text-white font-medium truncate">{item.name}</p>
+                      <div className="flex items-center gap-2 mt-0.5">
+                        <span className="text-[9px] text-zinc-500 uppercase">{genre}</span>
+                        <span className="text-[9px] text-zinc-600">•</span>
+                        <span className="text-[9px] text-zinc-500">
+                          {type === 'music' ? formatMusicDuration(item.duration) : `${item.duration}s`}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </GlassCard>
+              </motion.div>
+            );
+          })}
+        </div>
+      </div>
     </motion.div>
   );
 };
@@ -544,6 +647,17 @@ const TransitionsTab: React.FC = () => {
   const { project, addTransition } = useVideoEditor();
   const selectedClipId = project.selectedClipId;
 
+  // Check if there's a next clip to transition to
+  const canApplyTransition = React.useMemo(() => {
+    if (!selectedClipId) return false;
+    const clip = project.clips[selectedClipId];
+    if (!clip) return false;
+    const track = project.tracks.find(t => t.id === clip.trackId);
+    if (!track) return false;
+    const clipIndex = track.clips.indexOf(selectedClipId);
+    return clipIndex >= 0 && clipIndex < track.clips.length - 1;
+  }, [selectedClipId, project.clips, project.tracks]);
+
   const handleApplyTransition = useCallback((type: TransitionType) => {
     if (!selectedClipId) return;
     const clip = project.clips[selectedClipId];
@@ -553,9 +667,18 @@ const TransitionsTab: React.FC = () => {
     const clipIndex = track.clips.indexOf(selectedClipId);
     const nextClipId = track.clips[clipIndex + 1];
     if (nextClipId) {
-      addTransition(selectedClipId, nextClipId, type);
+      console.log('[TransitionsTab] Applying transition:', type, 'from', selectedClipId, 'to', nextClipId);
+      addTransition(selectedClipId, nextClipId, type, 20); // 20 frames = ~0.67 seconds
+    } else {
+      console.log('[TransitionsTab] No next clip to transition to');
     }
   }, [selectedClipId, project.clips, project.tracks, addTransition]);
+
+  const getMessage = () => {
+    if (!selectedClipId) return 'Select a clip first to apply transitions';
+    if (!canApplyTransition) return 'Add another clip after this one to create a transition';
+    return 'Click a transition to apply after selected clip';
+  };
 
   return (
     <motion.div
@@ -565,8 +688,8 @@ const TransitionsTab: React.FC = () => {
       transition={{ duration: 0.2 }}
       className="p-3"
     >
-      <p className="text-[11px] text-zinc-500 px-0.5 mb-3">
-        {selectedClipId ? 'Apply transition after selected clip' : 'Select a clip first to apply transitions'}
+      <p className={`text-[11px] px-0.5 mb-3 ${canApplyTransition ? 'text-green-400' : 'text-zinc-500'}`}>
+        {getMessage()}
       </p>
 
       <div className="grid grid-cols-2 gap-1.5">

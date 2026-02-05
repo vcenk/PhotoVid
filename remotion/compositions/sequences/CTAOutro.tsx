@@ -10,7 +10,6 @@ import {
   useCurrentFrame,
   useVideoConfig,
   spring,
-  Img,
 } from 'remotion';
 import { MODERN_COLORS, MODERN_FONTS } from '../templates/ModernTemplate';
 
@@ -117,10 +116,11 @@ export const CTAOutro: React.FC<CTAOutroProps> = ({
           }}
         />
 
-        {/* Logo */}
+        {/* Logo - using plain img for blob URL support */}
         {logoUrl ? (
-          <Img
+          <img
             src={logoUrl}
+            alt=""
             style={{
               width: 100,
               height: 100,

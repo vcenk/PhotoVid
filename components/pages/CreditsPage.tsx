@@ -61,7 +61,7 @@ export const CreditsPage: React.FC = () => {
     {
       name: 'Video Generation',
       credits: '5-10',
-      tools: ['Room Tour', 'Vehicle 360', 'Text to Video', 'Lipsync'],
+      tools: ['Room Tour', 'Vehicle 360', 'Text to Video', 'AI Dubbing'],
     },
   ];
 

@@ -27,8 +27,18 @@ Photovid is a React SPA for an AI-powered video creation platform with:
 - **Auth/Backend:** Supabase (@supabase/ssr)
 - **AI Generation:** FAL AI (Kling Video, Flux Dev, Lipsync models)
 - **Storage:** Cloudflare R2 (S3-compatible via AWS SDK)
-- **Video Rendering:** Remotion v4 (`@remotion/player` for preview, `remotion` for compositions)
+- **Video Rendering:** Remotion v4 (`@remotion/player` for preview, `remotion` for compositions, `@remotion/transitions` for scene transitions, `@remotion/light-leaks` for cinematic effects)
 - **Type Safety:** TypeScript 5.8
+
+### Remotion AI Skills
+
+The project includes Remotion AI Skills (`.agents/skills/remotion-best-practices/`) which provide best practices for:
+- Animations (frame-based, no CSS transitions)
+- Transitions (`TransitionSeries`, fade, slide, wipe)
+- Light leaks (`@remotion/light-leaks`)
+- Text animations (typewriter with string slicing)
+- Ken Burns effects
+- Audio handling
 
 ## Essential Commands
 

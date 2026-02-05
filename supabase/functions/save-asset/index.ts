@@ -75,14 +75,13 @@ serve(async (req) => {
       )
     }
 
-    // Insert asset
+    // Insert asset (note: thumbnail_url stored in metadata if provided)
     const assetData = {
       user_id: userId,
       url,
       type,
       name: name || `${type}_${Date.now()}`,
-      thumbnail_url: thumbnailUrl || null,
-      metadata: metadata || null,
+      metadata: { ...metadata, thumbnailUrl: thumbnailUrl || null },
       created_at: new Date().toISOString()
     }
 

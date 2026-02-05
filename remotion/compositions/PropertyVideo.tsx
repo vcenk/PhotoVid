@@ -1,23 +1,30 @@
 /**
  * PropertyVideo - Main Remotion Composition
- * Orchestrates the complete property video structure
+ * Orchestrates the complete property video structure using TransitionSeries
+ *
+ * Uses @remotion/transitions for professional scene transitions
+ * Uses @remotion/light-leaks for cinematic overlay effects
  *
  * Structure (30 seconds @ 30fps = 900 frames):
- * - LogoIntro: 0-60 frames (2 seconds)
- * - HeroSlide: 60-120 frames (2 seconds)
- * - ImageSlideshow: 120-720 frames (20 seconds)
- * - AgentCard: 720-840 frames (4 seconds)
- * - CTAOutro: 840-900 frames (2 seconds)
+ * - LogoIntro: 2 seconds
+ * - HeroSlide: 2 seconds
+ * - ImageSlideshow: 20 seconds
+ * - AgentCard: 4 seconds
+ * - CTAOutro: 2 seconds
  */
 
 import React from 'react';
-import { AbsoluteFill, Sequence, useVideoConfig } from 'remotion';
+import { AbsoluteFill, useVideoConfig } from 'remotion';
+import { TransitionSeries, linearTiming } from '@remotion/transitions';
+import { fade } from '@remotion/transitions/fade';
+import { slide } from '@remotion/transitions/slide';
+import { LightLeak } from '@remotion/light-leaks';
 import { LogoIntro } from './sequences/LogoIntro';
 import { HeroSlide } from './sequences/HeroSlide';
 import { ImageSlideshow } from './sequences/ImageSlideshow';
 import { AgentCard } from './sequences/AgentCard';
 import { CTAOutro } from './sequences/CTAOutro';
-import { ModernTemplate } from './templates/ModernTemplate';
+import { getTemplate, getTemplateColors } from './templates/TemplateFactory';
 import type {
   VideoImage,
   VideoPropertyData,
@@ -34,13 +41,15 @@ export interface PropertyVideoProps {
   format: ExportFormat;
 }
 
-// Frame timings for 30-second video at 30fps
-const TIMINGS = {
-  logoIntro: { start: 0, duration: 60 },      // 0-2 seconds
-  heroSlide: { start: 60, duration: 60 },     // 2-4 seconds
-  slideshow: { start: 120, duration: 600 },   // 4-24 seconds
-  agentCard: { start: 720, duration: 120 },   // 24-28 seconds
-  ctaOutro: { start: 840, duration: 60 },     // 28-30 seconds
+// Scene durations in frames (at 30fps)
+const DURATIONS = {
+  logoIntro: 60,      // 2 seconds
+  heroSlide: 60,      // 2 seconds
+  slideshow: 600,     // 20 seconds
+  agentCard: 120,     // 4 seconds
+  ctaOutro: 60,       // 2 seconds
+  transition: 15,     // 0.5 second transitions
+  lightLeak: 20,      // Light leak overlay duration
 };
 
 export const PropertyVideo: React.FC<PropertyVideoProps> = ({
@@ -50,56 +59,84 @@ export const PropertyVideo: React.FC<PropertyVideoProps> = ({
   templateId,
   format,
 }) => {
-  const { width, height } = useVideoConfig();
+  const { fps } = useVideoConfig();
 
-  // Get template component based on templateId
-  // For MVP, we only have ModernTemplate
-  const TemplateWrapper = ModernTemplate;
+  // Get template component based on templateId using the factory
+  const TemplateWrapper = getTemplate(templateId);
+
+  // Timing configuration for transitions
+  const fadeTransition = fade();
+  const slideTransition = slide({ direction: 'from-right' });
+  const transitionTiming = linearTiming({ durationInFrames: DURATIONS.transition });
 
   return (
     <AbsoluteFill>
       <TemplateWrapper format={format}>
-        {/* Logo Intro */}
-        <Sequence from={TIMINGS.logoIntro.start} durationInFrames={TIMINGS.logoIntro.duration}>
-          <LogoIntro
-            brokerageName={agentBranding.brokerageName}
-            logoUrl={agentBranding.logoUrl}
-          />
-        </Sequence>
+        <TransitionSeries>
+          {/* Scene 1: Logo Intro */}
+          <TransitionSeries.Sequence durationInFrames={DURATIONS.logoIntro}>
+            <LogoIntro
+              brokerageName={agentBranding.brokerageName}
+              logoUrl={agentBranding.logoUrl}
+            />
+          </TransitionSeries.Sequence>
 
-        {/* Hero Slide with Address */}
-        <Sequence from={TIMINGS.heroSlide.start} durationInFrames={TIMINGS.heroSlide.duration}>
-          <HeroSlide
-            image={images[0]?.url}
-            address={propertyData.address}
-            city={propertyData.city}
-            state={propertyData.state}
+          {/* Transition: Fade with Light Leak */}
+          <TransitionSeries.Transition
+            presentation={fadeTransition}
+            timing={transitionTiming}
           />
-        </Sequence>
 
-        {/* Image Slideshow with Ken Burns */}
-        <Sequence from={TIMINGS.slideshow.start} durationInFrames={TIMINGS.slideshow.duration}>
-          <ImageSlideshow
-            images={images}
-            propertyData={propertyData}
-          />
-        </Sequence>
+          {/* Scene 2: Hero Slide with Address */}
+          <TransitionSeries.Sequence durationInFrames={DURATIONS.heroSlide}>
+            <HeroSlide
+              image={images[0]?.url}
+              address={propertyData.address}
+              city={propertyData.city}
+              state={propertyData.state}
+            />
+          </TransitionSeries.Sequence>
 
-        {/* Agent Card */}
-        <Sequence from={TIMINGS.agentCard.start} durationInFrames={TIMINGS.agentCard.duration}>
-          <AgentCard
-            agentBranding={agentBranding}
-          />
-        </Sequence>
+          {/* Light Leak Overlay before slideshow */}
+          <TransitionSeries.Overlay durationInFrames={DURATIONS.lightLeak}>
+            <LightLeak seed={1} hueShift={30} />
+          </TransitionSeries.Overlay>
 
-        {/* CTA Outro */}
-        <Sequence from={TIMINGS.ctaOutro.start} durationInFrames={TIMINGS.ctaOutro.duration}>
-          <CTAOutro
-            brokerageName={agentBranding.brokerageName}
-            logoUrl={agentBranding.logoUrl}
-            address={propertyData.address}
+          {/* Scene 3: Image Slideshow with Ken Burns */}
+          <TransitionSeries.Sequence durationInFrames={DURATIONS.slideshow}>
+            <ImageSlideshow
+              images={images}
+              propertyData={propertyData}
+            />
+          </TransitionSeries.Sequence>
+
+          {/* Transition: Slide from right */}
+          <TransitionSeries.Transition
+            presentation={slideTransition}
+            timing={transitionTiming}
           />
-        </Sequence>
+
+          {/* Scene 4: Agent Card */}
+          <TransitionSeries.Sequence durationInFrames={DURATIONS.agentCard}>
+            <AgentCard
+              agentBranding={agentBranding}
+            />
+          </TransitionSeries.Sequence>
+
+          {/* Light Leak Overlay before CTA */}
+          <TransitionSeries.Overlay durationInFrames={DURATIONS.lightLeak}>
+            <LightLeak seed={3} hueShift={200} />
+          </TransitionSeries.Overlay>
+
+          {/* Scene 5: CTA Outro */}
+          <TransitionSeries.Sequence durationInFrames={DURATIONS.ctaOutro}>
+            <CTAOutro
+              brokerageName={agentBranding.brokerageName}
+              logoUrl={agentBranding.logoUrl}
+              address={propertyData.address}
+            />
+          </TransitionSeries.Sequence>
+        </TransitionSeries>
       </TemplateWrapper>
     </AbsoluteFill>
   );

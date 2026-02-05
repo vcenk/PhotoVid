@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback, useRef } from 'react';
+import React, { useState, useMemo, useCallback, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AssetProvider, useAssets, Asset } from '../../lib/store/contexts/AssetContext';
 import { NavigationRail } from '../dashboard/navigation/NavigationRail';
@@ -29,6 +29,12 @@ import {
   Wand2,
   Loader2,
   UploadCloud,
+  Eye,
+  Pencil,
+  ChevronLeft,
+  ChevronRight,
+  ZoomIn,
+  ZoomOut,
 } from 'lucide-react';
 
 type ViewMode = 'grid' | 'list';
@@ -48,7 +54,7 @@ const TOOL_OPTIONS = [
 
 const MyLibraryContent: React.FC = () => {
   const navigate = useNavigate();
-  const { assets, loading, deleteAsset, addAsset } = useAssets();
+  const { assets, loading, deleteAsset, addAsset, renameAsset } = useAssets();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -68,6 +74,37 @@ const MyLibraryContent: React.FC = () => {
 
   // Use in Tool Menu State
   const [showToolMenu, setShowToolMenu] = useState<string | null>(null);
+
+  // Preview Modal State
+  const [previewAsset, setPreviewAsset] = useState<Asset | null>(null);
+  const [previewIndex, setPreviewIndex] = useState<number>(0);
+
+  // Rename State
+  const [renameAssetId, setRenameAssetId] = useState<string | null>(null);
+  const [renameValue, setRenameValue] = useState('');
+
+  // Error/Toast State
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState<string | null>(null);
+
+  // Handle rename
+  const handleStartRename = (asset: Asset) => {
+    setRenameAssetId(asset.id);
+    setRenameValue(asset.name || '');
+  };
+
+  const handleSaveRename = async () => {
+    if (renameAssetId && renameValue.trim()) {
+      await renameAsset(renameAssetId, renameValue.trim());
+    }
+    setRenameAssetId(null);
+    setRenameValue('');
+  };
+
+  const handleCancelRename = () => {
+    setRenameAssetId(null);
+    setRenameValue('');
+  };
 
   // Handle file upload
   const handleFileUpload = useCallback(async (files: FileList | null) => {
@@ -175,6 +212,42 @@ const MyLibraryContent: React.FC = () => {
     return { total: assets.length, images, videos };
   }, [assets]);
 
+  // Handle preview navigation (needs filteredAssets)
+  const handlePreviewNext = useCallback(() => {
+    const currentIndex = filteredAssets.findIndex(a => a.id === previewAsset?.id);
+    if (currentIndex < filteredAssets.length - 1) {
+      setPreviewAsset(filteredAssets[currentIndex + 1]);
+      setPreviewIndex(currentIndex + 1);
+    }
+  }, [filteredAssets, previewAsset]);
+
+  const handlePreviewPrev = useCallback(() => {
+    const currentIndex = filteredAssets.findIndex(a => a.id === previewAsset?.id);
+    if (currentIndex > 0) {
+      setPreviewAsset(filteredAssets[currentIndex - 1]);
+      setPreviewIndex(currentIndex - 1);
+    }
+  }, [filteredAssets, previewAsset]);
+
+  // Open preview
+  const handleOpenPreview = useCallback((asset: Asset) => {
+    const index = filteredAssets.findIndex(a => a.id === asset.id);
+    setPreviewAsset(asset);
+    setPreviewIndex(index);
+  }, [filteredAssets]);
+
+  // Keyboard navigation for preview
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!previewAsset) return;
+      if (e.key === 'ArrowRight') handlePreviewNext();
+      if (e.key === 'ArrowLeft') handlePreviewPrev();
+      if (e.key === 'Escape') setPreviewAsset(null);
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [previewAsset, handlePreviewNext, handlePreviewPrev]);
+
   const toggleAssetSelection = (id: string) => {
     setSelectedAssets(prev => {
       const newSet = new Set(prev);
@@ -188,15 +261,29 @@ const MyLibraryContent: React.FC = () => {
   };
 
   const handleBulkDelete = async () => {
+    setIsDeleting('bulk');
+    let failCount = 0;
     for (const id of selectedAssets) {
-      await deleteAsset(id);
+      const success = await deleteAsset(id);
+      if (!success) failCount++;
+    }
+    if (failCount > 0) {
+      setErrorMessage(`Failed to delete ${failCount} asset(s). Please try again.`);
+      setTimeout(() => setErrorMessage(null), 5000);
     }
     setSelectedAssets(new Set());
+    setIsDeleting(null);
   };
 
   const handleDelete = async (id: string) => {
-    await deleteAsset(id);
+    setIsDeleting(id);
+    const success = await deleteAsset(id);
+    if (!success) {
+      setErrorMessage('Failed to delete asset. Please try again.');
+      setTimeout(() => setErrorMessage(null), 5000);
+    }
     setShowDeleteConfirm(null);
+    setIsDeleting(null);
   };
 
   const formatDate = (dateString: string) => {
@@ -414,6 +501,16 @@ const MyLibraryContent: React.FC = () => {
 
                         {/* Actions Overlay */}
                         <div className="absolute top-3 right-3 flex gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleOpenPreview(asset);
+                            }}
+                            className="p-2 bg-white/90 dark:bg-zinc-800/90 backdrop-blur rounded-lg text-zinc-600 dark:text-zinc-400 hover:text-indigo-600 shadow-sm transition-colors"
+                            title="Preview"
+                          >
+                            <Eye size={14} />
+                          </button>
                           {asset.type === 'image' && (
                             <div className="relative">
                               <button
@@ -455,20 +552,24 @@ const MyLibraryContent: React.FC = () => {
                             href={asset.url}
                             download
                             className="p-2 bg-white/90 dark:bg-zinc-800/90 backdrop-blur rounded-lg text-zinc-600 dark:text-zinc-400 hover:text-indigo-600 shadow-sm transition-colors"
+                            title="Download"
                           >
                             <Download size={14} />
                           </a>
-                          <a
-                            href={asset.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleStartRename(asset);
+                            }}
                             className="p-2 bg-white/90 dark:bg-zinc-800/90 backdrop-blur rounded-lg text-zinc-600 dark:text-zinc-400 hover:text-indigo-600 shadow-sm transition-colors"
+                            title="Rename"
                           >
-                            <ExternalLink size={14} />
-                          </a>
+                            <Pencil size={14} />
+                          </button>
                           <button
                             onClick={() => setShowDeleteConfirm(asset.id)}
                             className="p-2 bg-white/90 dark:bg-zinc-800/90 backdrop-blur rounded-lg text-zinc-600 dark:text-zinc-400 hover:text-red-500 shadow-sm transition-colors"
+                            title="Delete"
                           >
                             <Trash2 size={14} />
                           </button>
@@ -488,9 +589,31 @@ const MyLibraryContent: React.FC = () => {
 
                       {/* Info */}
                       <div className="p-3">
-                        <p className="text-sm font-medium text-zinc-900 dark:text-white truncate">
-                          {asset.name || (asset.type === 'image' ? 'Untitled Image' : 'Untitled Video')}
-                        </p>
+                        {renameAssetId === asset.id ? (
+                          <div className="flex items-center gap-1">
+                            <input
+                              type="text"
+                              value={renameValue}
+                              onChange={(e) => setRenameValue(e.target.value)}
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter') handleSaveRename();
+                                if (e.key === 'Escape') handleCancelRename();
+                              }}
+                              autoFocus
+                              className="flex-1 text-sm font-medium bg-transparent border-b border-indigo-500 outline-none text-zinc-900 dark:text-white"
+                            />
+                            <button onClick={handleSaveRename} className="p-1 text-green-500 hover:text-green-600">
+                              <Check size={14} />
+                            </button>
+                            <button onClick={handleCancelRename} className="p-1 text-zinc-400 hover:text-zinc-500">
+                              <X size={14} />
+                            </button>
+                          </div>
+                        ) : (
+                          <p className="text-sm font-medium text-zinc-900 dark:text-white truncate">
+                            {asset.name || (asset.type === 'image' ? 'Untitled Image' : 'Untitled Video')}
+                          </p>
+                        )}
                         <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5 flex items-center gap-1">
                           <Clock size={12} />
                           {formatDate(asset.created_at)}
@@ -571,9 +694,31 @@ const MyLibraryContent: React.FC = () => {
                           </div>
                         </td>
                         <td className="px-4 py-3">
-                          <span className="text-sm font-medium text-zinc-900 dark:text-white">
-                            {asset.name || (asset.type === 'image' ? 'Untitled Image' : 'Untitled Video')}
-                          </span>
+                          {renameAssetId === asset.id ? (
+                            <div className="flex items-center gap-2">
+                              <input
+                                type="text"
+                                value={renameValue}
+                                onChange={(e) => setRenameValue(e.target.value)}
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Enter') handleSaveRename();
+                                  if (e.key === 'Escape') handleCancelRename();
+                                }}
+                                autoFocus
+                                className="flex-1 text-sm font-medium bg-transparent border-b border-indigo-500 outline-none text-zinc-900 dark:text-white"
+                              />
+                              <button onClick={handleSaveRename} className="p-1 text-green-500 hover:text-green-600">
+                                <Check size={14} />
+                              </button>
+                              <button onClick={handleCancelRename} className="p-1 text-zinc-400 hover:text-zinc-500">
+                                <X size={14} />
+                              </button>
+                            </div>
+                          ) : (
+                            <span className="text-sm font-medium text-zinc-900 dark:text-white">
+                              {asset.name || (asset.type === 'image' ? 'Untitled Image' : 'Untitled Video')}
+                            </span>
+                          )}
                         </td>
                         <td className="px-4 py-3">
                           <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-full ${
@@ -590,6 +735,13 @@ const MyLibraryContent: React.FC = () => {
                         </td>
                         <td className="px-4 py-3">
                           <div className="flex items-center justify-end gap-1">
+                            <button
+                              onClick={() => handleOpenPreview(asset)}
+                              className="p-2 text-zinc-500 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+                              title="Preview"
+                            >
+                              <Eye size={16} />
+                            </button>
                             {asset.type === 'image' && (
                               <div className="relative">
                                 <button
@@ -631,20 +783,21 @@ const MyLibraryContent: React.FC = () => {
                               href={asset.url}
                               download
                               className="p-2 text-zinc-500 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+                              title="Download"
                             >
                               <Download size={16} />
                             </a>
-                            <a
-                              href={asset.url}
-                              target="_blank"
-                              rel="noopener noreferrer"
+                            <button
+                              onClick={() => handleStartRename(asset)}
                               className="p-2 text-zinc-500 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+                              title="Rename"
                             >
-                              <ExternalLink size={16} />
-                            </a>
+                              <Pencil size={16} />
+                            </button>
                             <button
                               onClick={() => handleDelete(asset.id)}
                               className="p-2 text-zinc-500 hover:text-red-500 transition-colors"
+                              title="Delete"
                             >
                               <Trash2 size={16} />
                             </button>
@@ -802,6 +955,143 @@ const MyLibraryContent: React.FC = () => {
                   </div>
                 </div>
               )}
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* Error Toast */}
+      <AnimatePresence>
+        {errorMessage && (
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 50 }}
+            className="fixed bottom-6 right-6 z-50 px-4 py-3 bg-red-600 text-white rounded-xl shadow-lg flex items-center gap-3"
+          >
+            <span className="text-sm">{errorMessage}</span>
+            <button
+              onClick={() => setErrorMessage(null)}
+              className="p-1 hover:bg-white/20 rounded-lg transition-colors"
+            >
+              <X size={16} />
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Preview Modal */}
+      <AnimatePresence>
+        {previewAsset && (
+          <>
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setPreviewAsset(null)}
+              className="fixed inset-0 bg-black/90 backdrop-blur-sm z-50"
+            />
+
+            {/* Modal */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="fixed inset-4 md:inset-8 lg:inset-16 z-50 flex flex-col"
+            >
+              {/* Header */}
+              <div className="flex items-center justify-between px-4 py-3 bg-black/50 backdrop-blur rounded-t-2xl">
+                <div className="flex items-center gap-4">
+                  <span className="text-white font-medium">
+                    {previewAsset.name || (previewAsset.type === 'image' ? 'Untitled Image' : 'Untitled Video')}
+                  </span>
+                  <span className="text-zinc-500 text-sm">
+                    {previewIndex + 1} of {filteredAssets.length}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <a
+                    href={previewAsset.url}
+                    download
+                    className="p-2 text-zinc-400 hover:text-white transition-colors rounded-lg hover:bg-white/10"
+                    title="Download"
+                  >
+                    <Download size={20} />
+                  </a>
+                  <a
+                    href={previewAsset.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="p-2 text-zinc-400 hover:text-white transition-colors rounded-lg hover:bg-white/10"
+                    title="Open in new tab"
+                  >
+                    <ExternalLink size={20} />
+                  </a>
+                  <button
+                    onClick={() => {
+                      handleStartRename(previewAsset);
+                      setPreviewAsset(null);
+                    }}
+                    className="p-2 text-zinc-400 hover:text-white transition-colors rounded-lg hover:bg-white/10"
+                    title="Rename"
+                  >
+                    <Pencil size={20} />
+                  </button>
+                  <button
+                    onClick={() => setPreviewAsset(null)}
+                    className="p-2 text-zinc-400 hover:text-white transition-colors rounded-lg hover:bg-white/10"
+                  >
+                    <X size={20} />
+                  </button>
+                </div>
+              </div>
+
+              {/* Content */}
+              <div className="flex-1 relative flex items-center justify-center bg-black/30 backdrop-blur rounded-b-2xl overflow-hidden">
+                {previewAsset.type === 'image' ? (
+                  <img
+                    src={previewAsset.url}
+                    alt={previewAsset.name}
+                    className="max-w-full max-h-full object-contain"
+                  />
+                ) : (
+                  <video
+                    src={previewAsset.url}
+                    controls
+                    autoPlay
+                    className="max-w-full max-h-full"
+                  />
+                )}
+
+                {/* Navigation Arrows */}
+                {previewIndex > 0 && (
+                  <button
+                    onClick={handlePreviewPrev}
+                    className="absolute left-4 top-1/2 -translate-y-1/2 p-3 bg-black/50 hover:bg-black/70 rounded-full text-white transition-colors"
+                  >
+                    <ChevronLeft size={24} />
+                  </button>
+                )}
+                {previewIndex < filteredAssets.length - 1 && (
+                  <button
+                    onClick={handlePreviewNext}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 p-3 bg-black/50 hover:bg-black/70 rounded-full text-white transition-colors"
+                  >
+                    <ChevronRight size={24} />
+                  </button>
+                )}
+              </div>
+
+              {/* Footer info */}
+              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 px-4 py-2 bg-black/50 backdrop-blur rounded-full text-xs text-zinc-400">
+                <span className="flex items-center gap-2">
+                  <Clock size={12} />
+                  {formatDate(previewAsset.created_at)}
+                  <span className="mx-2">•</span>
+                  Use ← → arrows to navigate
+                </span>
+              </div>
             </motion.div>
           </>
         )}

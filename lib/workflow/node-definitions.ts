@@ -3,7 +3,7 @@ import {
   Image as ImageIcon,
   Video,
   Music,
-  Mic2,
+  Languages,
   Wand2,
   ZoomIn,
   Paintbrush,
@@ -242,30 +242,34 @@ export const NODE_DEFINITIONS: Record<string, NodeDefinition> = {
     ]
   },
 
-  'gen-lipsync': {
-    type: 'gen-lipsync',
+  'gen-dubbing': {
+    type: 'gen-dubbing',
     category: 'processing',
-    label: 'Lipsync',
-    description: 'Sync lips to audio',
-    icon: Mic2,
+    label: 'AI Dubbing',
+    description: 'Translate video to another language',
+    icon: Languages,
     color: 'rose',
     inputs: [
-      { id: 'image', label: 'Portrait', type: 'image' },
-      { id: 'video', label: 'Video', type: 'video' },
-      { id: 'audio', label: 'Audio', type: 'audio' }
+      { id: 'video', label: 'Video', type: 'video' }
     ],
     outputs: [
-      { id: 'video', label: 'Synced Video', type: 'video' }
+      { id: 'video', label: 'Dubbed Video', type: 'video' }
     ],
     parameters: [
       {
-        id: 'model',
-        label: 'Model',
+        id: 'targetLanguage',
+        label: 'Target Language',
         type: 'select',
-        defaultValue: 'sync-labs',
+        defaultValue: 'es',
         options: [
-          { value: 'sync-labs', label: 'Sync Labs 2.0' },
-          { value: 'kling-lipsync', label: 'Kling LipSync' }
+          { value: 'es', label: 'Spanish' },
+          { value: 'fr', label: 'French' },
+          { value: 'de', label: 'German' },
+          { value: 'zh', label: 'Chinese' },
+          { value: 'ja', label: 'Japanese' },
+          { value: 'pt', label: 'Portuguese' },
+          { value: 'ar', label: 'Arabic' },
+          { value: 'hi', label: 'Hindi' }
         ]
       }
     ]

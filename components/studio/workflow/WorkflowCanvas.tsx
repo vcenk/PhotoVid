@@ -21,7 +21,7 @@ import { VideoInputNode } from './nodes/VideoInputNode';
 import { AudioInputNode } from './nodes/AudioInputNode';
 import { TextToImageNode } from './nodes/TextToImageNode';
 import { ImageToVideoNode } from './nodes/ImageToVideoNode';
-import { LipsyncNode } from './nodes/LipsyncNode';
+import { DubbingNode } from './nodes/DubbingNode';
 import { UpscaleNode } from './nodes/UpscaleNode';
 import { InpaintNode } from './nodes/InpaintNode';
 import { PreviewNode } from './nodes/PreviewNode';
@@ -39,7 +39,7 @@ const nodeTypes = {
   'gen-image-to-video': ImageToVideoNode,
   'gen-upscale': UpscaleNode,
   'gen-inpaint': InpaintNode,
-  'gen-lipsync': LipsyncNode,
+  'gen-dubbing': DubbingNode,
   'output-preview': PreviewNode
 };
 

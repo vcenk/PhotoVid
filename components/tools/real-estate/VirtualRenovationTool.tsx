@@ -147,7 +147,7 @@ const VirtualRenovationToolInner: React.FC = () => {
                 setGenerationProgress(prev => prev >= 90 ? (clearInterval(progressInterval), 90) : prev + 10);
             }, 400);
 
-            setTimeout(() => {
+            setTimeout(async () => {
                 clearInterval(progressInterval);
                 setGenerationProgress(100);
                 const mockUrl = 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=1200&h=800&fit=crop';

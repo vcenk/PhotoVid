@@ -119,15 +119,16 @@ export const AI_APPS: AIApp[] = [
     falModel: 'fal-ai/kling-video/v1.5/pro/image-to-video',
   },
   {
-    id: 'lipsync',
-    name: 'AI Lipsync',
-    description: 'Make any portrait speak with realistic lip sync animation',
+    id: 'dubbing',
+    name: 'AI Dubbing',
+    description: 'Translate videos to any language with voice cloning',
     category: 'video',
     thumbnail: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=300&fit=crop',
     isNew: true,
     isTrending: true,
     isPremium: true,
-    tags: ['Talking', 'Portrait', 'Pro'],
+    tags: ['Translation', 'Voice', 'Pro'],
+    route: '/studio/dubbing',
   },
   
   // Business & Professional

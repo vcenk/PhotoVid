@@ -84,7 +84,7 @@ const TOOL_NAMES: Record<string, string> = {
   'paint-color': 'Paint Color',
   'text-to-image': 'Text to Image',
   'image-to-video': 'Image to Video',
-  'lipsync': 'Lipsync',
+  'dubbing': 'AI Dubbing',
 };
 
 export function GenerationHistoryProvider({ children }: { children: ReactNode }) {
