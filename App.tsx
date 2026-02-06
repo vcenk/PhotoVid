@@ -54,7 +54,7 @@ import { LandscapeDesignTool } from './components/tools/real-estate/LandscapeDes
 import { AutoDeclutterTool } from './components/tools/real-estate/AutoDeclutterTool';
 import { PropertyRevealTool } from './components/tools/real-estate/PropertyRevealTool';
 import { RealEstatePageV2 } from './components/pages/RealEstatePageV2';
-import { QuickVideoPage } from './components/quick-video/QuickVideoPage';
+import { QuickVideoV2Page } from './components/quick-video-v2/QuickVideoV2Page';
 import { AuthPage } from './components/pages/AuthPage';
 import { AuthCallbackPage } from './components/pages/AuthCallbackPage';
 import { ResetPasswordPage } from './components/pages/ResetPasswordPage';
@@ -142,7 +142,7 @@ const App: React.FC = () => {
             <Route path="/studio/edit/headshot-retouching" element={<HeadshotRetouchingTool />} />
             <Route path="/studio/real-estate/storyboard" element={<StoryboardPage />} />
             <Route path="/studio/real-estate/video-builder" element={<VideoEditorPage />} />
-            <Route path="/studio/real-estate/quick-video" element={<QuickVideoPage />} />
+            <Route path="/studio/real-estate/quick-video" element={<QuickVideoV2Page />} />
             <Route path="/studio/real-estate/text-to-video" element={<TextToVideoPage />} />
             <Route path="/studio/apps/auto" element={<IndustryPage industryId="auto" />} />
             <Route path="/studio/apps/auto/background-swap" element={<BackgroundSwapTool />} />
