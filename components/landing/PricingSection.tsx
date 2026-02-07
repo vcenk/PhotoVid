@@ -173,9 +173,9 @@ export const PricingSection = () => {
             Pricing
           </motion.span>
 
-          <h2 className="text-4xl md:text-6xl font-bold text-white tracking-tighter leading-[1.1]">
+          <h2 className="text-4xl md:text-6xl font-bold text-white tracking-tighter leading-[1.1]" style={{ fontFamily: "'Roboto', sans-serif" }}>
             Start free. <br />
-            <span className="font-serif italic text-zinc-500">Scale when you're ready.</span>
+            <span className="text-zinc-400">Scale when you're ready.</span>
           </h2>
         </motion.div>
 

@@ -91,9 +91,10 @@ export const UseCasesSection = () => {
             viewport={{ once: true }}
             transition={{ delay: 0.1 }}
             className="text-4xl md:text-6xl font-bold text-white tracking-tighter mb-6"
+            style={{ fontFamily: "'Roboto', sans-serif" }}
           >
             Your role.{' '}
-            <span className="text-zinc-400 font-serif italic">Your workflow.</span>
+            <span className="text-zinc-400">Your workflow.</span>
           </motion.h2>
 
           <motion.p

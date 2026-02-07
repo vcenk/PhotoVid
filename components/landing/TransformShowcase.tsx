@@ -444,9 +444,9 @@ export const TransformShowcase: React.FC = () => {
             AI Magic
           </motion.span>
 
-          <h2 className="text-4xl md:text-6xl font-bold text-white tracking-tighter mb-4">
+          <h2 className="text-4xl md:text-6xl font-bold text-white tracking-tighter mb-4" style={{ fontFamily: "'Roboto', sans-serif" }}>
             Transform any{' '}
-            <span className="font-serif italic text-zinc-400">property.</span>
+            <span className="text-zinc-400">property.</span>
           </h2>
 
           <p className="text-lg text-zinc-400 max-w-2xl mx-auto">
