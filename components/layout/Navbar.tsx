@@ -104,14 +104,15 @@ export const Navbar: React.FC = () => {
       >
         {/* ── Logo (left) ── */}
         <div
-          className="flex items-center gap-2 cursor-pointer flex-shrink-0"
+          className="flex items-center gap-3 cursor-pointer flex-shrink-0"
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
         >
           <img
             src="/logo.png"
             alt="Photovid"
-            className="h-14 md:h-16 w-auto"
+            className="h-10 md:h-12 w-auto"
           />
+          <span className="text-xl md:text-2xl font-bold text-zinc-900 dark:text-white">Photovid</span>
         </div>
 
         {/* ── Centered Nav Links ── */}

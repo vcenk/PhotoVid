@@ -54,8 +54,9 @@ export const Footer = () => {
 
           {/* Brand Column */}
           <div className="flex-shrink-0 w-64 space-y-6">
-            <div className="flex items-center gap-2">
-              <img src="/logo.png" alt="Photovid" className="h-12 w-auto" />
+            <div className="flex items-center gap-3">
+              <img src="/logo.png" alt="Photovid" className="h-10 w-auto" />
+              <span className="text-xl font-bold text-white">Photovid</span>
             </div>
             <p className="text-zinc-500 text-sm leading-relaxed font-sans">
               AI-powered photo editing for real estate professionals. Transform listing photos in seconds.
