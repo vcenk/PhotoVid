@@ -107,13 +107,13 @@ export const Footer = () => {
         <div className="relative border-t border-white/10 pt-12 flex flex-col items-center">
 
           {/* Copyright Row */}
-          <div className="w-full flex flex-col md:flex-row justify-between items-center gap-4 text-[10px] font-bold uppercase tracking-widest text-zinc-600 mb-12">
-            <p>&copy; {new Date().getFullYear()} Photovid Inc.</p>
+          <div className="w-full flex flex-col items-center gap-4 text-[10px] font-bold uppercase tracking-widest text-zinc-600 mb-12">
             <div className="flex gap-8">
               <Link to="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link>
               <Link to="/terms" className="hover:text-white transition-colors">Terms of Service</Link>
               <a href="#" className="hover:text-white transition-colors">Cookies</a>
             </div>
+            <p>&copy; {new Date().getFullYear()} Photovid Inc.</p>
           </div>
 
           {/* Big Statement Type */}
