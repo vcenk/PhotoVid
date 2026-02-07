@@ -444,11 +444,9 @@ export const TransformShowcase: React.FC = () => {
             AI Magic
           </motion.span>
 
-          <h2 className="text-4xl md:text-6xl font-bold text-white tracking-tight mb-4">
-            Transform Any{' '}
-            <span className="bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 bg-clip-text text-transparent">
-              Property
-            </span>
+          <h2 className="text-4xl md:text-6xl font-bold text-white tracking-tighter mb-4">
+            Transform any{' '}
+            <span className="font-serif italic text-zinc-400">property.</span>
           </h2>
 
           <p className="text-lg text-zinc-400 max-w-2xl mx-auto">

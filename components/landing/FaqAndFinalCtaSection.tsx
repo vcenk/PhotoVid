@@ -103,9 +103,9 @@ export const FaqAndFinalCtaSection: React.FC = () => {
               className="mb-12"
             >
               <span className="text-[10px] font-black uppercase tracking-[0.4em] text-zinc-500 mb-4 block">Common Questions</span>
-              <h2 className="text-4xl md:text-5xl font-bold text-white tracking-tighter font-serif">
+              <h2 className="text-4xl md:text-5xl font-bold text-white tracking-tighter">
                 Everything you need <br />
-                <span className="text-zinc-500 italic">to know.</span>
+                <span className="font-serif italic text-zinc-500">to know.</span>
               </h2>
             </motion.div>
 
@@ -180,9 +180,9 @@ export const FaqAndFinalCtaSection: React.FC = () => {
               <Sparkles size={14} className="text-teal-400" /> Free to start — no credit card required
             </motion.div>
 
-            <h2 className="text-5xl md:text-8xl font-bold text-white tracking-tighter leading-[0.9] mb-10 font-serif">
+            <h2 className="text-5xl md:text-8xl font-bold text-white tracking-tighter leading-[0.9] mb-10">
               Transform your <br />
-              <span className="italic text-zinc-500">listings today.</span>
+              <span className="font-serif italic text-zinc-500">listings today.</span>
             </h2>
 
             <p className="text-lg md:text-xl text-zinc-400 font-sans mb-12 max-w-xl mx-auto">

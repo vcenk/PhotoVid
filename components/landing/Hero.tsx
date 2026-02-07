@@ -71,12 +71,11 @@ export const Hero = () => {
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3, duration: 1, ease: [0.25, 0.46, 0.45, 0.94] }}
-          className="text-5xl sm:text-6xl md:text-7xl lg:text-[5.5rem] font-bold text-white tracking-tight leading-[1.05] max-w-4xl"
-          style={{ fontFamily: "'Inter', sans-serif" }}
+          className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold text-white tracking-tighter leading-[1.05] max-w-4xl"
         >
           AI-Powered
           <br />
-          Real Estate
+          <span className="font-serif italic text-white/90">Real Estate</span>
         </motion.h1>
 
         {/* Subtitle */}
