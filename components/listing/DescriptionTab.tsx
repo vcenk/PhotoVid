@@ -81,7 +81,7 @@ export function DescriptionTab({ property, onGenerated }: DescriptionTabProps) {
       <div className="space-y-5">
         {/* Tone */}
         <div>
-          <label className="block text-sm font-medium text-zinc-300 mb-2">Tone</label>
+          <label className="block text-sm font-medium text-zinc-600 dark:text-zinc-300 mb-2">Tone</label>
           <div className="flex flex-wrap gap-2">
             {TONES.map((t) => (
               <button
@@ -90,8 +90,8 @@ export function DescriptionTab({ property, onGenerated }: DescriptionTabProps) {
                 className={cn(
                   'px-3.5 py-1.5 rounded-full text-sm font-medium transition-colors',
                   tone === t.value
-                    ? 'bg-violet-600 text-white'
-                    : 'bg-white/5 text-zinc-400 hover:text-white hover:bg-white/10'
+                    ? 'bg-emerald-600 text-white'
+                    : 'bg-zinc-100 dark:bg-white/5 text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-200 dark:hover:bg-white/10'
                 )}
               >
                 {t.label}
@@ -102,7 +102,7 @@ export function DescriptionTab({ property, onGenerated }: DescriptionTabProps) {
 
         {/* Length */}
         <div>
-          <label className="block text-sm font-medium text-zinc-300 mb-2">Length</label>
+          <label className="block text-sm font-medium text-zinc-600 dark:text-zinc-300 mb-2">Length</label>
           <div className="flex flex-wrap gap-2">
             {LENGTHS.map((l) => (
               <button
@@ -111,8 +111,8 @@ export function DescriptionTab({ property, onGenerated }: DescriptionTabProps) {
                 className={cn(
                   'px-3.5 py-1.5 rounded-full text-sm font-medium transition-colors',
                   length === l.value
-                    ? 'bg-violet-600 text-white'
-                    : 'bg-white/5 text-zinc-400 hover:text-white hover:bg-white/10'
+                    ? 'bg-emerald-600 text-white'
+                    : 'bg-zinc-100 dark:bg-white/5 text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-200 dark:hover:bg-white/10'
                 )}
               >
                 {l.label}
@@ -124,7 +124,7 @@ export function DescriptionTab({ property, onGenerated }: DescriptionTabProps) {
 
         {/* Highlight Features */}
         <div>
-          <label className="block text-sm font-medium text-zinc-300 mb-2">
+          <label className="block text-sm font-medium text-zinc-600 dark:text-zinc-300 mb-2">
             Highlight Features
           </label>
           {property.features && property.features.length > 0 ? (
@@ -136,8 +136,8 @@ export function DescriptionTab({ property, onGenerated }: DescriptionTabProps) {
                   className={cn(
                     'px-2.5 py-1 rounded-lg text-xs font-medium transition-colors',
                     highlightFeatures.includes(feat)
-                      ? 'bg-violet-500/20 text-violet-300 border border-violet-500/30'
-                      : 'bg-white/5 text-zinc-500 border border-white/5 hover:text-zinc-300'
+                      ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                      : 'bg-zinc-100 dark:bg-white/5 text-zinc-500 border border-zinc-200 dark:border-white/5 hover:text-zinc-700 dark:hover:text-zinc-300'
                   )}
                 >
                   {feat}
@@ -154,7 +154,7 @@ export function DescriptionTab({ property, onGenerated }: DescriptionTabProps) {
             placeholder="Custom keywords (comma-separated)"
             value={customKeywords}
             onChange={(e) => setCustomKeywords(e.target.value)}
-            className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:border-violet-500/30"
+            className="w-full px-3 py-2 rounded-lg bg-zinc-50 dark:bg-white/5 border border-zinc-200 dark:border-white/10 text-sm text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus:outline-none focus:border-emerald-500/30"
           />
         </div>
 
@@ -164,9 +164,9 @@ export function DescriptionTab({ property, onGenerated }: DescriptionTabProps) {
             type="checkbox"
             checked={includeNeighborhood}
             onChange={(e) => setIncludeNeighborhood(e.target.checked)}
-            className="rounded border-white/20 bg-white/5 text-violet-600 focus:ring-violet-500 focus:ring-offset-0"
+            className="rounded border-white/20 bg-white/5 text-emerald-600 focus:ring-emerald-500 focus:ring-offset-0"
           />
-          <span className="text-sm text-zinc-300">Include neighborhood info</span>
+          <span className="text-sm text-zinc-600 dark:text-zinc-300">Include neighborhood info</span>
         </label>
 
         {/* Fair housing note */}
@@ -181,7 +181,7 @@ export function DescriptionTab({ property, onGenerated }: DescriptionTabProps) {
         <button
           onClick={handleGenerate}
           disabled={isGenerating || !hasCredits}
-          className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-violet-600 text-white font-medium hover:bg-violet-500 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+          className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-emerald-600 text-white font-medium hover:bg-emerald-500 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
         >
           {isGenerating ? (
             <>
@@ -200,11 +200,11 @@ export function DescriptionTab({ property, onGenerated }: DescriptionTabProps) {
       </div>
 
       {/* Preview Panel */}
-      <div className="rounded-2xl border border-white/10 bg-zinc-900/50 p-5 min-h-[300px] flex flex-col">
+      <div className="rounded-2xl border border-zinc-200 dark:border-white/10 bg-white dark:bg-zinc-900/50 p-5 min-h-[300px] flex flex-col">
         {result ? (
           <>
             <div className="flex items-center justify-between mb-3">
-              <h4 className="text-sm font-medium text-zinc-300">Generated Description</h4>
+              <h4 className="text-sm font-medium text-zinc-600 dark:text-zinc-300">Generated Description</h4>
               <div className="flex items-center gap-1">
                 <button
                   onClick={() => {
@@ -214,8 +214,8 @@ export function DescriptionTab({ property, onGenerated }: DescriptionTabProps) {
                   className={cn(
                     'p-1.5 rounded-lg transition-colors',
                     isEditing
-                      ? 'bg-violet-500/20 text-violet-400'
-                      : 'text-zinc-500 hover:text-white hover:bg-white/5'
+                      ? 'bg-emerald-500/20 text-emerald-400'
+                      : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-white/5'
                   )}
                   title={isEditing ? 'Done editing' : 'Edit'}
                 >
@@ -242,13 +242,13 @@ export function DescriptionTab({ property, onGenerated }: DescriptionTabProps) {
               <textarea
                 value={editedText}
                 onChange={(e) => setEditedText(e.target.value)}
-                className="flex-1 w-full p-3 rounded-lg bg-white/5 border border-violet-500/20 text-sm text-zinc-200 leading-relaxed resize-none focus:outline-none focus:border-violet-500/40"
+                className="flex-1 w-full p-3 rounded-lg bg-zinc-50 dark:bg-white/5 border border-emerald-500/20 text-sm text-zinc-800 dark:text-zinc-200 leading-relaxed resize-none focus:outline-none focus:border-emerald-500/40"
               />
             ) : (
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                className="text-sm text-zinc-300 leading-relaxed whitespace-pre-wrap"
+                className="text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed whitespace-pre-wrap"
               >
                 {result}
               </motion.div>

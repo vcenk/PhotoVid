@@ -57,8 +57,8 @@ export function ListingCreator() {
     <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
       {/* Hero */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-white mb-2">Listing Content Studio</h1>
-        <p className="text-zinc-400 text-sm">
+        <h1 className="text-3xl font-bold text-zinc-900 dark:text-white mb-2">Listing Content Studio</h1>
+        <p className="text-zinc-500 dark:text-zinc-400 text-sm">
           Generate MLS descriptions, social media posts, flyers, and email campaigns for your listings.
         </p>
       </div>
@@ -72,8 +72,8 @@ export function ListingCreator() {
       </div>
 
       {!selectedProperty ? (
-        <div className="rounded-2xl border border-white/5 bg-zinc-900/30 p-12 text-center">
-          <Home size={32} className="mx-auto mb-3 text-zinc-700" />
+        <div className="rounded-2xl border border-zinc-200 dark:border-white/5 bg-zinc-100 dark:bg-zinc-900/30 p-12 text-center">
+          <Home size={32} className="mx-auto mb-3 text-zinc-400 dark:text-zinc-700" />
           <p className="text-zinc-500 text-sm">
             Select a property above to start generating listing content.
           </p>
@@ -93,8 +93,8 @@ export function ListingCreator() {
                   className={cn(
                     'flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all whitespace-nowrap relative',
                     isActive
-                      ? 'bg-violet-600 text-white'
-                      : 'text-zinc-400 hover:text-white hover:bg-white/5'
+                      ? 'bg-emerald-600 text-white'
+                      : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-white/5'
                   )}
                 >
                   <Icon size={16} />
@@ -106,7 +106,7 @@ export function ListingCreator() {
               );
             })}
 
-            <div className="w-px h-6 bg-white/10 mx-1 shrink-0" />
+            <div className="w-px h-6 bg-zinc-300 dark:bg-white/10 mx-1 shrink-0" />
 
             {LINK_TABS.map((link) => {
               const Icon = link.icon;
@@ -114,7 +114,7 @@ export function ListingCreator() {
                 <button
                   key={link.path}
                   onClick={() => navigate(link.path)}
-                  className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium text-zinc-500 hover:text-white hover:bg-white/5 transition-all whitespace-nowrap"
+                  className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium text-zinc-500 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-white/5 transition-all whitespace-nowrap"
                 >
                   <Icon size={16} />
                   {link.label}

@@ -132,7 +132,7 @@ export function PreviewStep() {
                 className={`
                     flex items-center gap-2 px-3 py-1.5 rounded-md transition-all text-xs font-medium
                     ${format === fmt
-                    ? 'bg-violet-600 text-white shadow-md'
+                    ? 'bg-emerald-600 text-white shadow-md'
                     : 'text-zinc-400 hover:text-white hover:bg-white/5'
                     }
                 `}
@@ -148,7 +148,7 @@ export function PreviewStep() {
         <div className="flex-1 flex flex-col items-center justify-center bg-black/20 rounded-3xl border border-white/5 p-6 backdrop-blur-sm relative overflow-hidden group">
             
              {/* Background Glow */}
-             <div className="absolute inset-0 bg-violet-500/5 blur-3xl rounded-full opacity-50 pointer-events-none" />
+             <div className="absolute inset-0 bg-emerald-500/5 blur-3xl rounded-full opacity-50 pointer-events-none" />
 
           <div
             className="relative bg-black rounded-2xl overflow-hidden shadow-2xl ring-1 ring-white/10 z-10"
@@ -202,7 +202,7 @@ export function PreviewStep() {
            {/* Playback Bar (Below video) */}
            {canPreview && (
                 <div className="w-full max-w-md mt-6 flex items-center justify-between gap-4 z-10 px-4 py-2 bg-black/40 rounded-full border border-white/5 backdrop-blur-md">
-                     <button onClick={handlePlayPause} className="text-white hover:text-violet-400 transition-colors">
+                     <button onClick={handlePlayPause} className="text-white hover:text-emerald-400 transition-colors">
                         {isPlaying ? <Pause size={20} className="fill-current" /> : <Play size={20} className="fill-current" />}
                      </button>
                      
@@ -240,7 +240,7 @@ export function PreviewStep() {
                     className={`
                     w-full flex items-center gap-4 p-4 rounded-xl border transition-all duration-200 text-left relative overflow-hidden
                     ${isSelected
-                        ? 'bg-violet-600/10 border-violet-500/50 shadow-lg shadow-violet-900/10'
+                        ? 'bg-emerald-600/10 border-emerald-500/50 shadow-lg shadow-emerald-900/10'
                         : 'bg-white/5 border-white/5 hover:bg-white/10 hover:border-white/10'
                     }
                     `}
@@ -248,7 +248,7 @@ export function PreviewStep() {
                     {/* Checkbox */}
                     <div className={`
                     w-5 h-5 rounded flex items-center justify-center border transition-colors
-                    ${isSelected ? 'bg-violet-600 border-violet-600' : 'border-zinc-600 bg-transparent'}
+                    ${isSelected ? 'bg-emerald-600 border-emerald-600' : 'border-zinc-600 bg-transparent'}
                     `}>
                     {isSelected && <Check size={12} className="text-white" />}
                     </div>
@@ -256,7 +256,7 @@ export function PreviewStep() {
                     {/* Icon */}
                     <div className={`
                     p-2 rounded-lg
-                    ${isSelected ? 'bg-violet-600/20 text-violet-300' : 'bg-white/5 text-zinc-500'}
+                    ${isSelected ? 'bg-emerald-600/20 text-emerald-300' : 'bg-white/5 text-zinc-500'}
                     `}>
                     {FORMAT_ICONS[fmt]}
                     </div>
@@ -269,7 +269,7 @@ export function PreviewStep() {
 
                     {/* Credits */}
                     <div className="text-right">
-                    <span className="text-xs font-mono text-violet-400 bg-violet-500/10 px-2 py-1 rounded">{VIDEO_EXPORT_CREDITS.single} credits</span>
+                    <span className="text-xs font-mono text-emerald-400 bg-emerald-500/10 px-2 py-1 rounded">{VIDEO_EXPORT_CREDITS.single} credits</span>
                     </div>
                 </motion.button>
                 );
@@ -316,7 +316,7 @@ export function PreviewStep() {
               w-full flex items-center justify-center gap-3 px-6 py-4 rounded-xl font-bold text-lg transition-all duration-300
               ${isLoading
                 ? 'bg-zinc-800 text-zinc-500 cursor-wait'
-                : 'bg-gradient-to-r from-violet-600 via-indigo-600 to-violet-600 bg-[length:200%_auto] hover:bg-[position:right_center] text-white shadow-lg shadow-violet-900/30 hover:shadow-violet-600/40 hover:-translate-y-0.5'
+                : 'bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-600 bg-[length:200%_auto] hover:bg-[position:right_center] text-white shadow-lg shadow-emerald-900/30 hover:shadow-emerald-600/40 hover:-translate-y-0.5'
               }
               disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:translate-y-0
             `}

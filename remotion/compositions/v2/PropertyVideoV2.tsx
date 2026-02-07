@@ -1,11 +1,13 @@
 /**
- * PropertyVideoV2 - Voice-Synced Remotion Composition
+ * PropertyVideoV2 - Enhanced Voice-Synced Remotion Composition
  *
  * Features:
  * - Voice narration synchronized to images
  * - Animated captions (word-by-word reveal)
+ * - Multiple transition types (fade, slide, wipe, zoom)
  * - Ken Burns effects per template style
- * - Background music with voice ducking
+ * - Background music with proper volume control
+ * - Music ducking when voice plays
  * - Light leaks and vignette effects
  */
 
@@ -18,22 +20,78 @@ import {
   interpolate,
   spring,
   Easing,
+  Audio,
 } from 'remotion';
 import type {
   PropertyVideoV2Props,
   TemplateV2Config,
   ScriptSegment,
   WordTiming,
+  TransitionStyle,
 } from '@/lib/types/quick-video-v2';
 import type { VideoImage, AgentBranding } from '@/lib/types/video-project';
 import { getKenBurnsDirection } from '@/lib/data/video-templates-v2';
 
 // ============================================================================
-// Constants
+// Light Leak Effect Component
 // ============================================================================
 
-const INTRO_DURATION_FRAMES = 60; // 2 seconds
-const OUTRO_DURATION_FRAMES = 90; // 3 seconds
+interface LightLeakProps {
+  intensity?: number;
+  color?: string;
+}
+
+function LightLeakEffect({ intensity = 0.3, color }: LightLeakProps) {
+  const frame = useCurrentFrame();
+  const { durationInFrames } = useVideoConfig();
+
+  // Animate the light leak position
+  const progress = (frame / durationInFrames) * 100;
+  const xPos = interpolate(frame, [0, durationInFrames], [-50, 150]);
+  const opacity = interpolate(
+    Math.sin((frame / 30) * Math.PI),
+    [-1, 1],
+    [0.1, intensity]
+  );
+
+  return (
+    <div
+      style={{
+        position: 'absolute',
+        inset: 0,
+        overflow: 'hidden',
+        pointerEvents: 'none',
+        mixBlendMode: 'screen',
+      }}
+    >
+      {/* Primary light leak */}
+      <div
+        style={{
+          position: 'absolute',
+          width: '60%',
+          height: '100%',
+          left: `${xPos}%`,
+          background: `radial-gradient(ellipse at center, ${color || 'rgba(255, 200, 100, 0.4)'} 0%, transparent 70%)`,
+          opacity,
+          transform: 'rotate(-15deg) scale(1.5)',
+        }}
+      />
+      {/* Secondary subtle leak */}
+      <div
+        style={{
+          position: 'absolute',
+          width: '40%',
+          height: '80%',
+          right: `${100 - xPos * 0.5}%`,
+          top: '10%',
+          background: `radial-gradient(ellipse at center, ${color || 'rgba(255, 150, 50, 0.3)'} 0%, transparent 60%)`,
+          opacity: opacity * 0.5,
+          transform: 'rotate(20deg)',
+        }}
+      />
+    </div>
+  );
+}
 
 // ============================================================================
 // Ken Burns Image Component
@@ -48,10 +106,10 @@ interface KenBurnsImageProps {
 
 function KenBurnsImage({ src, direction, intensity, durationInFrames }: KenBurnsImageProps) {
   const frame = useCurrentFrame();
-  const progress = frame / durationInFrames;
+  const progress = Math.min(frame / durationInFrames, 1);
 
   const scale = useMemo(() => {
-    const baseScale = 1;
+    const baseScale = 1.05; // Start slightly zoomed to avoid edges
     const zoomAmount = intensity;
 
     switch (direction) {
@@ -59,13 +117,16 @@ function KenBurnsImage({ src, direction, intensity, durationInFrames }: KenBurns
         return baseScale + progress * zoomAmount;
       case 'zoom-out':
         return baseScale + zoomAmount - progress * zoomAmount;
+      case 'pan-left':
+      case 'pan-right':
+        return baseScale + zoomAmount * 0.5;
       default:
-        return baseScale + zoomAmount * 0.5; // Slight zoom for pan
+        return baseScale;
     }
   }, [direction, intensity, progress]);
 
   const translateX = useMemo(() => {
-    const panAmount = intensity * 100; // pixels
+    const panAmount = intensity * 80;
 
     switch (direction) {
       case 'pan-left':
@@ -78,13 +139,7 @@ function KenBurnsImage({ src, direction, intensity, durationInFrames }: KenBurns
   }, [direction, intensity, progress]);
 
   return (
-    <div
-      style={{
-        width: '100%',
-        height: '100%',
-        overflow: 'hidden',
-      }}
-    >
+    <div style={{ width: '100%', height: '100%', overflow: 'hidden' }}>
       <img
         src={src}
         alt=""
@@ -96,6 +151,72 @@ function KenBurnsImage({ src, direction, intensity, durationInFrames }: KenBurns
           transformOrigin: 'center center',
         }}
       />
+    </div>
+  );
+}
+
+// ============================================================================
+// Transition Components
+// ============================================================================
+
+interface TransitionProps {
+  progress: number; // 0 to 1
+  style: TransitionStyle;
+  children: React.ReactNode;
+}
+
+function TransitionWrapper({ progress, style, children }: TransitionProps) {
+  const getTransform = () => {
+    switch (style) {
+      case 'slide':
+        // Slide in from right
+        const slideX = interpolate(progress, [0, 1], [100, 0], { extrapolateRight: 'clamp' });
+        return `translateX(${slideX}%)`;
+
+      case 'zoom':
+        // Zoom in from center
+        const zoomScale = interpolate(progress, [0, 1], [0.5, 1], { extrapolateRight: 'clamp' });
+        return `scale(${zoomScale})`;
+
+      case 'wipe':
+        // No transform for wipe, handled by clip-path
+        return 'none';
+
+      case 'fade':
+      default:
+        return 'none';
+    }
+  };
+
+  const getOpacity = () => {
+    if (style === 'fade') {
+      return interpolate(progress, [0, 1], [0, 1], { extrapolateRight: 'clamp' });
+    }
+    if (style === 'zoom') {
+      return interpolate(progress, [0, 0.3, 1], [0, 1, 1], { extrapolateRight: 'clamp' });
+    }
+    return 1;
+  };
+
+  const getClipPath = () => {
+    if (style === 'wipe') {
+      const wipeProgress = interpolate(progress, [0, 1], [0, 100], { extrapolateRight: 'clamp' });
+      return `inset(0 ${100 - wipeProgress}% 0 0)`;
+    }
+    return 'none';
+  };
+
+  return (
+    <div
+      style={{
+        position: 'absolute',
+        inset: 0,
+        opacity: getOpacity(),
+        transform: getTransform(),
+        clipPath: getClipPath(),
+      }}
+    >
+      {children}
     </div>
   );
 }
@@ -128,29 +249,34 @@ function AnimatedCaption({ wordTimings, currentTimeSeconds, template }: Animated
     <div
       style={{
         position: 'absolute',
-        bottom: 60,
-        left: 40,
-        right: 40,
+        bottom: 50,
+        left: 24,
+        right: 24,
         display: 'flex',
         justifyContent: 'center',
       }}
     >
       <div
         style={{
-          backgroundColor: template.colors.captionBg,
-          padding: '16px 24px',
-          borderRadius: 12,
-          maxWidth: '80%',
+          backgroundColor: 'rgba(0, 0, 0, 0.85)',
+          padding: '20px 36px',
+          borderRadius: 16,
+          maxWidth: '94%',
+          backdropFilter: 'blur(16px)',
+          boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
         }}
       >
         <p
           style={{
-            fontSize: 24,
+            fontSize: 48,
             fontFamily: template.fonts.body,
-            color: template.colors.text,
+            color: '#ffffff',
             lineHeight: 1.5,
             textAlign: 'center',
             margin: 0,
+            fontWeight: 600,
+            wordWrap: 'break-word',
+            overflowWrap: 'break-word',
           }}
         >
           {visibleWords.map((word, i) => {
@@ -158,7 +284,7 @@ function AnimatedCaption({ wordTimings, currentTimeSeconds, template }: Animated
             const wordFrame = Math.round(word.start * fps);
             const animationProgress = interpolate(
               frame - wordFrame,
-              [0, 8],
+              [0, 10],
               [0, 1],
               { extrapolateRight: 'clamp' }
             );
@@ -167,13 +293,12 @@ function AnimatedCaption({ wordTimings, currentTimeSeconds, template }: Animated
               <span
                 key={`${word.word}-${i}`}
                 style={{
-                  display: 'inline-block',
+                  display: 'inline',
                   opacity: animationProgress,
-                  transform: `translateY(${(1 - animationProgress) * 10}px)`,
-                  color: isCurrentWord ? template.colors.accent : template.colors.text,
-                  fontWeight: isCurrentWord ? 600 : 400,
-                  transition: 'color 0.1s, font-weight 0.1s',
-                  marginRight: 8,
+                  color: isCurrentWord ? template.colors.accent : '#ffffff',
+                  fontWeight: isCurrentWord ? 700 : 600,
+                  marginRight: 12,
+                  textShadow: '0 4px 12px rgba(0,0,0,0.6)',
                 }}
               >
                 {word.word}
@@ -202,11 +327,16 @@ function IntroSequence({ template, agentBranding }: IntroSequenceProps) {
   const logoScale = spring({
     frame,
     fps,
-    config: { damping: 20, stiffness: 80 },
+    config: { damping: 15, stiffness: 100 },
   });
 
-  const textOpacity = interpolate(frame, [20, 40], [0, 1], {
+  const textOpacity = interpolate(frame, [20, 45], [0, 1], {
     extrapolateRight: 'clamp',
+  });
+
+  const textSlide = interpolate(frame, [20, 45], [20, 0], {
+    extrapolateRight: 'clamp',
+    easing: Easing.out(Easing.cubic),
   });
 
   return (
@@ -217,60 +347,71 @@ function IntroSequence({ template, agentBranding }: IntroSequenceProps) {
         alignItems: 'center',
       }}
     >
+      {/* Subtle gradient background */}
+      <div
+        style={{
+          position: 'absolute',
+          inset: 0,
+          background: `radial-gradient(ellipse at center, ${template.colors.secondary} 0%, ${template.colors.background} 70%)`,
+        }}
+      />
+
       {/* Logo/Branding */}
-      {agentBranding?.logoUrl ? (
-        <img
-          src={agentBranding.logoUrl}
-          alt=""
-          style={{
-            width: 200,
-            height: 'auto',
-            transform: `scale(${logoScale})`,
-          }}
-        />
-      ) : agentBranding?.brokerageName ? (
-        <div
-          style={{
-            transform: `scale(${logoScale})`,
-            textAlign: 'center',
-          }}
-        >
+      <div style={{ transform: `scale(${logoScale})`, zIndex: 1 }}>
+        {agentBranding?.logoUrl ? (
+          <img
+            src={agentBranding.logoUrl}
+            alt=""
+            style={{
+              width: 180,
+              height: 'auto',
+              maxHeight: 120,
+              objectFit: 'contain',
+            }}
+          />
+        ) : agentBranding?.brokerageName ? (
           <h1
             style={{
-              fontSize: 48,
+              fontSize: 52,
               fontFamily: template.fonts.heading,
               color: template.colors.text,
               margin: 0,
+              textAlign: 'center',
             }}
           >
             {agentBranding.brokerageName}
           </h1>
-        </div>
-      ) : (
-        <div
-          style={{
-            width: 80,
-            height: 80,
-            borderRadius: 20,
-            backgroundColor: template.colors.accent,
-            transform: `scale(${logoScale})`,
-          }}
-        />
-      )}
+        ) : (
+          <div
+            style={{
+              width: 90,
+              height: 90,
+              borderRadius: 24,
+              background: `linear-gradient(135deg, ${template.colors.accent} 0%, ${template.colors.primary} 100%)`,
+            }}
+          />
+        )}
+      </div>
 
       {/* Subtitle */}
       <p
         style={{
           opacity: textOpacity,
-          marginTop: 20,
-          fontSize: 20,
+          transform: `translateY(${textSlide}px)`,
+          marginTop: 24,
+          fontSize: 22,
           fontFamily: template.fonts.body,
           color: template.colors.text,
-          opacity: 0.7,
+          letterSpacing: 4,
+          textTransform: 'uppercase',
+          zIndex: 1,
         }}
       >
         presents
       </p>
+
+      {/* Light leak on intro */}
+      {template.useLightLeaks && <LightLeakEffect intensity={0.2} />}
     </AbsoluteFill>
   );
 }
@@ -288,13 +429,19 @@ function OutroSequence({ template, agentBranding }: OutroSequenceProps) {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
 
-  const contentOpacity = interpolate(frame, [0, 20], [0, 1], {
+  const contentOpacity = interpolate(frame, [0, 25], [0, 1], {
     extrapolateRight: 'clamp',
   });
 
-  const slideUp = interpolate(frame, [0, 30], [30, 0], {
+  const slideUp = interpolate(frame, [0, 35], [40, 0], {
     extrapolateRight: 'clamp',
     easing: Easing.out(Easing.cubic),
+  });
+
+  const ctaScale = spring({
+    frame: frame - 10,
+    fps,
+    config: { damping: 12, stiffness: 80 },
   });
 
   return (
@@ -303,49 +450,73 @@ function OutroSequence({ template, agentBranding }: OutroSequenceProps) {
         backgroundColor: template.colors.background,
         justifyContent: 'center',
         alignItems: 'center',
-        opacity: contentOpacity,
       }}
     >
+      {/* Background gradient */}
+      <div
+        style={{
+          position: 'absolute',
+          inset: 0,
+          background: `radial-gradient(ellipse at center, ${template.colors.secondary} 0%, ${template.colors.background} 80%)`,
+        }}
+      />
+
       <div
         style={{
           textAlign: 'center',
           transform: `translateY(${slideUp}px)`,
+          opacity: contentOpacity,
+          zIndex: 1,
         }}
       >
         {/* CTA */}
         <h2
           style={{
-            fontSize: 36,
+            fontSize: 40,
             fontFamily: template.fonts.heading,
             color: template.colors.text,
-            marginBottom: 20,
+            marginBottom: 24,
+            transform: `scale(${Math.max(0, ctaScale)})`,
           }}
         >
           Schedule Your Private Tour
         </h2>
 
+        {/* Contact accent line */}
+        <div
+          style={{
+            width: 60,
+            height: 3,
+            backgroundColor: template.colors.accent,
+            margin: '0 auto 30px',
+            borderRadius: 2,
+          }}
+        />
+
         {/* Agent Info */}
         {agentBranding?.name && (
-          <div style={{ marginTop: 30 }}>
+          <div style={{ marginTop: 20 }}>
             {agentBranding.photoUrl && (
               <img
                 src={agentBranding.photoUrl}
                 alt=""
                 style={{
-                  width: 80,
-                  height: 80,
-                  borderRadius: 40,
+                  width: 90,
+                  height: 90,
+                  borderRadius: 45,
                   objectFit: 'cover',
-                  marginBottom: 16,
+                  marginBottom: 20,
+                  border: `3px solid ${template.colors.accent}`,
                 }}
               />
             )}
             <p
               style={{
-                fontSize: 24,
+                fontSize: 26,
                 fontFamily: template.fonts.body,
                 color: template.colors.text,
                 margin: 0,
+                fontWeight: 600,
               }}
             >
               {agentBranding.name}
@@ -353,24 +524,41 @@ function OutroSequence({ template, agentBranding }: OutroSequenceProps) {
             {agentBranding.phone && (
               <p
                 style={{
-                  fontSize: 18,
+                  fontSize: 22,
                   fontFamily: template.fonts.body,
                   color: template.colors.accent,
-                  margin: '8px 0 0',
+                  margin: '12px 0 0',
+                  fontWeight: 500,
                 }}
               >
                 {agentBranding.phone}
               </p>
             )}
+            {agentBranding.email && (
+              <p
+                style={{
+                  fontSize: 18,
+                  fontFamily: template.fonts.body,
+                  color: template.colors.text,
+                  opacity: 0.8,
+                  margin: '8px 0 0',
+                }}
+              >
+                {agentBranding.email}
+              </p>
+            )}
           </div>
         )}
       </div>
+
+      {/* Light leak on outro */}
+      {template.useLightLeaks && <LightLeakEffect intensity={0.15} />}
     </AbsoluteFill>
   );
 }
 
 // ============================================================================
-// Voice-Synced Slideshow
+// Voice-Synced Slideshow with Transitions
 // ============================================================================
 
 interface VoiceSyncedSlideshowProps {
@@ -392,65 +580,99 @@ function VoiceSyncedSlideshow({
   const { fps } = useVideoConfig();
   const currentTimeSeconds = frame / fps;
 
-  // Find current segment based on time
-  const currentSegmentIndex = segments.findIndex((seg, i) => {
-    const segmentStart = segments.slice(0, i).reduce((sum, s) => sum + s.duration, 0);
-    const segmentEnd = segmentStart + seg.duration;
-    return currentTimeSeconds >= segmentStart && currentTimeSeconds < segmentEnd;
-  });
+  // Calculate cumulative segment timings
+  const segmentTimings = useMemo(() => {
+    let cumulative = 0;
+    return segments.map((seg) => {
+      const start = cumulative;
+      cumulative += seg.duration;
+      return { start, end: cumulative, segment: seg };
+    });
+  }, [segments]);
 
+  // Find current and next segment
+  const currentSegmentIndex = segmentTimings.findIndex(
+    (t) => currentTimeSeconds >= t.start && currentTimeSeconds < t.end
+  );
   const activeIndex = currentSegmentIndex >= 0 ? currentSegmentIndex : 0;
+
+  const currentTiming = segmentTimings[activeIndex];
   const currentImage = images[activeIndex] || images[0];
   const currentSegment = segments[activeIndex] || segments[0];
 
-  // Calculate segment timing for transitions
-  const segmentStartTime = segments.slice(0, activeIndex).reduce((sum, s) => sum + s.duration, 0);
-  const segmentProgress = (currentTimeSeconds - segmentStartTime) / currentSegment.duration;
+  // Calculate transition progress (for entering the current slide)
+  const transitionDurationSeconds = template.transitionDuration / fps;
+  const timeIntoSegment = currentTimeSeconds - (currentTiming?.start || 0);
+  const transitionProgress = Math.min(timeIntoSegment / transitionDurationSeconds, 1);
 
-  // Transition opacity (fade between images)
-  const transitionProgress = interpolate(
-    segmentProgress,
-    [0, 0.1, 0.9, 1],
-    [0, 1, 1, 0.8],
-    { extrapolateRight: 'clamp' }
-  );
+  // Ken Burns direction for this image
+  const kenBurnsDirection = getKenBurnsDirection(template.kenBurnsStyle, activeIndex);
 
-  const kenBurnsDirection = getKenBurnsDirection(
-    template.kenBurnsStyle,
-    activeIndex
-  );
+  // Previous image for crossfade (if in transition period)
+  const prevIndex = activeIndex > 0 ? activeIndex - 1 : null;
+  const prevImage = prevIndex !== null ? images[prevIndex] : null;
+  const showPrevImage = transitionProgress < 1 && prevImage;
 
   return (
     <AbsoluteFill>
-      {/* Current Image with Ken Burns */}
-      {currentImage && (
-        <div style={{ opacity: transitionProgress }}>
+      {/* Previous Image (fading out during transition) */}
+      {showPrevImage && template.transitionStyle === 'fade' && (
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            opacity: 1 - transitionProgress,
+          }}
+        >
           <KenBurnsImage
-            src={currentImage.url}
-            direction={kenBurnsDirection}
+            src={prevImage.url}
+            direction={getKenBurnsDirection(template.kenBurnsStyle, prevIndex!)}
             intensity={template.kenBurnsIntensity}
-            durationInFrames={Math.round(currentSegment.duration * fps)}
+            durationInFrames={Math.round((currentSegment?.duration || 5) * fps)}
           />
         </div>
       )}
 
-      {/* Gradient overlay */}
+      {/* Current Image with Transition */}
+      {currentImage && (
+        <TransitionWrapper
+          progress={transitionProgress}
+          style={template.transitionStyle}
+        >
+          <KenBurnsImage
+            src={currentImage.url}
+            direction={kenBurnsDirection}
+            intensity={template.kenBurnsIntensity}
+            durationInFrames={Math.round((currentSegment?.duration || 5) * fps)}
+          />
+        </TransitionWrapper>
+      )}
+
+      {/* Gradient overlay for text readability */}
       <div
         style={{
           position: 'absolute',
           inset: 0,
-          background: 'linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 40%, transparent 100%)',
+          background: 'linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.2) 30%, transparent 50%, transparent 100%)',
         }}
       />
 
-      {/* Vignette */}
+      {/* Vignette effect */}
       {template.useVignette && (
         <div
           style={{
             position: 'absolute',
             inset: 0,
-            background: 'radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.4) 100%)',
+            background: 'radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.5) 100%)',
           }}
+        />
+      )}
+
+      {/* Light Leak effect */}
+      {template.useLightLeaks && (
+        <LightLeakEffect
+          intensity={0.25}
+          color={`${template.colors.accent}40`}
         />
       )}
 
@@ -488,10 +710,29 @@ export const PropertyVideoV2: React.FC<PropertyVideoV2Props> = ({
   const introDuration = template.introDuration;
   const outroDuration = template.outroDuration;
   const slideshowDuration = durationInFrames - introDuration - outroDuration;
-
-  // Calculate slideshow time offset
   const slideshowStartFrame = introDuration;
-  const slideshowCurrentFrame = Math.max(0, frame - slideshowStartFrame);
+
+  // Calculate music volume with ducking
+  // When voice is playing, reduce music volume
+  const currentTimeSeconds = frame / fps;
+  const isVoicePlaying = voiceAudioUrl && frame >= slideshowStartFrame && frame < (durationInFrames - outroDuration);
+
+  // Base music volume (0-1 scale)
+  const baseMusicVolume = (musicVolume || template.musicVolume) / 100;
+  // Ducked volume when voice plays
+  const duckedVolume = baseMusicVolume * (1 - template.voiceDuckLevel / 100);
+  // Final music volume
+  const finalMusicVolume = isVoicePlaying ? duckedVolume : baseMusicVolume;
+
+  // Fade music in/out at start/end
+  const musicFadeIn = interpolate(frame, [0, 30], [0, 1], { extrapolateRight: 'clamp' });
+  const musicFadeOut = interpolate(
+    frame,
+    [durationInFrames - 60, durationInFrames - 10],
+    [1, 0],
+    { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' }
+  );
+  const musicVolumeWithFade = finalMusicVolume * musicFadeIn * musicFadeOut;
 
   return (
     <AbsoluteFill style={{ backgroundColor: template.colors.background }}>
@@ -516,19 +757,19 @@ export const PropertyVideoV2: React.FC<PropertyVideoV2Props> = ({
         <OutroSequence template={template} agentBranding={agentBranding} />
       </Sequence>
 
-      {/* Voice Audio */}
+      {/* Voice Audio - using Remotion's Audio component */}
       {voiceAudioUrl && (
         <Sequence from={introDuration} durationInFrames={slideshowDuration}>
-          <audio src={voiceAudioUrl} />
+          <Audio src={voiceAudioUrl} volume={1} />
         </Sequence>
       )}
 
-      {/* Background Music with Ducking */}
+      {/* Background Music - with ducking and fades */}
       {template.musicTrack && (
-        <audio
+        <Audio
           src={template.musicTrack}
-          style={{ display: 'none' }}
-          // Volume handled by Remotion's Audio component in production
+          volume={musicVolumeWithFade}
+          loop
         />
       )}
     </AbsoluteFill>

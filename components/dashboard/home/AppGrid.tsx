@@ -104,7 +104,7 @@ export const AppGrid: React.FC<AppGridProps> = ({ category }) => {
       {/* Header + Search */}
       <div className="flex items-center justify-between mb-5">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-500 to-emerald-600 flex items-center justify-center">
             <Sparkles size={20} className="text-white" />
           </div>
           <div>
@@ -124,7 +124,7 @@ export const AppGrid: React.FC<AppGridProps> = ({ category }) => {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search tools..."
-            className="w-full pl-9 pr-3 py-2 text-sm bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:border-indigo-500"
+            className="w-full pl-9 pr-3 py-2 text-sm bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:border-teal-500"
           />
         </div>
       </div>
@@ -145,7 +145,7 @@ export const AppGrid: React.FC<AppGridProps> = ({ category }) => {
             >
               <div
                 onClick={() => handleClick(item)}
-                className="rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 overflow-hidden cursor-pointer group hover:border-indigo-500 dark:hover:border-indigo-500 transition-all hover:shadow-md"
+                className="rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 overflow-hidden cursor-pointer group hover:border-teal-500 dark:hover:border-teal-500 transition-all hover:shadow-md"
               >
                 {/* Image */}
                 <div className="relative aspect-video overflow-hidden">
@@ -166,7 +166,7 @@ export const AppGrid: React.FC<AppGridProps> = ({ category }) => {
                   </div>
                   {item.isPremium && (
                     <div className="absolute top-2 right-2">
-                      <span className="px-2 py-0.5 bg-gradient-to-r from-amber-400 to-yellow-500 text-black text-[10px] font-bold rounded-full flex items-center gap-0.5">
+                      <span className="px-2 py-0.5 bg-gradient-to-r from-amber-400 to-yellow-500 text-amber-900 text-[10px] font-bold rounded-full flex items-center gap-0.5">
                         <Crown size={8} /> Pro
                       </span>
                     </div>
@@ -175,7 +175,7 @@ export const AppGrid: React.FC<AppGridProps> = ({ category }) => {
 
                 {/* Content */}
                 <div className="p-4">
-                  <h3 className="text-sm font-bold text-zinc-900 dark:text-white mb-1 truncate group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                  <h3 className="text-sm font-bold text-zinc-900 dark:text-white mb-1 truncate group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">
                     {item.name}
                   </h3>
                   <p className="text-xs text-zinc-500 dark:text-zinc-400 line-clamp-1 mb-3">
@@ -187,7 +187,7 @@ export const AppGrid: React.FC<AppGridProps> = ({ category }) => {
                         {item.tags[0]}
                       </span>
                     )}
-                    <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400 group-hover:text-indigo-500 flex items-center gap-1 transition-colors ml-auto">
+                    <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400 group-hover:text-teal-500 flex items-center gap-1 transition-colors ml-auto">
                       Use Tool <ArrowRight size={12} />
                     </span>
                   </div>
@@ -203,7 +203,7 @@ export const AppGrid: React.FC<AppGridProps> = ({ category }) => {
         <div className="flex justify-center mt-6">
           <button
             onClick={() => setShowAll(true)}
-            className="flex items-center gap-2 px-6 py-2.5 text-sm font-medium text-zinc-600 dark:text-zinc-300 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl hover:border-indigo-500 dark:hover:border-indigo-500 transition-all"
+            className="flex items-center gap-2 px-6 py-2.5 text-sm font-medium text-zinc-600 dark:text-zinc-300 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl hover:border-teal-500 dark:hover:border-teal-500 transition-all"
           >
             Show More
             <ChevronDown size={16} />

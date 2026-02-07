@@ -31,7 +31,7 @@ const AUTO_TOOLS = [
         name: 'Showroom Background',
         description: 'Replace lot backgrounds with premium showroom settings',
         icon: ImageIcon,
-        gradient: 'from-blue-500 to-indigo-600',
+        gradient: 'from-blue-500 to-teal-600',
     },
     {
         id: 'vehicle-enhancement',
@@ -45,7 +45,7 @@ const AUTO_TOOLS = [
         name: 'Color Visualizer',
         description: 'Show vehicles in different colors for customers',
         icon: Palette,
-        gradient: 'from-violet-500 to-purple-600',
+        gradient: 'from-emerald-500 to-teal-600',
     },
     {
         id: 'blemish-removal',
@@ -112,7 +112,7 @@ export const AutoDealershipPage: React.FC = () => {
     };
 
     return (
-        <div className="h-screen flex bg-white dark:bg-[#09090b]">
+        <div className="h-screen flex bg-white dark:bg-[#09090b] font-[Space_Grotesk]">
             {/* Navigation Rail */}
             <NavigationRail isMobileOpen={mobileMenuOpen} onMobileClose={() => setMobileMenuOpen(false)} />
 

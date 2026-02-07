@@ -1560,7 +1560,7 @@ const SocialMediaPosterToolInner: React.FC = () => {
                 <button
                   onClick={handleGenerateContent}
                   disabled={isGeneratingContent}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-violet-500/20 text-violet-400 hover:bg-violet-500/30 transition-colors text-xs"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30 transition-colors text-xs"
                 >
                   {isGeneratingContent ? (
                     <Loader2 className="w-3.5 h-3.5 animate-spin" />

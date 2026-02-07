@@ -90,7 +90,7 @@ export function FlyerTab({ property, onGenerated }: FlyerTabProps) {
       <div className="space-y-5">
         {/* Template selector */}
         <div>
-          <label className="block text-sm font-medium text-zinc-300 mb-2">Template</label>
+          <label className="block text-sm font-medium text-zinc-600 dark:text-zinc-300 mb-2">Template</label>
           <div className="grid grid-cols-2 gap-2">
             {TEMPLATES.map((t) => (
               <button
@@ -99,13 +99,13 @@ export function FlyerTab({ property, onGenerated }: FlyerTabProps) {
                 className={cn(
                   'flex flex-col items-start p-3 rounded-xl border text-left transition-all',
                   template === t.value
-                    ? 'border-violet-500/30 bg-violet-500/10'
-                    : 'border-white/5 bg-white/5 hover:bg-white/10'
+                    ? 'border-emerald-500/30 bg-emerald-500/10'
+                    : 'border-zinc-200 dark:border-white/5 bg-zinc-50 dark:bg-white/5 hover:bg-zinc-100 dark:hover:bg-white/10'
                 )}
               >
                 <div className="flex items-center gap-2 mb-1">
                   <LayoutTemplate size={14} className="text-zinc-400" />
-                  <span className="text-sm font-medium text-white">{t.label}</span>
+                  <span className="text-sm font-medium text-zinc-900 dark:text-white">{t.label}</span>
                 </div>
                 <span className="text-xs text-zinc-500">{t.desc}</span>
               </button>
@@ -122,7 +122,7 @@ export function FlyerTab({ property, onGenerated }: FlyerTabProps) {
                 type="date"
                 value={openHouseDate}
                 onChange={(e) => setOpenHouseDate(e.target.value)}
-                className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-sm text-white focus:outline-none focus:border-violet-500/30"
+                className="w-full px-3 py-2 rounded-lg bg-zinc-50 dark:bg-white/5 border border-zinc-200 dark:border-white/10 text-sm text-zinc-900 dark:text-white focus:outline-none focus:border-emerald-500/30"
               />
             </div>
             <div>
@@ -131,7 +131,7 @@ export function FlyerTab({ property, onGenerated }: FlyerTabProps) {
                 type="time"
                 value={openHouseTime}
                 onChange={(e) => setOpenHouseTime(e.target.value)}
-                className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-sm text-white focus:outline-none focus:border-violet-500/30"
+                className="w-full px-3 py-2 rounded-lg bg-zinc-50 dark:bg-white/5 border border-zinc-200 dark:border-white/10 text-sm text-zinc-900 dark:text-white focus:outline-none focus:border-emerald-500/30"
               />
             </div>
           </div>
@@ -139,31 +139,31 @@ export function FlyerTab({ property, onGenerated }: FlyerTabProps) {
 
         {/* Agent Info */}
         <div>
-          <label className="block text-sm font-medium text-zinc-300 mb-2">Agent Information</label>
+          <label className="block text-sm font-medium text-zinc-600 dark:text-zinc-300 mb-2">Agent Information</label>
           <div className="grid grid-cols-2 gap-2">
             <input
               placeholder="Your Name"
               value={agentInfo.agentName}
               onChange={(e) => setAgentInfo((p: any) => ({ ...p, agentName: e.target.value }))}
-              className="px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:border-violet-500/30"
+              className="px-3 py-2 rounded-lg bg-zinc-50 dark:bg-white/5 border border-zinc-200 dark:border-white/10 text-sm text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus:outline-none focus:border-emerald-500/30"
             />
             <input
               placeholder="Phone"
               value={agentInfo.agentPhone}
               onChange={(e) => setAgentInfo((p: any) => ({ ...p, agentPhone: e.target.value }))}
-              className="px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:border-violet-500/30"
+              className="px-3 py-2 rounded-lg bg-zinc-50 dark:bg-white/5 border border-zinc-200 dark:border-white/10 text-sm text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus:outline-none focus:border-emerald-500/30"
             />
             <input
               placeholder="Email"
               value={agentInfo.agentEmail}
               onChange={(e) => setAgentInfo((p: any) => ({ ...p, agentEmail: e.target.value }))}
-              className="px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:border-violet-500/30"
+              className="px-3 py-2 rounded-lg bg-zinc-50 dark:bg-white/5 border border-zinc-200 dark:border-white/10 text-sm text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus:outline-none focus:border-emerald-500/30"
             />
             <input
               placeholder="Brokerage"
               value={agentInfo.brokerage}
               onChange={(e) => setAgentInfo((p: any) => ({ ...p, brokerage: e.target.value }))}
-              className="px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:border-violet-500/30"
+              className="px-3 py-2 rounded-lg bg-zinc-50 dark:bg-white/5 border border-zinc-200 dark:border-white/10 text-sm text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus:outline-none focus:border-emerald-500/30"
             />
           </div>
         </div>
@@ -172,7 +172,7 @@ export function FlyerTab({ property, onGenerated }: FlyerTabProps) {
         <button
           onClick={handleGenerate}
           disabled={isGenerating || !hasCredits}
-          className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-violet-600 text-white font-medium hover:bg-violet-500 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+          className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-emerald-600 text-white font-medium hover:bg-emerald-500 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
         >
           {isGenerating ? (
             <>
@@ -191,15 +191,15 @@ export function FlyerTab({ property, onGenerated }: FlyerTabProps) {
       </div>
 
       {/* Flyer Preview */}
-      <div className="rounded-2xl border border-white/10 bg-zinc-900/50 p-5 min-h-[400px] flex flex-col">
+      <div className="rounded-2xl border border-zinc-200 dark:border-white/10 bg-white dark:bg-zinc-900/50 p-5 min-h-[400px] flex flex-col">
         {flyerCopy ? (
           <>
             <div className="flex items-center justify-between mb-3">
-              <h4 className="text-sm font-medium text-zinc-300">Flyer Preview — {FLYER_TEMPLATE_LABELS[template]}</h4>
+              <h4 className="text-sm font-medium text-zinc-600 dark:text-zinc-300">Flyer Preview — {FLYER_TEMPLATE_LABELS[template]}</h4>
               <div className="flex items-center gap-1">
                 <button
                   onClick={handleCopyText}
-                  className="p-1.5 rounded-lg text-zinc-500 hover:text-white hover:bg-white/5 transition-colors"
+                  className="p-1.5 rounded-lg text-zinc-500 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-white/5 transition-colors"
                 >
                   {copied ? <Check size={14} className="text-green-400" /> : <Copy size={14} />}
                 </button>
@@ -229,8 +229,8 @@ export function FlyerTab({ property, onGenerated }: FlyerTabProps) {
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <div className="w-full h-full bg-gradient-to-br from-violet-200 to-purple-300 flex items-center justify-center">
-                    <span className="text-violet-600/50 text-lg font-semibold">Property Photo</span>
+                  <div className="w-full h-full bg-gradient-to-br from-emerald-200 to-teal-300 flex items-center justify-center">
+                    <span className="text-emerald-600/50 text-lg font-semibold">Property Photo</span>
                   </div>
                 )}
                 {template === 'luxury' && (
@@ -253,7 +253,7 @@ export function FlyerTab({ property, onGenerated }: FlyerTabProps) {
                 </div>
 
                 {price && (
-                  <div className="text-lg font-bold text-violet-700 mb-2">{price}</div>
+                  <div className="text-lg font-bold text-emerald-700 mb-2">{price}</div>
                 )}
 
                 {details && (
@@ -265,12 +265,12 @@ export function FlyerTab({ property, onGenerated }: FlyerTabProps) {
                 </p>
 
                 {template === 'open-house' && openHouseDate && (
-                  <div className="px-3 py-2 rounded-lg bg-violet-50 border border-violet-100 text-sm text-violet-800 font-medium mb-3">
+                  <div className="px-3 py-2 rounded-lg bg-emerald-50 border border-emerald-100 text-sm text-emerald-800 font-medium mb-3">
                     Open House: {openHouseDate} {openHouseTime && `at ${openHouseTime}`}
                   </div>
                 )}
 
-                <p className="text-xs text-violet-600 font-semibold italic mb-4">
+                <p className="text-xs text-emerald-600 font-semibold italic mb-4">
                   {flyerCopy.tagline}
                 </p>
 

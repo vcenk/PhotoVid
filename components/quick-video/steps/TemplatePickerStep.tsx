@@ -45,7 +45,7 @@ export function TemplatePickerStep() {
                 className={`
                   relative group rounded-2xl overflow-hidden border transition-all duration-300
                   ${isSelected
-                    ? 'border-violet-500 ring-4 ring-violet-500/10 shadow-xl shadow-violet-500/20'
+                    ? 'border-emerald-500 ring-4 ring-emerald-500/10 shadow-xl shadow-emerald-500/20'
                     : 'border-white/5 hover:border-white/20 hover:shadow-lg hover:shadow-black/20'
                   }
                 `}
@@ -77,7 +77,7 @@ export function TemplatePickerStep() {
 
                 {/* Selection Indicator */}
                 {isSelected && (
-                  <div className="absolute top-3 right-3 w-7 h-7 bg-violet-600 rounded-full flex items-center justify-center shadow-lg animate-in fade-in zoom-in duration-200">
+                  <div className="absolute top-3 right-3 w-7 h-7 bg-emerald-600 rounded-full flex items-center justify-center shadow-lg animate-in fade-in zoom-in duration-200">
                     <Check size={14} className="text-white" />
                   </div>
                 )}
@@ -119,7 +119,7 @@ export function TemplatePickerStep() {
                 className={`
                   relative flex flex-col p-5 rounded-2xl border transition-all duration-300 text-left
                   ${isSelected
-                    ? 'bg-violet-600/10 border-violet-500/50 shadow-lg shadow-violet-900/10'
+                    ? 'bg-emerald-600/10 border-emerald-500/50 shadow-lg shadow-emerald-900/10'
                     : 'bg-white/5 border-white/5 hover:bg-white/10 hover:border-white/10'
                   }
                 `}
@@ -127,23 +127,23 @@ export function TemplatePickerStep() {
                 <div className="flex items-start justify-between mb-4">
                   <div className={`
                     p-3 rounded-xl transition-colors
-                    ${isSelected ? 'bg-violet-600 text-white' : 'bg-zinc-800 text-zinc-400 group-hover:text-white'}
+                    ${isSelected ? 'bg-emerald-600 text-white' : 'bg-zinc-800 text-zinc-400 group-hover:text-white'}
                   `}>
                     {option.icon}
                   </div>
                   {isSelected && (
-                    <div className="w-6 h-6 bg-violet-600 rounded-full flex items-center justify-center">
+                    <div className="w-6 h-6 bg-emerald-600 rounded-full flex items-center justify-center">
                        <Check size={14} className="text-white" />
                     </div>
                   )}
                 </div>
                 
                 <div>
-                    <h4 className={`font-semibold text-lg mb-1 ${isSelected ? 'text-violet-100' : 'text-zinc-200'}`}>
+                    <h4 className={`font-semibold text-lg mb-1 ${isSelected ? 'text-emerald-100' : 'text-zinc-200'}`}>
                         {option.label}
                     </h4>
                     <div className="flex items-center gap-2 mb-2">
-                        <span className={`text-xs font-mono px-2 py-0.5 rounded ${isSelected ? 'bg-violet-600/20 text-violet-200' : 'bg-black/30 text-zinc-500'}`}>
+                        <span className={`text-xs font-mono px-2 py-0.5 rounded ${isSelected ? 'bg-emerald-600/20 text-emerald-200' : 'bg-black/30 text-zinc-500'}`}>
                             {option.ratio}
                         </span>
                     </div>
@@ -156,12 +156,12 @@ export function TemplatePickerStep() {
       </div>
 
       {/* Tip */}
-      <div className="flex items-start gap-4 p-5 bg-gradient-to-r from-violet-900/20 to-indigo-900/20 border border-violet-500/10 rounded-2xl backdrop-blur-sm">
-        <div className="p-2 bg-violet-600/20 rounded-lg text-violet-400">
+      <div className="flex items-start gap-4 p-5 bg-gradient-to-r from-emerald-900/20 to-teal-900/20 border border-emerald-500/10 rounded-2xl backdrop-blur-sm">
+        <div className="p-2 bg-emerald-600/20 rounded-lg text-emerald-400">
             <Sparkles size={20} />
         </div>
         <div>
-          <p className="text-sm text-violet-200 font-semibold mb-1">Pro Tip</p>
+          <p className="text-sm text-emerald-200 font-semibold mb-1">Pro Tip</p>
           <p className="text-sm text-zinc-400 leading-relaxed">
             For social media, we recommend the <strong>Vertical (9:16)</strong> format.
             You can still export multiple formats later from the preview step.

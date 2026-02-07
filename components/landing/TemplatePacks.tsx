@@ -99,14 +99,14 @@ const Card = ({ item }: { item: typeof TEMPLATES[0] }) => {
               </h3>
               {/* Reveal on Hover */}
               <div className="h-0 group-hover:h-12 overflow-hidden transition-all duration-300">
-                <p className="pt-2 text-xs text-indigo-300 font-mono flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity delay-100">
+                <p className="pt-2 text-xs text-teal-300 font-mono flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity delay-100">
                   <Zap size={12} /> {item.tools}
                 </p>
               </div>
             </div>
 
             {/* Action Button */}
-            <div className="w-10 h-10 rounded-full bg-white text-black flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 scale-50 group-hover:scale-100 shadow-lg hover:bg-indigo-400 hover:text-white">
+            <div className="w-10 h-10 rounded-full bg-white text-black flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 scale-50 group-hover:scale-100 shadow-lg hover:bg-teal-400 hover:text-white">
               <ArrowUpRight size={18} />
             </div>
           </div>
@@ -137,8 +137,8 @@ export const TemplatePacks = () => {
               viewport={{ once: true }}
               className="flex items-center gap-3 mb-6"
             >
-              <div className="w-12 h-[1px] bg-indigo-500" />
-              <span className="text-xs font-bold uppercase tracking-[0.3em] text-indigo-400">
+              <div className="w-12 h-[1px] bg-teal-500" />
+              <span className="text-xs font-bold uppercase tracking-[0.3em] text-teal-400">
                 Template Library
               </span>
             </motion.div>

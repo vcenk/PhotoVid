@@ -89,7 +89,7 @@ export const MosaicSlideshow = () => {
         </span>
         <h2 className="text-3xl md:text-5xl font-bold text-white tracking-tight mb-4">
           See what's{' '}
-          <span className="bg-gradient-to-r from-indigo-400 to-violet-400 bg-clip-text text-transparent">
+          <span className="bg-gradient-to-r from-teal-400 to-emerald-400 bg-clip-text text-transparent">
             possible
           </span>
         </h2>

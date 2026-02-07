@@ -36,7 +36,7 @@ export function BrandingStep() {
   const inputClasses = (name: string) => `
     w-full px-4 py-3.5 bg-white/5 border rounded-xl text-white placeholder-zinc-500 transition-all duration-300
     ${activeField === name 
-      ? 'border-violet-500/50 ring-4 ring-violet-500/10 bg-white/10' 
+      ? 'border-emerald-500/50 ring-4 ring-emerald-500/10 bg-white/10' 
       : 'border-white/5 hover:border-white/10 hover:bg-white/10'
     }
     focus:outline-none
@@ -56,7 +56,7 @@ export function BrandingStep() {
         {/* Agent Photo */}
         <div className="space-y-4">
           <label className="flex items-center gap-2 text-sm font-medium text-zinc-300">
-            <Camera size={16} className="text-violet-400" />
+            <Camera size={16} className="text-emerald-400" />
             Agent Headshot
           </label>
           <div className="relative group">
@@ -64,8 +64,8 @@ export function BrandingStep() {
               aspect-square rounded-3xl border-2 border-dashed overflow-hidden
               flex items-center justify-center transition-all duration-300
               ${photoPreview 
-                ? 'border-violet-500/50 bg-black/40' 
-                : 'border-white/10 bg-white/5 group-hover:border-violet-500/30 group-hover:bg-white/10'
+                ? 'border-emerald-500/50 bg-black/40' 
+                : 'border-white/10 bg-white/5 group-hover:border-emerald-500/30 group-hover:bg-white/10'
               }
             `}>
               {photoPreview ? (
@@ -76,8 +76,8 @@ export function BrandingStep() {
                 />
               ) : (
                 <div className="text-center p-6 transition-transform duration-300 group-hover:scale-105">
-                  <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mx-auto mb-4 group-hover:bg-violet-600/20 group-hover:text-violet-300 transition-colors">
-                     <User size={32} className="text-zinc-500 group-hover:text-violet-300" />
+                  <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mx-auto mb-4 group-hover:bg-emerald-600/20 group-hover:text-emerald-300 transition-colors">
+                     <User size={32} className="text-zinc-500 group-hover:text-emerald-300" />
                   </div>
                   <p className="text-sm font-medium text-white mb-1">Upload Photo</p>
                   <p className="text-xs text-zinc-500">JPG or PNG</p>
@@ -108,7 +108,7 @@ export function BrandingStep() {
         {/* Brokerage Logo */}
         <div className="space-y-4">
           <label className="flex items-center gap-2 text-sm font-medium text-zinc-300">
-            <Building2 size={16} className="text-violet-400" />
+            <Building2 size={16} className="text-emerald-400" />
             Brokerage Logo
           </label>
           <div className="relative group">
@@ -116,8 +116,8 @@ export function BrandingStep() {
               aspect-square rounded-3xl border-2 border-dashed overflow-hidden
               flex items-center justify-center transition-all duration-300
               ${logoPreview 
-                ? 'border-violet-500/50 bg-black/40' 
-                : 'border-white/10 bg-white/5 group-hover:border-violet-500/30 group-hover:bg-white/10'
+                ? 'border-emerald-500/50 bg-black/40' 
+                : 'border-white/10 bg-white/5 group-hover:border-emerald-500/30 group-hover:bg-white/10'
               }
             `}>
               {logoPreview ? (
@@ -128,8 +128,8 @@ export function BrandingStep() {
                 />
               ) : (
                 <div className="text-center p-6 transition-transform duration-300 group-hover:scale-105">
-                  <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mx-auto mb-4 group-hover:bg-violet-600/20 group-hover:text-violet-300 transition-colors">
-                     <Upload size={32} className="text-zinc-500 group-hover:text-violet-300" />
+                  <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mx-auto mb-4 group-hover:bg-emerald-600/20 group-hover:text-emerald-300 transition-colors">
+                     <Upload size={32} className="text-zinc-500 group-hover:text-emerald-300" />
                   </div>
                   <p className="text-sm font-medium text-white mb-1">Upload Logo</p>
                   <p className="text-xs text-zinc-500">PNG with transparent background</p>
@@ -164,7 +164,7 @@ export function BrandingStep() {
         {/* Agent Name - Required */}
         <div className="space-y-2">
             <label className="flex items-center gap-2 text-sm font-medium text-zinc-300">
-            <User size={16} className="text-violet-400" />
+            <User size={16} className="text-emerald-400" />
             Agent Name <span className="text-red-400">*</span>
             </label>
             <input
@@ -268,12 +268,12 @@ export function BrandingStep() {
       </div>
 
       {/* Tip */}
-      <div className="flex items-start gap-4 p-5 bg-violet-600/10 border border-violet-500/20 rounded-2xl backdrop-blur-sm">
-        <div className="p-2 bg-violet-600/20 rounded-lg text-violet-300">
+      <div className="flex items-start gap-4 p-5 bg-emerald-600/10 border border-emerald-500/20 rounded-2xl backdrop-blur-sm">
+        <div className="p-2 bg-emerald-600/20 rounded-lg text-emerald-300">
             <Info size={20} />
         </div>
         <div>
-          <p className="text-sm text-violet-200 font-semibold mb-1">Save Your Branding</p>
+          <p className="text-sm text-emerald-200 font-semibold mb-1">Save Your Branding</p>
           <p className="text-sm text-zinc-400 leading-relaxed">
             In a future update, your branding will be saved to your profile and auto-loaded for new videos.
             For now, you'll need to enter it each time.

@@ -131,7 +131,7 @@ const Staging360ToolInner: React.FC = () => {
                                 <ArrowLeft size={18} className="text-zinc-400" />
                             </button>
                             <h1 className="text-base font-semibold text-white flex items-center gap-2">
-                                <Compass size={18} className="text-violet-400" />
+                                <Compass size={18} className="text-emerald-400" />
                                 360° Virtual Staging
                             </h1>
                             <span className="ml-auto px-2 py-0.5 bg-gradient-to-r from-amber-500 to-orange-500 rounded text-[10px] font-bold text-white flex items-center gap-1">
@@ -146,7 +146,7 @@ const Staging360ToolInner: React.FC = () => {
                             {!imagePreview ? (
                                 <div
                                     onDragEnter={handleDrag} onDragLeave={handleDrag} onDragOver={handleDrag} onDrop={handleDrop}
-                                    className={`relative border border-dashed rounded-xl p-6 text-center transition-all cursor-pointer ${isDragging ? 'border-violet-500 bg-violet-500/10' : 'border-white/10 hover:border-white/20 bg-white/[0.02]'}`}
+                                    className={`relative border border-dashed rounded-xl p-6 text-center transition-all cursor-pointer ${isDragging ? 'border-emerald-500 bg-emerald-500/10' : 'border-white/10 hover:border-white/20 bg-white/[0.02]'}`}
                                 >
                                     <input type="file" className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" onChange={handleFileChange} accept="image/*" />
                                     <UploadCloud size={28} className="mx-auto mb-2 text-zinc-500" />
@@ -170,7 +170,7 @@ const Staging360ToolInner: React.FC = () => {
                                     <button
                                         key={room.id}
                                         onClick={() => setRoomType(room.id as typeof roomType)}
-                                        className={`p-2.5 rounded-xl text-xs font-medium transition-all ${roomType === room.id ? 'bg-violet-500/20 text-violet-300 ring-1 ring-violet-500/50' : 'bg-white/5 text-zinc-400 hover:bg-white/10'}`}
+                                        className={`p-2.5 rounded-xl text-xs font-medium transition-all ${roomType === room.id ? 'bg-emerald-500/20 text-emerald-300 ring-1 ring-emerald-500/50' : 'bg-white/5 text-zinc-400 hover:bg-white/10'}`}
                                     >
                                         {room.name}
                                     </button>
@@ -185,11 +185,11 @@ const Staging360ToolInner: React.FC = () => {
                                     <button
                                         key={s.id}
                                         onClick={() => setStyle(s.id as typeof style)}
-                                        className={`w-full p-3 rounded-xl text-left transition-all ${style === s.id ? 'bg-violet-500/10 border border-violet-500/30' : 'bg-white/[0.02] border border-white/5 hover:border-white/10'}`}
+                                        className={`w-full p-3 rounded-xl text-left transition-all ${style === s.id ? 'bg-emerald-500/10 border border-emerald-500/30' : 'bg-white/[0.02] border border-white/5 hover:border-white/10'}`}
                                     >
                                         <div className="flex items-center justify-between">
                                             <span className="text-sm font-medium text-white">{s.name}</span>
-                                            {style === s.id && <Check size={16} className="text-violet-400" />}
+                                            {style === s.id && <Check size={16} className="text-emerald-400" />}
                                         </div>
                                         <p className="text-xs text-zinc-500 mt-1">{s.desc}</p>
                                     </button>
@@ -197,9 +197,9 @@ const Staging360ToolInner: React.FC = () => {
                             </div>
                         </div>
 
-                        <div className="p-3 rounded-xl bg-violet-500/5 border border-violet-500/10">
-                            <p className="text-xs text-violet-300/80 leading-relaxed">
-                                <strong className="text-violet-300">Premium Feature:</strong> Stage 360° panoramic photos for immersive virtual tours. Compatible with all major VR platforms.
+                        <div className="p-3 rounded-xl bg-emerald-500/5 border border-emerald-500/10">
+                            <p className="text-xs text-emerald-300/80 leading-relaxed">
+                                <strong className="text-emerald-300">Premium Feature:</strong> Stage 360° panoramic photos for immersive virtual tours. Compatible with all major VR platforms.
                             </p>
                         </div>
                     </div>
@@ -208,7 +208,7 @@ const Staging360ToolInner: React.FC = () => {
                         <button
                             onClick={handleGenerate}
                             disabled={!uploadedImage || isGenerating}
-                            className={`w-full py-3 rounded-xl font-semibold text-sm transition-all flex items-center justify-center gap-2 ${uploadedImage && !isGenerating ? 'bg-violet-600 hover:bg-violet-500 text-white' : 'bg-white/5 text-zinc-600 cursor-not-allowed'}`}
+                            className={`w-full py-3 rounded-xl font-semibold text-sm transition-all flex items-center justify-center gap-2 ${uploadedImage && !isGenerating ? 'bg-emerald-600 hover:bg-emerald-500 text-white' : 'bg-white/5 text-zinc-600 cursor-not-allowed'}`}
                         >
                             {isGenerating ? <><Loader2 size={18} className="animate-spin" />Staging {generationProgress}%</> : <><Sparkles size={18} />Stage 360° Room</>}
                         </button>
@@ -227,7 +227,7 @@ const Staging360ToolInner: React.FC = () => {
                                 ) : (
                                     <button onClick={async () => { if (resultImage) { try { await addAsset(resultImage, 'image', '360 Staging Result'); setSavedToLibrary(true); } catch {} } }} className="px-3 py-1.5 text-xs font-medium text-zinc-400 hover:text-white bg-white/5 hover:bg-white/10 rounded-lg transition-colors flex items-center gap-1.5"><BookmarkPlus size={14} />Save to Library</button>
                                 )}
-                                <button onClick={() => resultImage && downloadFile(resultImage, `360-staging-${Date.now()}.jpg`)} className="px-3 py-1.5 text-xs font-medium text-white bg-violet-600 hover:bg-violet-500 rounded-lg transition-colors flex items-center gap-1.5"><Download size={14} />Download</button>
+                                <button onClick={() => resultImage && downloadFile(resultImage, `360-staging-${Date.now()}.jpg`)} className="px-3 py-1.5 text-xs font-medium text-white bg-emerald-600 hover:bg-emerald-500 rounded-lg transition-colors flex items-center gap-1.5"><Download size={14} />Download</button>
                             </div>
                         )}
                     </div>
@@ -240,7 +240,7 @@ const Staging360ToolInner: React.FC = () => {
                                 </div>
                                 <p className="text-red-400 text-sm font-medium mb-2">360° Staging Failed</p>
                                 <p className="text-zinc-500 text-xs max-w-xs">{error}</p>
-                                <button onClick={() => setError(null)} className="mt-4 px-4 py-2 text-xs font-medium text-white bg-violet-600 hover:bg-violet-500 rounded-lg transition-colors">Try Again</button>
+                                <button onClick={() => setError(null)} className="mt-4 px-4 py-2 text-xs font-medium text-white bg-emerald-600 hover:bg-emerald-500 rounded-lg transition-colors">Try Again</button>
                             </div>
                         ) : !imagePreview ? (
                             <div className="text-center">
@@ -251,7 +251,7 @@ const Staging360ToolInner: React.FC = () => {
                         ) : isGenerating ? (
                             <div className="text-center">
                                 <div className="relative w-24 h-24 mx-auto mb-6">
-                                    <svg className="w-full h-full -rotate-90"><circle cx="48" cy="48" r="44" stroke="currentColor" strokeWidth="4" fill="none" className="text-white/10" /><circle cx="48" cy="48" r="44" stroke="currentColor" strokeWidth="4" fill="none" strokeDasharray={276.46} strokeDashoffset={276.46 - (276.46 * generationProgress) / 100} className="text-violet-500 transition-all duration-300" strokeLinecap="round" /></svg>
+                                    <svg className="w-full h-full -rotate-90"><circle cx="48" cy="48" r="44" stroke="currentColor" strokeWidth="4" fill="none" className="text-white/10" /><circle cx="48" cy="48" r="44" stroke="currentColor" strokeWidth="4" fill="none" strokeDasharray={276.46} strokeDashoffset={276.46 - (276.46 * generationProgress) / 100} className="text-emerald-500 transition-all duration-300" strokeLinecap="round" /></svg>
                                     <span className="absolute inset-0 flex items-center justify-center text-xl font-semibold text-white">{generationProgress}%</span>
                                 </div>
                                 <p className="text-zinc-400 font-medium">Staging 360° panorama...</p>
@@ -259,7 +259,7 @@ const Staging360ToolInner: React.FC = () => {
                         ) : (
                             <div className="relative rounded-2xl overflow-hidden shadow-2xl">
                                 <img src={resultImage || imagePreview} alt="Preview" className="max-w-full max-h-[calc(100vh-180px)] object-contain" />
-                                {resultImage && <div className="absolute top-4 right-4 px-3 py-1.5 bg-violet-500/80 backdrop-blur rounded-lg text-xs text-white font-medium flex items-center gap-1.5"><Compass size={12} />360° Staged</div>}
+                                {resultImage && <div className="absolute top-4 right-4 px-3 py-1.5 bg-emerald-500/80 backdrop-blur rounded-lg text-xs text-white font-medium flex items-center gap-1.5"><Compass size={12} />360° Staged</div>}
                                 {!resultImage && <div className="absolute inset-0 flex items-center justify-center bg-black/40"><div className="text-center text-white"><Compass size={28} className="mx-auto mb-2 opacity-80" /><p className="text-sm font-medium">Ready to stage</p></div></div>}
                             </div>
                         )}

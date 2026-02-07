@@ -298,7 +298,7 @@ const VirtualStagingToolInner: React.FC = () => {
                             </button>
                             <div>
                                 <h1 className="text-base font-semibold text-white flex items-center gap-2">
-                                    <Sofa size={18} className="text-indigo-400" />
+                                    <Sofa size={18} className="text-teal-400" />
                                     Virtual Staging
                                 </h1>
                             </div>
@@ -321,7 +321,7 @@ const VirtualStagingToolInner: React.FC = () => {
                                     className={`
                                         relative border border-dashed rounded-xl p-6 text-center transition-all cursor-pointer
                                         ${isDragging
-                                            ? 'border-indigo-500 bg-indigo-500/10'
+                                            ? 'border-teal-500 bg-teal-500/10'
                                             : 'border-white/10 hover:border-white/20 bg-white/[0.02]'
                                         }
                                     `}
@@ -367,7 +367,7 @@ const VirtualStagingToolInner: React.FC = () => {
                                         onClick={() => setSelectedRoom(room.id)}
                                         className={`px-3 py-2 rounded-lg text-xs font-medium transition-all ${
                                             selectedRoom === room.id
-                                                ? 'bg-indigo-600 text-white'
+                                                ? 'bg-teal-600 text-white'
                                                 : 'bg-white/5 text-zinc-400 hover:bg-white/10 hover:text-zinc-300'
                                         }`}
                                     >
@@ -389,7 +389,7 @@ const VirtualStagingToolInner: React.FC = () => {
                                         onClick={() => setSelectedStyle(style.id)}
                                         className={`relative rounded-xl overflow-hidden transition-all ${
                                             selectedStyle === style.id
-                                                ? 'ring-2 ring-indigo-500 ring-offset-2 ring-offset-[#111113]'
+                                                ? 'ring-2 ring-teal-500 ring-offset-2 ring-offset-[#111113]'
                                                 : 'hover:ring-1 hover:ring-white/20'
                                         }`}
                                     >
@@ -403,7 +403,7 @@ const VirtualStagingToolInner: React.FC = () => {
                                             {style.name}
                                         </span>
                                         {selectedStyle === style.id && (
-                                            <div className="absolute top-2 right-2 w-5 h-5 bg-indigo-500 rounded-full flex items-center justify-center">
+                                            <div className="absolute top-2 right-2 w-5 h-5 bg-teal-500 rounded-full flex items-center justify-center">
                                                 <Check size={12} className="text-white" />
                                             </div>
                                         )}
@@ -419,7 +419,7 @@ const VirtualStagingToolInner: React.FC = () => {
                                     type="checkbox"
                                     checked={removeFurniture}
                                     onChange={(e) => setRemoveFurniture(e.target.checked)}
-                                    className="w-4 h-4 rounded border-zinc-600 bg-transparent text-indigo-600 focus:ring-indigo-500 focus:ring-offset-0"
+                                    className="w-4 h-4 rounded border-zinc-600 bg-transparent text-teal-600 focus:ring-teal-500 focus:ring-offset-0"
                                 />
                                 <div>
                                     <p className="text-sm text-zinc-300">Remove existing furniture</p>
@@ -434,7 +434,7 @@ const VirtualStagingToolInner: React.FC = () => {
                         {/* Credit Info */}
                         <div className="flex items-center justify-between text-xs">
                             <span className="text-zinc-500">Cost</span>
-                            <span className={`flex items-center gap-1 ${hasCredits ? 'text-violet-400' : 'text-red-400'}`}>
+                            <span className={`flex items-center gap-1 ${hasCredits ? 'text-emerald-400' : 'text-red-400'}`}>
                                 <Zap size={12} className="fill-current" />
                                 {CREDIT_COST} credits
                             </span>
@@ -459,7 +459,7 @@ const VirtualStagingToolInner: React.FC = () => {
                             disabled={!uploadedImage || isGenerating || !hasCredits}
                             className={`w-full py-3 rounded-xl font-semibold text-sm transition-all flex items-center justify-center gap-2 ${
                                 uploadedImage && !isGenerating && hasCredits
-                                    ? 'bg-indigo-600 hover:bg-indigo-500 text-white'
+                                    ? 'bg-teal-600 hover:bg-teal-500 text-white'
                                     : 'bg-white/5 text-zinc-600 cursor-not-allowed'
                             }`}
                         >
@@ -496,7 +496,7 @@ const VirtualStagingToolInner: React.FC = () => {
                                 )}
                                 <button
                                     onClick={handleDownload}
-                                    className="px-3 py-1.5 text-xs font-medium text-white bg-indigo-600 hover:bg-indigo-500 rounded-lg transition-colors flex items-center gap-1.5"
+                                    className="px-3 py-1.5 text-xs font-medium text-white bg-teal-600 hover:bg-teal-500 rounded-lg transition-colors flex items-center gap-1.5"
                                 >
                                     <Download size={14} />
                                     Download
@@ -517,7 +517,7 @@ const VirtualStagingToolInner: React.FC = () => {
                                 <p className="text-zinc-500 text-xs max-w-xs">{error}</p>
                                 <button
                                     onClick={() => setError(null)}
-                                    className="mt-4 px-4 py-2 text-xs font-medium text-white bg-indigo-600 hover:bg-indigo-500 rounded-lg transition-colors"
+                                    className="mt-4 px-4 py-2 text-xs font-medium text-white bg-teal-600 hover:bg-teal-500 rounded-lg transition-colors"
                                 >
                                     Try Again
                                 </button>
@@ -556,7 +556,7 @@ const VirtualStagingToolInner: React.FC = () => {
                                             fill="none"
                                             strokeDasharray={276.46}
                                             strokeDashoffset={276.46 - (276.46 * generationProgress) / 100}
-                                            className="text-indigo-500 transition-all duration-300"
+                                            className="text-teal-500 transition-all duration-300"
                                             strokeLinecap="round"
                                         />
                                     </svg>

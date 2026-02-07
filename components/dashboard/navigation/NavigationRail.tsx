@@ -13,7 +13,6 @@ import {
   Building2,
   Moon,
   Sun,
-  HelpCircle,
   LogOut,
   Settings,
   ChevronDown,
@@ -117,7 +116,7 @@ export function NavigationRail({ isMobileOpen, onMobileClose }: NavigationRailPr
   const sidebarContent = (
     <div className="flex-1 flex flex-col h-full">
       {/* Logo */}
-      <div className="h-14 flex items-center gap-2.5 px-4 border-b border-white/5 shrink-0">
+      <div className="h-14 flex items-center gap-2.5 px-4 border-b border-zinc-200 dark:border-white/5 shrink-0">
         <button
           onClick={() => {
             navigate('/studio');
@@ -125,19 +124,17 @@ export function NavigationRail({ isMobileOpen, onMobileClose }: NavigationRailPr
           }}
           className="flex items-center gap-2.5 hover:opacity-80 transition-opacity min-w-0"
         >
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center shrink-0">
-            <img
-              src="/photovid.svg"
-              alt="Photovid"
-              className="w-6 h-6 object-contain"
-              onError={(e) => {
-                (e.target as HTMLImageElement).style.display = 'none';
-              }}
-            />
-          </div>
+          <img
+            src="/logo.png"
+            alt="Photovid"
+            className="h-8 w-auto object-contain"
+            onError={(e) => {
+              (e.target as HTMLImageElement).style.display = 'none';
+            }}
+          />
           <span
             className={cn(
-              'text-sm font-semibold tracking-wide text-white whitespace-nowrap transition-opacity duration-200',
+              'text-sm font-semibold tracking-wide text-zinc-900 dark:text-white whitespace-nowrap transition-opacity duration-200',
               expanded ? 'opacity-100' : 'opacity-0 w-0 overflow-hidden'
             )}
           >
@@ -149,15 +146,15 @@ export function NavigationRail({ isMobileOpen, onMobileClose }: NavigationRailPr
         {isMobileOpen && (
           <button
             onClick={onMobileClose}
-            className="ml-auto p-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-white/5 transition-colors lg:hidden"
+            className="ml-auto p-1.5 rounded-lg text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-white/5 transition-colors lg:hidden"
           >
-            <X size={18} />
+            <X size={20} />
           </button>
         )}
       </div>
 
       {/* Navigation */}
-      <div className="flex-1 flex flex-col py-3 px-3 overflow-x-hidden overflow-y-auto scrollbar-none">
+      <div className="flex-1 flex flex-col py-3 px-3 overflow-x-hidden overflow-y-auto scrollbar-none bg-white dark:bg-transparent">
         {/* Main Nav Items */}
         <div className="space-y-1">
           {navItems.map((item) => {
@@ -175,13 +172,13 @@ export function NavigationRail({ isMobileOpen, onMobileClose }: NavigationRailPr
                     'w-full flex items-center gap-3 rounded-xl text-sm font-medium transition-all duration-200 relative group',
                     expanded ? 'px-3 py-2.5 justify-between' : 'px-0 py-2.5 justify-center',
                     active
-                      ? 'bg-violet-500/15 text-violet-400'
-                      : 'text-zinc-400 hover:text-white hover:bg-white/5',
-                    isOpen && 'bg-white/5 text-white'
+                      ? 'bg-emerald-100 dark:bg-emerald-500/15 text-emerald-600 dark:text-emerald-400'
+                      : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-white/5',
+                    isOpen && 'bg-zinc-100 dark:bg-white/5 text-zinc-900 dark:text-white'
                   )}
                 >
                   <div className={cn('flex items-center gap-3', !expanded && 'justify-center w-full')}>
-                    <Icon size={18} strokeWidth={1.75} className="shrink-0" />
+                    <Icon size={20} strokeWidth={1.75} className="shrink-0" />
                     <span
                       className={cn(
                         'whitespace-nowrap transition-opacity duration-200',
@@ -195,18 +192,18 @@ export function NavigationRail({ isMobileOpen, onMobileClose }: NavigationRailPr
                     <ChevronDown
                       size={16}
                       className={cn(
-                        'text-zinc-500 transition-transform duration-200 shrink-0',
-                        isOpen && 'rotate-180 text-zinc-300'
+                        'text-zinc-400 dark:text-zinc-500 transition-transform duration-200 shrink-0',
+                        isOpen && 'rotate-180 text-zinc-600 dark:text-zinc-300'
                       )}
                     />
                   )}
                   {/* Dot indicator for collapsed items with children */}
                   {hasChildren && !expanded && (
-                    <span className="absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-zinc-500" />
+                    <span className="absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-zinc-400 dark:bg-zinc-500" />
                   )}
                   {/* Tooltip for collapsed state */}
                   {!expanded && (
-                    <span className="absolute left-full ml-2 px-2 py-1 rounded-md bg-zinc-800 text-white text-xs font-medium whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-150 z-[60]">
+                    <span className="absolute left-full ml-2 px-2 py-1 rounded-md bg-zinc-900 dark:bg-zinc-800 text-white text-xs font-medium whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-150 z-[60]">
                       {item.label}
                     </span>
                   )}
@@ -237,11 +234,11 @@ export function NavigationRail({ isMobileOpen, onMobileClose }: NavigationRailPr
                               className={cn(
                                 'w-full flex items-center gap-3 pl-10 pr-3 py-2 rounded-lg text-sm font-medium transition-all duration-150',
                                 childActive
-                                  ? 'bg-violet-500/15 text-violet-400'
-                                  : 'text-zinc-500 hover:text-white hover:bg-white/5'
+                                  ? 'bg-emerald-100 dark:bg-emerald-500/15 text-emerald-600 dark:text-emerald-400'
+                                  : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-white/5'
                               )}
                             >
-                              <ChildIcon size={16} strokeWidth={1.75} />
+                              <ChildIcon size={18} strokeWidth={1.75} />
                               <span>{child.label}</span>
                             </button>
                           );
@@ -259,17 +256,17 @@ export function NavigationRail({ isMobileOpen, onMobileClose }: NavigationRailPr
         <div className="flex-1 min-h-8" />
 
         {/* Bottom Section */}
-        <div className="space-y-1 pt-3 border-t border-white/5">
+        <div className="space-y-1 pt-3 border-t border-zinc-200 dark:border-white/5">
           {/* Admin */}
           {isAdmin && (
             <button
               onClick={() => navigate('/studio/admin')}
               className={cn(
-                'w-full flex items-center gap-3 rounded-xl text-sm font-medium text-amber-400/80 hover:text-amber-400 hover:bg-amber-500/10 transition-all duration-200 relative group',
+                'w-full flex items-center gap-3 rounded-xl text-sm font-medium text-amber-600 dark:text-amber-400/80 hover:text-amber-700 dark:hover:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-500/10 transition-all duration-200 relative group',
                 expanded ? 'px-3 py-2.5' : 'px-0 py-2.5 justify-center'
               )}
             >
-              <Shield size={18} strokeWidth={1.75} className="shrink-0" />
+              <Shield size={20} strokeWidth={1.75} className="shrink-0" />
               <span
                 className={cn(
                   'whitespace-nowrap transition-opacity duration-200',
@@ -279,7 +276,7 @@ export function NavigationRail({ isMobileOpen, onMobileClose }: NavigationRailPr
                 Admin
               </span>
               {!expanded && (
-                <span className="absolute left-full ml-2 px-2 py-1 rounded-md bg-zinc-800 text-amber-400 text-xs font-medium whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-150 z-[60]">
+                <span className="absolute left-full ml-2 px-2 py-1 rounded-md bg-zinc-900 dark:bg-zinc-800 text-amber-400 text-xs font-medium whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-150 z-[60]">
                   Admin
                 </span>
               )}
@@ -290,12 +287,12 @@ export function NavigationRail({ isMobileOpen, onMobileClose }: NavigationRailPr
           <button
             onClick={() => navigate('/studio/credits')}
             className={cn(
-              'w-full flex items-center gap-3 rounded-xl text-sm font-medium text-zinc-400 hover:text-white hover:bg-white/5 transition-all duration-200 relative group',
+              'w-full flex items-center gap-3 rounded-xl text-sm font-medium text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-white/5 transition-all duration-200 relative group',
               expanded ? 'px-3 py-2.5 justify-between' : 'px-0 py-2.5 justify-center'
             )}
           >
             <div className={cn('flex items-center gap-3', !expanded && 'justify-center w-full')}>
-              <Zap size={18} strokeWidth={1.75} className="text-yellow-500 shrink-0" />
+              <Zap size={20} strokeWidth={1.75} className="text-yellow-500 shrink-0" />
               <span
                 className={cn(
                   'whitespace-nowrap transition-opacity duration-200',
@@ -306,12 +303,12 @@ export function NavigationRail({ isMobileOpen, onMobileClose }: NavigationRailPr
               </span>
             </div>
             {expanded && (
-              <span className="px-2 py-0.5 rounded-full bg-violet-500/20 text-violet-400 text-xs font-semibold">
+              <span className="px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs font-semibold">
                 {balance}
               </span>
             )}
             {!expanded && (
-              <span className="absolute left-full ml-2 px-2 py-1 rounded-md bg-zinc-800 text-white text-xs font-medium whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-150 z-[60]">
+              <span className="absolute left-full ml-2 px-2 py-1 rounded-md bg-zinc-900 dark:bg-zinc-800 text-white text-xs font-medium whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-150 z-[60]">
                 Credits: {balance}
               </span>
             )}
@@ -321,11 +318,11 @@ export function NavigationRail({ isMobileOpen, onMobileClose }: NavigationRailPr
           <button
             onClick={() => navigate('/studio/settings')}
             className={cn(
-              'w-full flex items-center gap-3 rounded-xl text-sm font-medium text-zinc-400 hover:text-white hover:bg-white/5 transition-all duration-200 relative group',
+              'w-full flex items-center gap-3 rounded-xl text-sm font-medium text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-white/5 transition-all duration-200 relative group',
               expanded ? 'px-3 py-2.5' : 'px-0 py-2.5 justify-center'
             )}
           >
-            <Settings size={18} strokeWidth={1.75} className="shrink-0" />
+            <Settings size={20} strokeWidth={1.75} className="shrink-0" />
             <span
               className={cn(
                 'whitespace-nowrap transition-opacity duration-200',
@@ -335,7 +332,7 @@ export function NavigationRail({ isMobileOpen, onMobileClose }: NavigationRailPr
               Settings
             </span>
             {!expanded && (
-              <span className="absolute left-full ml-2 px-2 py-1 rounded-md bg-zinc-800 text-white text-xs font-medium whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-150 z-[60]">
+              <span className="absolute left-full ml-2 px-2 py-1 rounded-md bg-zinc-900 dark:bg-zinc-800 text-white text-xs font-medium whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-150 z-[60]">
                 Settings
               </span>
             )}
@@ -344,41 +341,29 @@ export function NavigationRail({ isMobileOpen, onMobileClose }: NavigationRailPr
 
         {/* Footer */}
         <div className={cn(
-          'pt-3 mt-3 border-t border-white/5',
+          'pt-3 mt-3 border-t border-zinc-200 dark:border-white/5',
           expanded ? 'flex items-center justify-between' : 'flex flex-col items-center gap-1'
         )}>
           <button
             onClick={toggleTheme}
-            className="p-2.5 rounded-xl text-zinc-500 hover:text-white hover:bg-white/5 transition-all relative group"
+            className="p-2.5 rounded-xl text-zinc-500 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-white/5 transition-all relative group"
             title={theme === 'dark' ? 'Light mode' : 'Dark mode'}
           >
-            {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+            {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
             {!expanded && (
-              <span className="absolute left-full ml-2 px-2 py-1 rounded-md bg-zinc-800 text-white text-xs font-medium whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-150 z-[60]">
+              <span className="absolute left-full ml-2 px-2 py-1 rounded-md bg-zinc-900 dark:bg-zinc-800 text-white text-xs font-medium whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-150 z-[60]">
                 {theme === 'dark' ? 'Light mode' : 'Dark mode'}
               </span>
             )}
           </button>
           <button
-            onClick={() => navigate('/studio/help')}
-            className="p-2.5 rounded-xl text-zinc-500 hover:text-white hover:bg-white/5 transition-all relative group"
-            title="Help"
-          >
-            <HelpCircle size={18} />
-            {!expanded && (
-              <span className="absolute left-full ml-2 px-2 py-1 rounded-md bg-zinc-800 text-white text-xs font-medium whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-150 z-[60]">
-                Help
-              </span>
-            )}
-          </button>
-          <button
             onClick={handleSignOut}
-            className="p-2.5 rounded-xl text-zinc-500 hover:text-red-400 hover:bg-red-500/10 transition-all relative group"
+            className="p-2.5 rounded-xl text-zinc-500 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 transition-all relative group"
             title="Sign Out"
           >
-            <LogOut size={18} />
+            <LogOut size={20} />
             {!expanded && (
-              <span className="absolute left-full ml-2 px-2 py-1 rounded-md bg-zinc-800 text-white text-xs font-medium whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-150 z-[60]">
+              <span className="absolute left-full ml-2 px-2 py-1 rounded-md bg-zinc-900 dark:bg-zinc-800 text-white text-xs font-medium whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-150 z-[60]">
                 Sign Out
               </span>
             )}
@@ -399,7 +384,7 @@ export function NavigationRail({ isMobileOpen, onMobileClose }: NavigationRailPr
           if (!isMobileOpen) setActiveSubmenu(null);
         }}
         className={cn(
-          'fixed left-0 top-0 bottom-0 bg-zinc-950 border-r border-white/5 flex flex-col z-50 transition-all duration-300 ease-in-out hidden lg:flex',
+          'fixed left-0 top-0 bottom-0 bg-white dark:bg-zinc-950 border-r border-zinc-200 dark:border-white/5 flex flex-col z-50 transition-all duration-300 ease-in-out hidden lg:flex font-[Space_Grotesk]',
           isExpanded ? 'w-56' : 'w-16'
         )}
       >
@@ -428,7 +413,7 @@ export function NavigationRail({ isMobileOpen, onMobileClose }: NavigationRailPr
             animate={{ x: 0 }}
             exit={{ x: '-100%' }}
             transition={{ duration: 0.3, ease: 'easeInOut' }}
-            className="fixed left-0 top-0 bottom-0 w-56 bg-zinc-950 border-r border-white/5 flex flex-col z-[51] lg:hidden"
+            className="fixed left-0 top-0 bottom-0 w-56 bg-white dark:bg-zinc-950 border-r border-zinc-200 dark:border-white/5 flex flex-col z-[51] lg:hidden font-[Space_Grotesk]"
           >
             {sidebarContent}
           </motion.div>

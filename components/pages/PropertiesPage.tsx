@@ -114,7 +114,7 @@ const AddPropertyModal: React.FC<AddPropertyModalProps> = ({ onClose, onAdd }) =
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               placeholder="e.g., Modern Downtown Condo"
-              className="w-full px-4 py-3 bg-zinc-100 dark:bg-zinc-800 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-4 py-3 bg-zinc-100 dark:bg-zinc-800 rounded-xl outline-none focus:ring-2 focus:ring-teal-500"
             />
           </div>
 
@@ -129,7 +129,7 @@ const AddPropertyModal: React.FC<AddPropertyModalProps> = ({ onClose, onAdd }) =
                 value={formData.address}
                 onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                 placeholder="123 Main Street"
-                className="w-full px-4 py-3 bg-zinc-100 dark:bg-zinc-800 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-4 py-3 bg-zinc-100 dark:bg-zinc-800 rounded-xl outline-none focus:ring-2 focus:ring-teal-500"
               />
             </div>
             <div>
@@ -139,7 +139,7 @@ const AddPropertyModal: React.FC<AddPropertyModalProps> = ({ onClose, onAdd }) =
                 value={formData.city}
                 onChange={(e) => setFormData({ ...formData, city: e.target.value })}
                 placeholder="San Francisco"
-                className="w-full px-4 py-3 bg-zinc-100 dark:bg-zinc-800 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-4 py-3 bg-zinc-100 dark:bg-zinc-800 rounded-xl outline-none focus:ring-2 focus:ring-teal-500"
               />
             </div>
             <div className="grid grid-cols-2 gap-4">
@@ -150,7 +150,7 @@ const AddPropertyModal: React.FC<AddPropertyModalProps> = ({ onClose, onAdd }) =
                   value={formData.state}
                   onChange={(e) => setFormData({ ...formData, state: e.target.value })}
                   placeholder="CA"
-                  className="w-full px-4 py-3 bg-zinc-100 dark:bg-zinc-800 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-4 py-3 bg-zinc-100 dark:bg-zinc-800 rounded-xl outline-none focus:ring-2 focus:ring-teal-500"
                 />
               </div>
               <div>
@@ -160,7 +160,7 @@ const AddPropertyModal: React.FC<AddPropertyModalProps> = ({ onClose, onAdd }) =
                   value={formData.zipCode}
                   onChange={(e) => setFormData({ ...formData, zipCode: e.target.value })}
                   placeholder="94102"
-                  className="w-full px-4 py-3 bg-zinc-100 dark:bg-zinc-800 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-4 py-3 bg-zinc-100 dark:bg-zinc-800 rounded-xl outline-none focus:ring-2 focus:ring-teal-500"
                 />
               </div>
             </div>
@@ -173,7 +173,7 @@ const AddPropertyModal: React.FC<AddPropertyModalProps> = ({ onClose, onAdd }) =
               <select
                 value={formData.propertyType}
                 onChange={(e) => setFormData({ ...formData, propertyType: e.target.value as Property['propertyType'] })}
-                className="w-full px-4 py-3 bg-zinc-100 dark:bg-zinc-800 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-4 py-3 bg-zinc-100 dark:bg-zinc-800 rounded-xl outline-none focus:ring-2 focus:ring-teal-500"
               >
                 <option value="house">House</option>
                 <option value="condo">Condo</option>
@@ -188,7 +188,7 @@ const AddPropertyModal: React.FC<AddPropertyModalProps> = ({ onClose, onAdd }) =
               <select
                 value={formData.status}
                 onChange={(e) => setFormData({ ...formData, status: e.target.value as Property['status'] })}
-                className="w-full px-4 py-3 bg-zinc-100 dark:bg-zinc-800 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-4 py-3 bg-zinc-100 dark:bg-zinc-800 rounded-xl outline-none focus:ring-2 focus:ring-teal-500"
               >
                 <option value="draft">Draft</option>
                 <option value="active">Active</option>
@@ -203,7 +203,7 @@ const AddPropertyModal: React.FC<AddPropertyModalProps> = ({ onClose, onAdd }) =
                 value={formData.bedrooms}
                 onChange={(e) => setFormData({ ...formData, bedrooms: e.target.value })}
                 placeholder="3"
-                className="w-full px-4 py-3 bg-zinc-100 dark:bg-zinc-800 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-4 py-3 bg-zinc-100 dark:bg-zinc-800 rounded-xl outline-none focus:ring-2 focus:ring-teal-500"
               />
             </div>
             <div>
@@ -214,7 +214,7 @@ const AddPropertyModal: React.FC<AddPropertyModalProps> = ({ onClose, onAdd }) =
                 value={formData.bathrooms}
                 onChange={(e) => setFormData({ ...formData, bathrooms: e.target.value })}
                 placeholder="2"
-                className="w-full px-4 py-3 bg-zinc-100 dark:bg-zinc-800 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-4 py-3 bg-zinc-100 dark:bg-zinc-800 rounded-xl outline-none focus:ring-2 focus:ring-teal-500"
               />
             </div>
           </div>
@@ -227,7 +227,7 @@ const AddPropertyModal: React.FC<AddPropertyModalProps> = ({ onClose, onAdd }) =
                 value={formData.price}
                 onChange={(e) => setFormData({ ...formData, price: e.target.value })}
                 placeholder="500000"
-                className="w-full px-4 py-3 bg-zinc-100 dark:bg-zinc-800 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-4 py-3 bg-zinc-100 dark:bg-zinc-800 rounded-xl outline-none focus:ring-2 focus:ring-teal-500"
               />
             </div>
             <div>
@@ -237,7 +237,7 @@ const AddPropertyModal: React.FC<AddPropertyModalProps> = ({ onClose, onAdd }) =
                 value={formData.squareFeet}
                 onChange={(e) => setFormData({ ...formData, squareFeet: e.target.value })}
                 placeholder="1500"
-                className="w-full px-4 py-3 bg-zinc-100 dark:bg-zinc-800 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-4 py-3 bg-zinc-100 dark:bg-zinc-800 rounded-xl outline-none focus:ring-2 focus:ring-teal-500"
               />
             </div>
           </div>
@@ -252,7 +252,7 @@ const AddPropertyModal: React.FC<AddPropertyModalProps> = ({ onClose, onAdd }) =
               value={formData.mlsNumber}
               onChange={(e) => setFormData({ ...formData, mlsNumber: e.target.value })}
               placeholder="MLS123456"
-              className="w-full px-4 py-3 bg-zinc-100 dark:bg-zinc-800 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-4 py-3 bg-zinc-100 dark:bg-zinc-800 rounded-xl outline-none focus:ring-2 focus:ring-teal-500"
             />
           </div>
 
@@ -266,7 +266,7 @@ const AddPropertyModal: React.FC<AddPropertyModalProps> = ({ onClose, onAdd }) =
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               placeholder="Describe the property..."
               rows={3}
-              className="w-full px-4 py-3 bg-zinc-100 dark:bg-zinc-800 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+              className="w-full px-4 py-3 bg-zinc-100 dark:bg-zinc-800 rounded-xl outline-none focus:ring-2 focus:ring-teal-500 resize-none"
             />
           </div>
 
@@ -281,7 +281,7 @@ const AddPropertyModal: React.FC<AddPropertyModalProps> = ({ onClose, onAdd }) =
             </button>
             <button
               type="submit"
-              className="px-6 py-2.5 text-sm font-medium bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl transition-colors"
+              className="px-6 py-2.5 text-sm font-medium bg-teal-600 hover:bg-teal-700 text-white rounded-xl transition-colors"
             >
               Add Property
             </button>
@@ -325,7 +325,7 @@ const PropertiesContent: React.FC = () => {
   };
 
   return (
-    <div className="flex h-screen bg-white dark:bg-[#09090b] text-zinc-900 dark:text-white font-sans overflow-hidden">
+    <div className="flex h-screen bg-white dark:bg-[#09090b] text-zinc-900 dark:text-white font-[Space_Grotesk] overflow-hidden">
       <NavigationRail isMobileOpen={mobileMenuOpen} onMobileClose={() => setMobileMenuOpen(false)} />
 <div className="flex-1 flex flex-col min-w-0 overflow-hidden ml-0 lg:ml-16">
         <DashboardTopbar onMenuClick={() => {}} />
@@ -342,7 +342,7 @@ const PropertiesContent: React.FC = () => {
               </div>
               <button
                 onClick={() => setShowAddModal(true)}
-                className="flex items-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-xl transition-colors"
+                className="flex items-center gap-2 px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-medium rounded-xl transition-colors"
               >
                 <Plus size={18} />
                 Add Property
@@ -359,7 +359,7 @@ const PropertiesContent: React.FC = () => {
                   placeholder="Search properties..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 bg-zinc-100 dark:bg-zinc-800 rounded-xl text-sm outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full pl-10 pr-4 py-2.5 bg-zinc-100 dark:bg-zinc-800 rounded-xl text-sm outline-none focus:ring-2 focus:ring-teal-500"
                 />
               </div>
 
@@ -384,7 +384,7 @@ const PropertiesContent: React.FC = () => {
             {/* Properties Grid */}
             {loading && properties.length === 0 ? (
               <div className="flex items-center justify-center h-64">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-600"></div>
               </div>
             ) : filteredProperties.length === 0 ? (
               <div className="text-center py-20 bg-zinc-50 dark:bg-zinc-900/50 rounded-3xl border-2 border-dashed border-zinc-200 dark:border-zinc-800">
@@ -402,7 +402,7 @@ const PropertiesContent: React.FC = () => {
                 {!searchQuery && statusFilter === 'all' && (
                   <button
                     onClick={() => setShowAddModal(true)}
-                    className="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-xl transition-colors"
+                    className="inline-flex items-center gap-2 px-6 py-3 bg-teal-600 hover:bg-teal-700 text-white font-medium rounded-xl transition-colors"
                   >
                     <Plus size={18} />
                     Add Your First Property
@@ -422,7 +422,7 @@ const PropertiesContent: React.FC = () => {
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.95 }}
                         transition={{ delay: index * 0.05 }}
-                        className="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 overflow-hidden hover:border-indigo-500 dark:hover:border-indigo-500 transition-all duration-200 hover:shadow-lg group"
+                        className="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 overflow-hidden hover:border-teal-500 dark:hover:border-teal-500 transition-all duration-200 hover:shadow-lg group"
                       >
                         {/* Thumbnail */}
                         <div className="aspect-[4/3] bg-zinc-100 dark:bg-zinc-800 relative overflow-hidden">
@@ -511,7 +511,7 @@ const PropertiesContent: React.FC = () => {
                             <h3 className="text-lg font-semibold text-zinc-900 dark:text-white truncate pr-2">
                               {property.name}
                             </h3>
-                            <span className="text-lg font-bold text-indigo-600 dark:text-indigo-400 whitespace-nowrap">
+                            <span className="text-lg font-bold text-teal-600 dark:text-teal-400 whitespace-nowrap">
                               {formatPrice(property.price)}
                             </span>
                           </div>

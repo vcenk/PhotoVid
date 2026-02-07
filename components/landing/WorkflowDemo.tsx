@@ -76,7 +76,7 @@ export const WorkflowDemo = () => {
         <div className="absolute top-1/2 left-0 right-0 h-1 bg-zinc-800 -z-10 rounded-full" />
         {/* Active line */}
         <div
-          className="absolute top-1/2 left-0 h-1 bg-indigo-500 -z-10 rounded-full transition-all duration-1000 ease-linear"
+          className="absolute top-1/2 left-0 h-1 bg-teal-500 -z-10 rounded-full transition-all duration-1000 ease-linear"
           style={{ width: `${(activeStep / (STEPS.length - 1)) * 100}%` }}
         />
 
@@ -95,9 +95,9 @@ export const WorkflowDemo = () => {
                 className={`
                   w-16 h-16 rounded-2xl flex items-center justify-center border-2 shadow-sm transition-colors duration-500
                   ${isActive
-                    ? 'bg-zinc-800 border-indigo-500 text-indigo-400 shadow-xl shadow-indigo-900/30'
+                    ? 'bg-zinc-800 border-teal-500 text-teal-400 shadow-xl shadow-teal-900/30'
                     : isCompleted
-                      ? 'bg-indigo-950 border-indigo-800 text-indigo-400'
+                      ? 'bg-teal-950 border-teal-800 text-teal-400'
                       : 'bg-zinc-900 border-zinc-700 text-zinc-600'
                   }
                 `}
@@ -147,14 +147,14 @@ export const WorkflowDemo = () => {
             <div className="space-y-6">
               <div className="space-y-2">
                 <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-zinc-500">
-                  <Wand2 size={12} className="text-indigo-400" /> AI Tool Input
+                  <Wand2 size={12} className="text-teal-400" /> AI Tool Input
                 </div>
                 <p className="font-mono text-zinc-300 text-sm leading-relaxed">
                   {DEMO_SCENARIO.prompt}
                   <motion.span
                     animate={{ opacity: [1, 0] }}
                     transition={{ repeat: Infinity, duration: 0.8 }}
-                    className="inline-block w-2 h-4 ml-1 bg-indigo-500 align-middle"
+                    className="inline-block w-2 h-4 ml-1 bg-teal-500 align-middle"
                   />
                 </p>
               </div>
@@ -162,7 +162,7 @@ export const WorkflowDemo = () => {
               {/* Progress Line */}
               <div className="pt-6 border-t border-white/10">
                 <div className="flex justify-between items-end mb-2">
-                  <span className="text-xs text-indigo-400 font-mono flex items-center gap-2">
+                  <span className="text-xs text-teal-400 font-mono flex items-center gap-2">
                     {progress < 100 ? <Loader2 size={12} className="animate-spin" /> : <CheckCircle2 size={12} />}
                     {currentStep.status}
                   </span>
@@ -170,7 +170,7 @@ export const WorkflowDemo = () => {
                 </div>
                 <div className="h-1 w-full bg-zinc-800 rounded-full overflow-hidden">
                   <motion.div
-                    className="h-full bg-indigo-500"
+                    className="h-full bg-teal-500"
                     initial={{ width: 0 }}
                     animate={{ width: `${progress}%` }}
                     transition={{ ease: "linear" }}
@@ -204,15 +204,15 @@ export const WorkflowDemo = () => {
                 >
                   {/* Scan line effect */}
                   <motion.div
-                    className="absolute left-0 right-0 h-1 bg-gradient-to-r from-transparent via-indigo-400 to-transparent opacity-60"
+                    className="absolute left-0 right-0 h-1 bg-gradient-to-r from-transparent via-teal-400 to-transparent opacity-60"
                     animate={{ top: ['0%', '100%', '0%'] }}
                     transition={{ repeat: Infinity, duration: 2.5, ease: "easeInOut" }}
                   />
                   {/* Shimmer overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/10 via-transparent to-violet-500/10" />
+                  <div className="absolute inset-0 bg-gradient-to-br from-teal-500/10 via-transparent to-emerald-500/10" />
                   {/* Label */}
                   <div className="relative flex items-center gap-2 px-4 py-2 rounded-full bg-black/60 backdrop-blur-md border border-white/20">
-                    <Sparkles size={14} className="text-indigo-400" />
+                    <Sparkles size={14} className="text-teal-400" />
                     <span className="text-[11px] font-bold uppercase tracking-widest text-white">
                       AI Processing
                     </span>

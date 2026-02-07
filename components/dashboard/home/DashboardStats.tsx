@@ -26,7 +26,7 @@ export const DashboardStats: React.FC = () => {
       label: 'Assets',
       value: stats.totalAssets,
       icon: FolderOpen,
-      iconColor: 'text-indigo-400',
+      iconColor: 'text-teal-400',
       onClick: () => navigate('/studio/library'),
     },
     {
@@ -40,7 +40,7 @@ export const DashboardStats: React.FC = () => {
       label: 'Videos',
       value: stats.videos,
       icon: Video,
-      iconColor: 'text-purple-400',
+      iconColor: 'text-teal-400',
       onClick: () => navigate('/studio/library'),
     },
     {
@@ -60,7 +60,7 @@ export const DashboardStats: React.FC = () => {
           <button
             key={pill.label}
             onClick={pill.onClick}
-            className="flex items-center gap-2.5 px-4 py-2.5 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 hover:border-indigo-500 dark:hover:border-indigo-500 transition-all text-left group"
+            className="flex items-center gap-2.5 px-4 py-2.5 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 hover:border-teal-500 dark:hover:border-teal-500 transition-all text-left group"
           >
             <Icon size={16} className={pill.iconColor} />
             <span className="text-sm font-bold text-zinc-900 dark:text-white">{pill.value}</span>

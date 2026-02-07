@@ -299,7 +299,7 @@ const MyLibraryContent: React.FC = () => {
   };
 
   return (
-    <div className="flex h-screen bg-white dark:bg-[#09090b] text-zinc-900 dark:text-white font-sans overflow-hidden">
+    <div className="flex h-screen bg-white dark:bg-[#09090b] text-zinc-900 dark:text-white font-[Space_Grotesk] overflow-hidden">
       <NavigationRail isMobileOpen={mobileMenuOpen} onMobileClose={() => setMobileMenuOpen(false)} />
 <div className="flex-1 flex flex-col min-w-0 overflow-hidden ml-0 lg:ml-16">
         <DashboardTopbar onMenuClick={() => {}} />
@@ -327,8 +327,8 @@ const MyLibraryContent: React.FC = () => {
 
               <div className="flex items-center gap-3">
                 {selectedAssets.size > 0 && (
-                  <div className="flex items-center gap-3 bg-indigo-50 dark:bg-indigo-950/30 px-4 py-2 rounded-xl">
-                    <span className="text-sm text-indigo-600 dark:text-indigo-400 font-medium">
+                  <div className="flex items-center gap-3 bg-teal-50 dark:bg-teal-950/30 px-4 py-2 rounded-xl">
+                    <span className="text-sm text-teal-600 dark:text-teal-400 font-medium">
                       {selectedAssets.size} selected
                     </span>
                     <button
@@ -348,7 +348,7 @@ const MyLibraryContent: React.FC = () => {
 
                 <button
                   onClick={() => setShowUploadModal(true)}
-                  className="flex items-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-xl transition-colors"
+                  className="flex items-center gap-2 px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-medium rounded-xl transition-colors"
                 >
                   <Upload size={18} />
                   Upload
@@ -366,7 +366,7 @@ const MyLibraryContent: React.FC = () => {
                   placeholder="Search assets..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 bg-zinc-100 dark:bg-zinc-800 border border-transparent focus:border-indigo-500 rounded-xl text-sm outline-none transition-colors"
+                  className="w-full pl-10 pr-4 py-2.5 bg-zinc-100 dark:bg-zinc-800 border border-transparent focus:border-teal-500 rounded-xl text-sm outline-none transition-colors"
                 />
               </div>
 
@@ -428,7 +428,7 @@ const MyLibraryContent: React.FC = () => {
             {/* Content */}
             {loading && assets.length === 0 ? (
               <div className="flex items-center justify-center h-64">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-600"></div>
               </div>
             ) : filteredAssets.length === 0 ? (
               <div className="text-center py-20 bg-zinc-50 dark:bg-zinc-900/50 rounded-3xl border-2 border-dashed border-zinc-200 dark:border-zinc-800">
@@ -446,7 +446,7 @@ const MyLibraryContent: React.FC = () => {
                 {!searchQuery && filterType === 'all' && (
                   <button
                     onClick={() => navigate('/studio/apps')}
-                    className="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-xl transition-colors"
+                    className="inline-flex items-center gap-2 px-6 py-3 bg-teal-600 hover:bg-teal-700 text-white font-medium rounded-xl transition-colors"
                   >
                     <Plus size={18} />
                     Start Creating
@@ -464,14 +464,14 @@ const MyLibraryContent: React.FC = () => {
                       initial={{ opacity: 0, scale: 0.95 }}
                       animate={{ opacity: 1, scale: 1 }}
                       exit={{ opacity: 0, scale: 0.95 }}
-                      className="group relative bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 overflow-hidden hover:border-indigo-500 dark:hover:border-indigo-500 transition-all duration-200 hover:shadow-lg"
+                      className="group relative bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 overflow-hidden hover:border-teal-500 dark:hover:border-teal-500 transition-all duration-200 hover:shadow-lg"
                     >
                       {/* Selection Checkbox */}
                       <div
                         onClick={() => toggleAssetSelection(asset.id)}
                         className={`absolute top-3 left-3 z-10 w-6 h-6 rounded-lg border-2 flex items-center justify-center cursor-pointer transition-all ${
                           selectedAssets.has(asset.id)
-                            ? 'bg-indigo-600 border-indigo-600'
+                            ? 'bg-teal-600 border-teal-600'
                             : 'bg-white/80 dark:bg-zinc-800/80 border-zinc-300 dark:border-zinc-600 opacity-0 group-hover:opacity-100'
                         }`}
                       >
@@ -506,7 +506,7 @@ const MyLibraryContent: React.FC = () => {
                               e.stopPropagation();
                               handleOpenPreview(asset);
                             }}
-                            className="p-2 bg-white/90 dark:bg-zinc-800/90 backdrop-blur rounded-lg text-zinc-600 dark:text-zinc-400 hover:text-indigo-600 shadow-sm transition-colors"
+                            className="p-2 bg-white/90 dark:bg-zinc-800/90 backdrop-blur rounded-lg text-zinc-600 dark:text-zinc-400 hover:text-teal-600 shadow-sm transition-colors"
                             title="Preview"
                           >
                             <Eye size={14} />
@@ -518,7 +518,7 @@ const MyLibraryContent: React.FC = () => {
                                   e.stopPropagation();
                                   setShowToolMenu(showToolMenu === asset.id ? null : asset.id);
                                 }}
-                                className="p-2 bg-indigo-600 hover:bg-indigo-700 rounded-lg text-white shadow-sm transition-colors"
+                                className="p-2 bg-teal-600 hover:bg-teal-700 rounded-lg text-white shadow-sm transition-colors"
                                 title="Use in Tool"
                               >
                                 <Wand2 size={14} />
@@ -551,7 +551,7 @@ const MyLibraryContent: React.FC = () => {
                           <a
                             href={asset.url}
                             download
-                            className="p-2 bg-white/90 dark:bg-zinc-800/90 backdrop-blur rounded-lg text-zinc-600 dark:text-zinc-400 hover:text-indigo-600 shadow-sm transition-colors"
+                            className="p-2 bg-white/90 dark:bg-zinc-800/90 backdrop-blur rounded-lg text-zinc-600 dark:text-zinc-400 hover:text-teal-600 shadow-sm transition-colors"
                             title="Download"
                           >
                             <Download size={14} />
@@ -561,7 +561,7 @@ const MyLibraryContent: React.FC = () => {
                               e.stopPropagation();
                               handleStartRename(asset);
                             }}
-                            className="p-2 bg-white/90 dark:bg-zinc-800/90 backdrop-blur rounded-lg text-zinc-600 dark:text-zinc-400 hover:text-indigo-600 shadow-sm transition-colors"
+                            className="p-2 bg-white/90 dark:bg-zinc-800/90 backdrop-blur rounded-lg text-zinc-600 dark:text-zinc-400 hover:text-teal-600 shadow-sm transition-colors"
                             title="Rename"
                           >
                             <Pencil size={14} />
@@ -580,7 +580,7 @@ const MyLibraryContent: React.FC = () => {
                           <span className={`px-2 py-1 text-[10px] font-semibold rounded-md ${
                             asset.type === 'image'
                               ? 'bg-blue-500/90 text-white'
-                              : 'bg-purple-500/90 text-white'
+                              : 'bg-teal-500/90 text-white'
                           }`}>
                             {asset.type === 'image' ? 'IMAGE' : 'VIDEO'}
                           </span>
@@ -600,7 +600,7 @@ const MyLibraryContent: React.FC = () => {
                                 if (e.key === 'Escape') handleCancelRename();
                               }}
                               autoFocus
-                              className="flex-1 text-sm font-medium bg-transparent border-b border-indigo-500 outline-none text-zinc-900 dark:text-white"
+                              className="flex-1 text-sm font-medium bg-transparent border-b border-teal-500 outline-none text-zinc-900 dark:text-white"
                             />
                             <button onClick={handleSaveRename} className="p-1 text-green-500 hover:text-green-600">
                               <Check size={14} />
@@ -687,8 +687,8 @@ const MyLibraryContent: React.FC = () => {
                             {asset.type === 'image' ? (
                               <img src={asset.url} alt={asset.name} className="w-full h-full object-cover" />
                             ) : (
-                              <div className="w-full h-full flex items-center justify-center bg-purple-100 dark:bg-purple-900/30">
-                                <Video size={20} className="text-purple-600 dark:text-purple-400" />
+                              <div className="w-full h-full flex items-center justify-center bg-teal-100 dark:bg-teal-900/30">
+                                <Video size={20} className="text-teal-600 dark:text-teal-400" />
                               </div>
                             )}
                           </div>
@@ -705,7 +705,7 @@ const MyLibraryContent: React.FC = () => {
                                   if (e.key === 'Escape') handleCancelRename();
                                 }}
                                 autoFocus
-                                className="flex-1 text-sm font-medium bg-transparent border-b border-indigo-500 outline-none text-zinc-900 dark:text-white"
+                                className="flex-1 text-sm font-medium bg-transparent border-b border-teal-500 outline-none text-zinc-900 dark:text-white"
                               />
                               <button onClick={handleSaveRename} className="p-1 text-green-500 hover:text-green-600">
                                 <Check size={14} />
@@ -724,7 +724,7 @@ const MyLibraryContent: React.FC = () => {
                           <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-full ${
                             asset.type === 'image'
                               ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400'
-                              : 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400'
+                              : 'bg-teal-100 dark:bg-teal-900/30 text-teal-700 dark:text-teal-400'
                           }`}>
                             {asset.type === 'image' ? <ImageIcon size={12} /> : <Video size={12} />}
                             {asset.type === 'image' ? 'Image' : 'Video'}
@@ -737,7 +737,7 @@ const MyLibraryContent: React.FC = () => {
                           <div className="flex items-center justify-end gap-1">
                             <button
                               onClick={() => handleOpenPreview(asset)}
-                              className="p-2 text-zinc-500 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+                              className="p-2 text-zinc-500 hover:text-teal-600 dark:hover:text-teal-400 transition-colors"
                               title="Preview"
                             >
                               <Eye size={16} />
@@ -749,7 +749,7 @@ const MyLibraryContent: React.FC = () => {
                                     e.stopPropagation();
                                     setShowToolMenu(showToolMenu === `list-${asset.id}` ? null : `list-${asset.id}`);
                                   }}
-                                  className="p-2 text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300 transition-colors"
+                                  className="p-2 text-teal-600 hover:text-teal-700 dark:text-teal-400 dark:hover:text-teal-300 transition-colors"
                                   title="Use in Tool"
                                 >
                                   <Wand2 size={16} />
@@ -782,14 +782,14 @@ const MyLibraryContent: React.FC = () => {
                             <a
                               href={asset.url}
                               download
-                              className="p-2 text-zinc-500 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+                              className="p-2 text-zinc-500 hover:text-teal-600 dark:hover:text-teal-400 transition-colors"
                               title="Download"
                             >
                               <Download size={16} />
                             </a>
                             <button
                               onClick={() => handleStartRename(asset)}
-                              className="p-2 text-zinc-500 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+                              className="p-2 text-zinc-500 hover:text-teal-600 dark:hover:text-teal-400 transition-colors"
                               title="Rename"
                             >
                               <Pencil size={16} />
@@ -873,7 +873,7 @@ const MyLibraryContent: React.FC = () => {
                           strokeWidth="6"
                           strokeLinecap="round"
                           strokeDasharray={`${uploadProgress * 2.26} 226`}
-                          className="text-indigo-600 transition-all duration-300"
+                          className="text-teal-600 transition-all duration-300"
                         />
                       </svg>
                       <div className="absolute inset-0 flex items-center justify-center">
@@ -894,20 +894,20 @@ const MyLibraryContent: React.FC = () => {
                     onDrop={handleDrop}
                     className={`relative border-2 border-dashed rounded-2xl p-8 text-center transition-all ${
                       isDragging
-                        ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-950/30'
-                        : 'border-zinc-300 dark:border-zinc-700 hover:border-indigo-400 dark:hover:border-indigo-600'
+                        ? 'border-teal-500 bg-teal-50 dark:bg-teal-950/30'
+                        : 'border-zinc-300 dark:border-zinc-700 hover:border-teal-400 dark:hover:border-teal-600'
                     }`}
                   >
                     <div className={`w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center transition-colors ${
                       isDragging
-                        ? 'bg-indigo-100 dark:bg-indigo-900/50'
+                        ? 'bg-teal-100 dark:bg-teal-900/50'
                         : 'bg-zinc-100 dark:bg-zinc-800'
                     }`}>
                       <UploadCloud
                         size={32}
                         className={`transition-colors ${
                           isDragging
-                            ? 'text-indigo-600 dark:text-indigo-400'
+                            ? 'text-teal-600 dark:text-teal-400'
                             : 'text-zinc-400'
                         }`}
                       />
@@ -941,7 +941,7 @@ const MyLibraryContent: React.FC = () => {
                   <div className="flex items-center gap-3">
                     <button
                       onClick={() => fileInputRef.current?.click()}
-                      className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-xl transition-colors"
+                      className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-medium rounded-xl transition-colors"
                     >
                       <Upload size={18} />
                       Choose Files

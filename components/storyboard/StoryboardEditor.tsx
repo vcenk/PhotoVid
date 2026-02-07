@@ -89,7 +89,7 @@ export const StoryboardEditor: React.FC = () => {
             className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors flex items-center gap-1.5 ${
               isGenerating || storyboard.scenes.every(s => !s.imageUrl)
                 ? 'bg-white/5 text-zinc-600 cursor-not-allowed'
-                : 'bg-violet-600 hover:bg-violet-500 text-white'
+                : 'bg-emerald-600 hover:bg-emerald-500 text-white'
             }`}
           >
             {isGenerating ? (
@@ -124,7 +124,7 @@ export const StoryboardEditor: React.FC = () => {
             disabled={!hasAllVideos}
             className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors flex items-center gap-1.5 ${
               hasAllVideos
-                ? 'bg-indigo-600 hover:bg-indigo-500 text-white'
+                ? 'bg-teal-600 hover:bg-teal-500 text-white'
                 : 'bg-white/5 text-zinc-600 cursor-not-allowed'
             }`}
           >
@@ -148,12 +148,12 @@ export const StoryboardEditor: React.FC = () => {
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               onClick={() => addScene()}
-              className="w-64 h-full min-h-[360px] flex-shrink-0 rounded-2xl border-2 border-dashed border-white/10 hover:border-violet-500/50 hover:bg-violet-500/5 transition-all flex flex-col items-center justify-center gap-3 group"
+              className="w-64 h-full min-h-[360px] flex-shrink-0 rounded-2xl border-2 border-dashed border-white/10 hover:border-emerald-500/50 hover:bg-emerald-500/5 transition-all flex flex-col items-center justify-center gap-3 group"
             >
-              <div className="w-12 h-12 rounded-xl bg-white/5 group-hover:bg-violet-500/20 flex items-center justify-center transition-colors">
-                <Plus size={24} className="text-zinc-500 group-hover:text-violet-400" />
+              <div className="w-12 h-12 rounded-xl bg-white/5 group-hover:bg-emerald-500/20 flex items-center justify-center transition-colors">
+                <Plus size={24} className="text-zinc-500 group-hover:text-emerald-400" />
               </div>
-              <span className="text-sm text-zinc-500 group-hover:text-violet-400">Add Scene</span>
+              <span className="text-sm text-zinc-500 group-hover:text-emerald-400">Add Scene</span>
             </motion.button>
           </div>
         </div>

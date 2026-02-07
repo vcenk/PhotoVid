@@ -35,7 +35,7 @@ export const DubbingNode = memo(({ id, data, selected }: NodeProps) => {
         status === 'completed' && 'border-emerald-500 ring-2 ring-emerald-500/20',
         status === 'error' && 'border-red-500 ring-2 ring-red-500/20',
         status === 'idle' && 'border-rose-300 dark:border-rose-700',
-        selected && 'ring-4 ring-indigo-500/30'
+        selected && 'ring-4 ring-teal-500/30'
       )}
     >
       {/* Header */}
@@ -66,7 +66,7 @@ export const DubbingNode = memo(({ id, data, selected }: NodeProps) => {
         type="target"
         position={Position.Left}
         id="video"
-        className="w-3 h-3 bg-violet-500 border-2 border-white dark:border-zinc-900"
+        className="w-3 h-3 bg-emerald-500 border-2 border-white dark:border-zinc-900"
         style={{ top: '50%' }}
       />
 
@@ -121,7 +121,7 @@ export const DubbingNode = memo(({ id, data, selected }: NodeProps) => {
         type="source"
         position={Position.Right}
         id="video"
-        className="w-3 h-3 bg-violet-500 border-2 border-white dark:border-zinc-900"
+        className="w-3 h-3 bg-emerald-500 border-2 border-white dark:border-zinc-900"
         style={{ top: '50%' }}
       />
     </div>

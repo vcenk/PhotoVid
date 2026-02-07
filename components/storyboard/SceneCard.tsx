@@ -79,7 +79,7 @@ export const SceneCard: React.FC<SceneCardProps> = ({ scene, index }) => {
   const statusColors = {
     pending: 'border-white/10',
     uploading: 'border-blue-500/50',
-    generating: 'border-violet-500/50',
+    generating: 'border-emerald-500/50',
     completed: 'border-green-500/50',
     failed: 'border-red-500/50',
   };
@@ -93,7 +93,7 @@ export const SceneCard: React.FC<SceneCardProps> = ({ scene, index }) => {
       </div>
     ),
     generating: (
-      <div className="absolute top-2 right-2 px-2 py-1 bg-violet-500/80 rounded-lg text-[10px] text-white flex items-center gap-1">
+      <div className="absolute top-2 right-2 px-2 py-1 bg-emerald-500/80 rounded-lg text-[10px] text-white flex items-center gap-1">
         <Loader2 size={10} className="animate-spin" />
         Generating
       </div>
@@ -144,7 +144,7 @@ export const SceneCard: React.FC<SceneCardProps> = ({ scene, index }) => {
             onDragOver={handleDrag}
             onDrop={handleDrop}
             className={`w-full h-full flex flex-col items-center justify-center cursor-pointer transition-colors ${
-              isDragging ? 'bg-violet-500/10' : 'bg-zinc-900'
+              isDragging ? 'bg-emerald-500/10' : 'bg-zinc-900'
             }`}
           >
             <input
@@ -153,7 +153,7 @@ export const SceneCard: React.FC<SceneCardProps> = ({ scene, index }) => {
               onChange={handleFileChange}
               accept="image/*"
             />
-            <UploadCloud size={24} className={isDragging ? 'text-violet-400' : 'text-zinc-600'} />
+            <UploadCloud size={24} className={isDragging ? 'text-emerald-400' : 'text-zinc-600'} />
             <span className="text-xs text-zinc-500 mt-2">Drop image</span>
           </div>
         )}
@@ -182,7 +182,7 @@ export const SceneCard: React.FC<SceneCardProps> = ({ scene, index }) => {
         <select
           value={scene.room || ''}
           onChange={(e) => updateScene(scene.id, { room: e.target.value })}
-          className="w-full px-2 py-1.5 text-xs bg-white/5 border border-white/10 rounded-lg text-zinc-300 focus:outline-none focus:ring-1 focus:ring-violet-500"
+          className="w-full px-2 py-1.5 text-xs bg-white/5 border border-white/10 rounded-lg text-zinc-300 focus:outline-none focus:ring-1 focus:ring-emerald-500"
         >
           <option value="">Select room...</option>
           {ROOM_TYPES.map((room) => (
@@ -198,7 +198,7 @@ export const SceneCard: React.FC<SceneCardProps> = ({ scene, index }) => {
           <select
             value={scene.motionStyle}
             onChange={(e) => updateScene(scene.id, { motionStyle: e.target.value as Scene['motionStyle'] })}
-            className="flex-1 px-2 py-1 text-[10px] bg-white/5 border border-white/10 rounded-lg text-zinc-400 focus:outline-none focus:ring-1 focus:ring-violet-500"
+            className="flex-1 px-2 py-1 text-[10px] bg-white/5 border border-white/10 rounded-lg text-zinc-400 focus:outline-none focus:ring-1 focus:ring-emerald-500"
           >
             {MOTION_STYLES.map((style) => (
               <option key={style.id} value={style.id}>
@@ -218,7 +218,7 @@ export const SceneCard: React.FC<SceneCardProps> = ({ scene, index }) => {
                 onClick={() => updateScene(scene.id, { duration })}
                 className={`px-2 py-1 text-[10px] rounded transition-colors ${
                   scene.duration === duration
-                    ? 'bg-violet-600 text-white'
+                    ? 'bg-emerald-600 text-white'
                     : 'bg-white/5 text-zinc-400 hover:bg-white/10'
                 }`}
               >
@@ -239,7 +239,7 @@ export const SceneCard: React.FC<SceneCardProps> = ({ scene, index }) => {
                 ? 'bg-white/5 text-zinc-600 cursor-not-allowed'
                 : scene.status === 'completed'
                 ? 'bg-green-600/20 text-green-400 cursor-default'
-                : 'bg-violet-600 hover:bg-violet-500 text-white'
+                : 'bg-emerald-600 hover:bg-emerald-500 text-white'
             }`}
           >
             {isGenerating ? (

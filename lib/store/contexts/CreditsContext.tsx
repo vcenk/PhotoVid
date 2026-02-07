@@ -7,17 +7,31 @@ import {
   getCreditCost,
   DEFAULT_STARTING_CREDITS,
 } from '../../types/credits';
+import { TIERS, TierId, TierConfig } from '../../config/tiers';
+
+export interface SubscriptionInfo {
+  tierId: TierId;
+  tier: TierConfig;
+  status: 'active' | 'past_due' | 'canceled' | 'trialing';
+  currentPeriodEnd?: string;
+  cancelAtPeriodEnd: boolean;
+  monthlyAllowance: number;
+}
 
 interface CreditsContextType {
   balance: number;
   loading: boolean;
   transactions: CreditTransaction[];
   isAdmin: boolean;
+  subscription: SubscriptionInfo;
   fetchCredits: () => Promise<void>;
+  fetchSubscription: () => Promise<void>;
   deductCredits: (tool: CreditCostKey, generationId?: string, description?: string) => Promise<boolean>;
   addCredits: (amount: number, type: CreditTransaction['type'], description?: string) => Promise<boolean>;
   hasEnoughCredits: (tool: CreditCostKey) => boolean;
   getCostForTool: (tool: CreditCostKey) => number;
+  createCheckoutSession: (tierId: TierId, billingPeriod: 'monthly' | 'yearly') => Promise<string | null>;
+  openCustomerPortal: () => Promise<string | null>;
 }
 
 const CreditsContext = createContext<CreditsContextType | undefined>(undefined);
@@ -55,11 +69,20 @@ function saveLocalCredits(data: LocalCreditsData) {
   }
 }
 
+const DEFAULT_SUBSCRIPTION: SubscriptionInfo = {
+  tierId: 'free',
+  tier: TIERS.free,
+  status: 'active',
+  cancelAtPeriodEnd: false,
+  monthlyAllowance: TIERS.free.monthlyCredits,
+};
+
 export function CreditsProvider({ children }: { children: ReactNode }) {
   const [balance, setBalance] = useState(DEFAULT_STARTING_CREDITS);
   const [loading, setLoading] = useState(false);
   const [transactions, setTransactions] = useState<CreditTransaction[]>([]);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [subscription, setSubscription] = useState<SubscriptionInfo>(DEFAULT_SUBSCRIPTION);
   const supabase = createClient();
 
   // ============================================
@@ -291,9 +314,131 @@ export function CreditsProvider({ children }: { children: ReactNode }) {
     return getCreditCost(tool);
   }, []);
 
+  // ============================================
+  // Fetch subscription status
+  // ============================================
+  const fetchSubscription = useCallback(async () => {
+    if (!supabase) {
+      setSubscription(DEFAULT_SUBSCRIPTION);
+      return;
+    }
+
+    try {
+      const { data: userData } = await supabase.auth.getUser();
+      if (!userData.user) {
+        setSubscription(DEFAULT_SUBSCRIPTION);
+        return;
+      }
+
+      const { data, error } = await supabase.functions.invoke('get-subscription');
+
+      if (error || !data?.success) {
+        console.error('Error fetching subscription:', error);
+        setSubscription(DEFAULT_SUBSCRIPTION);
+        return;
+      }
+
+      const sub = data.subscription;
+      const tierId = (sub.tier_id || 'free') as TierId;
+      const tier = TIERS[tierId] || TIERS.free;
+
+      setSubscription({
+        tierId,
+        tier,
+        status: sub.status || 'active',
+        currentPeriodEnd: sub.current_period_end,
+        cancelAtPeriodEnd: sub.cancel_at_period_end || false,
+        monthlyAllowance: tier.monthlyCredits, // Always use tier config as source of truth
+      });
+    } catch (error) {
+      console.error('Error fetching subscription:', error);
+      setSubscription(DEFAULT_SUBSCRIPTION);
+    }
+  }, [supabase]);
+
+  // ============================================
+  // Create Stripe checkout session
+  // ============================================
+  const createCheckoutSession = useCallback(async (
+    tierId: TierId,
+    billingPeriod: 'monthly' | 'yearly'
+  ): Promise<string | null> => {
+    if (!supabase) {
+      console.error('Supabase not configured');
+      return null;
+    }
+
+    try {
+      const tier = TIERS[tierId];
+      if (!tier || tier.priceMonthly === 0) {
+        console.error('Invalid tier or free tier');
+        return null;
+      }
+
+      // Get the price ID from tier config (set after running setup-stripe-products)
+      const priceId = billingPeriod === 'monthly'
+        ? tier.stripePriceIdMonthly
+        : tier.stripePriceIdYearly;
+
+      if (!priceId) {
+        console.error('Price ID not configured for tier:', tierId);
+        return null;
+      }
+
+      const { data, error } = await supabase.functions.invoke('create-checkout-session', {
+        body: {
+          priceId,
+          tierId,
+          billingPeriod,
+          successUrl: `${window.location.origin}/studio/credits?success=true`,
+          cancelUrl: `${window.location.origin}/studio/credits?canceled=true`,
+        },
+      });
+
+      if (error || !data?.success) {
+        console.error('Error creating checkout session:', error);
+        return null;
+      }
+
+      return data.url;
+    } catch (error) {
+      console.error('Error creating checkout session:', error);
+      return null;
+    }
+  }, [supabase]);
+
+  // ============================================
+  // Open Stripe customer portal
+  // ============================================
+  const openCustomerPortal = useCallback(async (): Promise<string | null> => {
+    if (!supabase) {
+      console.error('Supabase not configured');
+      return null;
+    }
+
+    try {
+      const { data, error } = await supabase.functions.invoke('customer-portal', {
+        body: {
+          returnUrl: `${window.location.origin}/studio/credits`,
+        },
+      });
+
+      if (error || !data?.success) {
+        console.error('Error opening customer portal:', error);
+        return null;
+      }
+
+      return data.url;
+    } catch (error) {
+      console.error('Error opening customer portal:', error);
+      return null;
+    }
+  }, [supabase]);
+
   useEffect(() => {
     fetchCredits();
-  }, [fetchCredits]);
+    fetchSubscription();
+  }, [fetchCredits, fetchSubscription]);
 
   return (
     <CreditsContext.Provider
@@ -302,11 +447,15 @@ export function CreditsProvider({ children }: { children: ReactNode }) {
         loading,
         transactions,
         isAdmin,
+        subscription,
         fetchCredits,
+        fetchSubscription,
         deductCredits,
         addCredits,
         hasEnoughCredits,
         getCostForTool,
+        createCheckoutSession,
+        openCustomerPortal,
       }}
     >
       {children}

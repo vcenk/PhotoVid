@@ -53,7 +53,7 @@ export function TemplateCarousels() {
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-bold">{section.title}</h2>
             <button
-              className="hidden sm:flex items-center gap-1 text-sm font-medium text-violet-600 dark:text-violet-400 hover:text-violet-700 dark:hover:text-violet-300 transition-colors"
+              className="hidden sm:flex items-center gap-1 text-sm font-medium text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors"
               onClick={() => {
                 // TODO: Navigate to filtered templates page
                 navigate('/dashboard/templates');
@@ -72,7 +72,7 @@ export function TemplateCarousels() {
                   key={template.id}
                   className={cn(
                     'flex-shrink-0 w-72 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800',
-                    'rounded-2xl overflow-hidden hover:border-violet-300 dark:hover:border-violet-700 hover:shadow-lg transition-all group snap-start'
+                    'rounded-2xl overflow-hidden hover:border-emerald-300 dark:hover:border-emerald-700 hover:shadow-lg transition-all group snap-start'
                   )}
                 >
                   {/* Thumbnail */}
@@ -115,7 +115,7 @@ export function TemplateCarousels() {
                         'w-full flex items-center justify-center gap-2 px-4 py-2.5',
                         'bg-zinc-900 dark:bg-white text-white dark:text-zinc-900',
                         'rounded-xl text-sm font-bold hover:bg-zinc-800 dark:hover:bg-zinc-100',
-                        'transition-all group-hover:bg-violet-600 dark:group-hover:bg-violet-600',
+                        'transition-all group-hover:bg-emerald-600 dark:group-hover:bg-emerald-600',
                         'group-hover:text-white dark:group-hover:text-white'
                       )}
                     >

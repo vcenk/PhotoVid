@@ -115,7 +115,7 @@ export const TestimonialsCarousel: React.FC = () => {
       <div className="absolute inset-0 bg-gradient-to-b from-zinc-900 via-zinc-950 to-black" />
 
       {/* Ambient glow */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-indigo-600/10 rounded-full blur-[150px]" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-teal-600/10 rounded-full blur-[150px]" />
 
       <div className="relative max-w-7xl mx-auto px-6">
         {/* Header */}
@@ -126,7 +126,7 @@ export const TestimonialsCarousel: React.FC = () => {
             viewport={{ once: true }}
             className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-zinc-400 text-xs font-bold uppercase tracking-widest mb-6"
           >
-            <Quote size={14} className="text-indigo-400" />
+            <Quote size={14} className="text-teal-400" />
             What professionals say
           </motion.span>
 
@@ -137,7 +137,7 @@ export const TestimonialsCarousel: React.FC = () => {
             className="text-3xl md:text-5xl font-bold text-white tracking-tight"
           >
             Trusted by{' '}
-            <span className="bg-gradient-to-r from-indigo-400 to-violet-400 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-teal-400 to-emerald-400 bg-clip-text text-transparent">
               10,000+
             </span>{' '}
             real estate pros
@@ -164,7 +164,7 @@ export const TestimonialsCarousel: React.FC = () => {
               >
                 <div className="relative bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8 md:p-12">
                   {/* Quote icon */}
-                  <div className="absolute -top-4 -left-4 w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center shadow-lg shadow-indigo-500/30">
+                  <div className="absolute -top-4 -left-4 w-12 h-12 rounded-2xl bg-gradient-to-br from-teal-500 to-emerald-500 flex items-center justify-center shadow-lg shadow-teal-500/30">
                     <Quote size={20} className="text-white" />
                   </div>
 
@@ -188,7 +188,7 @@ export const TestimonialsCarousel: React.FC = () => {
                         alt={currentTestimonial.name}
                         className="w-14 h-14 rounded-full object-cover border-2 border-white/20"
                       />
-                      <div className="absolute inset-0 rounded-full bg-gradient-to-br from-indigo-500/20 to-transparent" />
+                      <div className="absolute inset-0 rounded-full bg-gradient-to-br from-teal-500/20 to-transparent" />
                     </div>
                     <div>
                       <div className="font-bold text-white">{currentTestimonial.name}</div>
@@ -199,7 +199,7 @@ export const TestimonialsCarousel: React.FC = () => {
                   </div>
 
                   {/* Decorative gradient */}
-                  <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-indigo-500/5 to-violet-500/5 pointer-events-none" />
+                  <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-teal-500/5 to-emerald-500/5 pointer-events-none" />
                 </div>
               </motion.div>
             </AnimatePresence>
@@ -236,7 +236,7 @@ export const TestimonialsCarousel: React.FC = () => {
                 }}
                 className={`w-2 h-2 rounded-full transition-all duration-300 ${
                   idx === activeIndex
-                    ? 'w-8 bg-gradient-to-r from-indigo-500 to-violet-500'
+                    ? 'w-8 bg-gradient-to-r from-teal-500 to-emerald-500'
                     : 'bg-white/20 hover:bg-white/40'
                 }`}
               />

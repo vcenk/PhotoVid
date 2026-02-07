@@ -9,7 +9,7 @@ export const AssetLibrary: React.FC = () => {
   if (loading && assets.length === 0) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-600"></div>
       </div>
     );
   }
@@ -61,7 +61,7 @@ export const AssetLibrary: React.FC = () => {
                   href={asset.url} 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="p-2 bg-white/90 backdrop-blur rounded-lg text-zinc-500 hover:text-indigo-600 shadow-sm transition-colors"
+                  className="p-2 bg-white/90 backdrop-blur rounded-lg text-zinc-500 hover:text-teal-600 shadow-sm transition-colors"
                 >
                   <ExternalLink size={14} />
                 </a>

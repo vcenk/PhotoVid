@@ -143,7 +143,7 @@ export const VehicleWalkthroughTool: React.FC = () => {
                                 <ArrowLeft size={18} className="text-zinc-400" />
                             </button>
                             <h1 className="text-base font-semibold text-white flex items-center gap-2">
-                                <Video size={18} className="text-violet-400" />
+                                <Video size={18} className="text-emerald-400" />
                                 Vehicle Walkthrough
                             </h1>
                             <span className="ml-auto px-2 py-0.5 bg-gradient-to-r from-amber-500 to-orange-500 rounded text-[10px] font-bold text-white flex items-center gap-1">
@@ -158,7 +158,7 @@ export const VehicleWalkthroughTool: React.FC = () => {
                             {!imagePreview ? (
                                 <div
                                     onDragEnter={handleDrag} onDragLeave={handleDrag} onDragOver={handleDrag} onDrop={handleDrop}
-                                    className={`relative border border-dashed rounded-xl p-6 text-center transition-all cursor-pointer ${isDragging ? 'border-violet-500 bg-violet-500/10' : 'border-white/10 hover:border-white/20 bg-white/[0.02]'}`}
+                                    className={`relative border border-dashed rounded-xl p-6 text-center transition-all cursor-pointer ${isDragging ? 'border-emerald-500 bg-emerald-500/10' : 'border-white/10 hover:border-white/20 bg-white/[0.02]'}`}
                                 >
                                     <input type="file" className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" onChange={handleFileChange} accept="image/*" />
                                     <UploadCloud size={28} className="mx-auto mb-2 text-zinc-500" />
@@ -182,7 +182,7 @@ export const VehicleWalkthroughTool: React.FC = () => {
                                     <button
                                         key={sp.id}
                                         onClick={() => setStartPoint(sp.id as typeof startPoint)}
-                                        className={`p-2.5 rounded-xl text-center transition-all ${startPoint === sp.id ? 'bg-violet-500/20 text-violet-300 ring-1 ring-violet-500/50' : 'bg-white/5 text-zinc-400 hover:bg-white/10'}`}
+                                        className={`p-2.5 rounded-xl text-center transition-all ${startPoint === sp.id ? 'bg-emerald-500/20 text-emerald-300 ring-1 ring-emerald-500/50' : 'bg-white/5 text-zinc-400 hover:bg-white/10'}`}
                                     >
                                         <span className="text-xs font-medium">{sp.name}</span>
                                     </button>
@@ -197,7 +197,7 @@ export const VehicleWalkthroughTool: React.FC = () => {
                                     <button
                                         key={d.value}
                                         onClick={() => setDuration(d.value as typeof duration)}
-                                        className={`p-2.5 rounded-xl text-center transition-all ${duration === d.value ? 'bg-violet-500/20 text-violet-300 ring-1 ring-violet-500/50' : 'bg-white/5 text-zinc-400 hover:bg-white/10'}`}
+                                        className={`p-2.5 rounded-xl text-center transition-all ${duration === d.value ? 'bg-emerald-500/20 text-emerald-300 ring-1 ring-emerald-500/50' : 'bg-white/5 text-zinc-400 hover:bg-white/10'}`}
                                     >
                                         <span className="text-sm font-bold">{d.label}</span>
                                     </button>
@@ -212,7 +212,7 @@ export const VehicleWalkthroughTool: React.FC = () => {
                                     <button
                                         key={h.id}
                                         onClick={() => toggleHighlight(h.id as typeof highlights[number])}
-                                        className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${highlights.includes(h.id as typeof highlights[number]) ? 'bg-violet-500/20 text-violet-300 ring-1 ring-violet-500/50' : 'bg-white/5 text-zinc-400 hover:bg-white/10'}`}
+                                        className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${highlights.includes(h.id as typeof highlights[number]) ? 'bg-emerald-500/20 text-emerald-300 ring-1 ring-emerald-500/50' : 'bg-white/5 text-zinc-400 hover:bg-white/10'}`}
                                     >
                                         {h.name}
                                     </button>
@@ -227,11 +227,11 @@ export const VehicleWalkthroughTool: React.FC = () => {
                                     <button
                                         key={style.id}
                                         onClick={() => setMotionStyle(style.id as typeof motionStyle)}
-                                        className={`w-full p-3 rounded-xl text-left transition-all ${motionStyle === style.id ? 'bg-violet-500/10 border border-violet-500/30' : 'bg-white/[0.02] border border-white/5 hover:border-white/10'}`}
+                                        className={`w-full p-3 rounded-xl text-left transition-all ${motionStyle === style.id ? 'bg-emerald-500/10 border border-emerald-500/30' : 'bg-white/[0.02] border border-white/5 hover:border-white/10'}`}
                                     >
                                         <div className="flex items-center justify-between">
                                             <span className="text-sm font-medium text-white">{style.name}</span>
-                                            {motionStyle === style.id && <Check size={16} className="text-violet-400" />}
+                                            {motionStyle === style.id && <Check size={16} className="text-emerald-400" />}
                                         </div>
                                         <p className="text-xs text-zinc-500 mt-1">{style.desc}</p>
                                     </button>
@@ -244,7 +244,7 @@ export const VehicleWalkthroughTool: React.FC = () => {
                         <button
                             onClick={handleGenerate}
                             disabled={!uploadedImage || isGenerating}
-                            className={`w-full py-3 rounded-xl font-semibold text-sm transition-all flex items-center justify-center gap-2 ${uploadedImage && !isGenerating ? 'bg-violet-600 hover:bg-violet-500 text-white' : 'bg-white/5 text-zinc-600 cursor-not-allowed'}`}
+                            className={`w-full py-3 rounded-xl font-semibold text-sm transition-all flex items-center justify-center gap-2 ${uploadedImage && !isGenerating ? 'bg-emerald-600 hover:bg-emerald-500 text-white' : 'bg-white/5 text-zinc-600 cursor-not-allowed'}`}
                         >
                             {isGenerating ? <><Loader2 size={18} className="animate-spin" />Generating {generationProgress}%</> : <><Sparkles size={18} />Generate Walkthrough</>}
                         </button>
@@ -258,7 +258,7 @@ export const VehicleWalkthroughTool: React.FC = () => {
                         {resultVideo && (
                             <div className="flex items-center gap-2">
                                 <button onClick={() => setResultVideo(null)} className="px-3 py-1.5 text-xs font-medium text-zinc-400 hover:text-white bg-white/5 hover:bg-white/10 rounded-lg transition-colors flex items-center gap-1.5"><RefreshCw size={14} />New Video</button>
-                                <button className="px-3 py-1.5 text-xs font-medium text-white bg-violet-600 hover:bg-violet-500 rounded-lg transition-colors flex items-center gap-1.5"><Download size={14} />Download</button>
+                                <button className="px-3 py-1.5 text-xs font-medium text-white bg-emerald-600 hover:bg-emerald-500 rounded-lg transition-colors flex items-center gap-1.5"><Download size={14} />Download</button>
                             </div>
                         )}
                     </div>
@@ -271,7 +271,7 @@ export const VehicleWalkthroughTool: React.FC = () => {
                                 </div>
                                 <p className="text-red-400 text-sm font-medium mb-2">Video Generation Failed</p>
                                 <p className="text-zinc-500 text-xs max-w-xs">{error}</p>
-                                <button onClick={() => setError(null)} className="mt-4 px-4 py-2 text-xs font-medium text-white bg-violet-600 hover:bg-violet-500 rounded-lg transition-colors">Try Again</button>
+                                <button onClick={() => setError(null)} className="mt-4 px-4 py-2 text-xs font-medium text-white bg-emerald-600 hover:bg-emerald-500 rounded-lg transition-colors">Try Again</button>
                             </div>
                         ) : !imagePreview ? (
                             <div className="text-center">
@@ -282,7 +282,7 @@ export const VehicleWalkthroughTool: React.FC = () => {
                         ) : isGenerating ? (
                             <div className="text-center">
                                 <div className="relative w-24 h-24 mx-auto mb-6">
-                                    <svg className="w-full h-full -rotate-90"><circle cx="48" cy="48" r="44" stroke="currentColor" strokeWidth="4" fill="none" className="text-white/10" /><circle cx="48" cy="48" r="44" stroke="currentColor" strokeWidth="4" fill="none" strokeDasharray={276.46} strokeDashoffset={276.46 - (276.46 * generationProgress) / 100} className="text-violet-500 transition-all duration-300" strokeLinecap="round" /></svg>
+                                    <svg className="w-full h-full -rotate-90"><circle cx="48" cy="48" r="44" stroke="currentColor" strokeWidth="4" fill="none" className="text-white/10" /><circle cx="48" cy="48" r="44" stroke="currentColor" strokeWidth="4" fill="none" strokeDasharray={276.46} strokeDashoffset={276.46 - (276.46 * generationProgress) / 100} className="text-emerald-500 transition-all duration-300" strokeLinecap="round" /></svg>
                                     <span className="absolute inset-0 flex items-center justify-center text-xl font-semibold text-white">{generationProgress}%</span>
                                 </div>
                                 <p className="text-zinc-400 font-medium">Generating walkthrough video...</p>
@@ -291,7 +291,7 @@ export const VehicleWalkthroughTool: React.FC = () => {
                         ) : resultVideo ? (
                             <div className="relative rounded-2xl overflow-hidden shadow-2xl">
                                 <video src={resultVideo} controls autoPlay loop className="max-w-full max-h-[calc(100vh-180px)]" />
-                                <div className="absolute top-4 right-4 px-3 py-1.5 bg-violet-500/80 backdrop-blur rounded-lg text-xs text-white font-medium flex items-center gap-1.5"><Video size={12} />Walkthrough</div>
+                                <div className="absolute top-4 right-4 px-3 py-1.5 bg-emerald-500/80 backdrop-blur rounded-lg text-xs text-white font-medium flex items-center gap-1.5"><Video size={12} />Walkthrough</div>
                             </div>
                         ) : (
                             <div className="relative rounded-2xl overflow-hidden shadow-2xl">

@@ -87,7 +87,7 @@ const ComparisonSlider: React.FC<SliderProps> = ({ before, after, beforeLabel, a
           draggable={false}
         />
         {/* After Label */}
-        <div className="absolute bottom-4 right-4 px-3.5 py-1.5 bg-white rounded-full text-xs font-bold text-black flex items-center gap-2 shadow-lg">
+        <div className="absolute bottom-4 right-4 px-3.5 py-1.5 bg-white dark:bg-zinc-100 rounded-full text-xs font-bold text-black flex items-center gap-2 shadow-lg">
           <Sparkles size={12} />
           {afterLabel}
         </div>
@@ -159,8 +159,8 @@ export const BeforeAfterShowcase: React.FC = () => {
       className="relative py-24 md:py-32 overflow-hidden bg-black"
     >
       {/* Ambient glow */}
-      <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-[500px] h-[500px] bg-indigo-500/10 rounded-full blur-[120px] pointer-events-none" />
-      <div className="absolute top-1/2 right-1/4 -translate-y-1/2 w-[500px] h-[500px] bg-violet-500/10 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-[500px] h-[500px] bg-teal-500/10 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute top-1/2 right-1/4 -translate-y-1/2 w-[500px] h-[500px] bg-emerald-500/10 rounded-full blur-[120px] pointer-events-none" />
 
       <div className="relative max-w-7xl mx-auto px-6">
         {/* Header */}
@@ -180,7 +180,7 @@ export const BeforeAfterShowcase: React.FC = () => {
 
           <h2 className="text-3xl md:text-5xl font-bold text-white tracking-tight mb-4">
             Transform Any{' '}
-            <span className="bg-gradient-to-r from-indigo-400 to-violet-400 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-teal-400 to-emerald-400 bg-clip-text text-transparent">
               Property
             </span>
           </h2>
@@ -209,7 +209,7 @@ export const BeforeAfterShowcase: React.FC = () => {
                 onClick={() => setActiveExample(example)}
                 className={`flex items-center gap-2 px-6 py-3 rounded-full text-sm font-semibold transition-all duration-300 ${
                   isActive
-                    ? 'bg-white text-black shadow-lg'
+                    ? 'bg-white dark:bg-zinc-100 text-black shadow-lg'
                     : 'bg-white/5 text-zinc-400 border border-white/10 hover:bg-white/10 hover:text-white'
                 }`}
               >

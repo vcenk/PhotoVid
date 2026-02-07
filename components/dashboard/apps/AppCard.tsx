@@ -22,7 +22,7 @@ export const AppCard: React.FC<AppCardProps> = ({ app, onSelect }) => {
             onClick={() => onSelect?.(app)}
         >
             {/* Card Container */}
-            <div className="relative bg-white dark:bg-zinc-900 rounded-2xl overflow-hidden border border-zinc-100 dark:border-zinc-800 shadow-sm hover:shadow-xl hover:border-violet-200 dark:hover:border-violet-900/50 transition-all duration-300">
+            <div className="relative bg-white dark:bg-zinc-900 rounded-2xl overflow-hidden border border-zinc-100 dark:border-zinc-800 shadow-sm hover:shadow-xl hover:border-emerald-200 dark:hover:border-emerald-900/50 transition-all duration-300">
                 {/* Thumbnail */}
                 <div className="relative aspect-[4/3] overflow-hidden bg-zinc-100 dark:bg-zinc-800">
                     <img
@@ -53,7 +53,7 @@ export const AppCard: React.FC<AppCardProps> = ({ app, onSelect }) => {
                     {/* Premium Badge - Top Right */}
                     {app.isPremium && (
                         <div className="absolute top-3 right-3">
-                            <span className="px-2 py-1 bg-gradient-to-r from-amber-400 to-yellow-500 text-black text-[10px] font-bold uppercase rounded-full flex items-center gap-1 shadow-lg">
+                            <span className="px-2 py-1 bg-gradient-to-r from-amber-400 to-yellow-500 text-amber-900 text-[10px] font-bold uppercase rounded-full flex items-center gap-1 shadow-lg">
                                 <Crown size={10} />
                                 Pro
                             </span>
@@ -70,14 +70,14 @@ export const AppCard: React.FC<AppCardProps> = ({ app, onSelect }) => {
                         className="absolute inset-0 flex items-center justify-center"
                     >
                         <div className="w-14 h-14 rounded-full bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm flex items-center justify-center shadow-2xl group-hover:scale-110 transition-transform">
-                            <Play size={24} className="text-violet-600 dark:text-violet-400 ml-1" fill="currentColor" />
+                            <Play size={24} className="text-emerald-600 dark:text-emerald-400 ml-1" fill="currentColor" />
                         </div>
                     </motion.div>
                 </div>
 
                 {/* Content */}
                 <div className="p-4">
-                    <h3 className="font-semibold text-zinc-900 dark:text-white text-base mb-1 group-hover:text-violet-600 dark:group-hover:text-violet-400 transition-colors">
+                    <h3 className="font-semibold text-zinc-900 dark:text-white text-base mb-1 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
                         {app.name}
                     </h3>
                     <p className="text-zinc-500 dark:text-zinc-400 text-sm line-clamp-2 leading-relaxed">
@@ -106,7 +106,7 @@ export const AppCard: React.FC<AppCardProps> = ({ app, onSelect }) => {
                     }}
                     className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-white dark:from-zinc-900 via-white/95 dark:via-zinc-900/95 to-transparent"
                 >
-                    <button className="w-full py-2.5 bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white text-sm font-semibold rounded-xl hover:from-violet-700 hover:to-fuchsia-700 transition-colors flex items-center justify-center gap-2 shadow-lg shadow-violet-200 dark:shadow-violet-900/30">
+                    <button className="w-full py-2.5 bg-gradient-to-r from-emerald-600 to-fuchsia-600 text-white text-sm font-semibold rounded-xl hover:from-emerald-700 hover:to-fuchsia-700 transition-colors flex items-center justify-center gap-2 shadow-lg shadow-emerald-200 dark:shadow-emerald-900/30">
                         <Sparkles size={16} />
                         Try Now
                     </button>

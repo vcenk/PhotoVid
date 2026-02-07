@@ -31,6 +31,7 @@ import {
   Share2,
 } from 'lucide-react';
 import { NavigationRail } from '../dashboard/navigation/NavigationRail';
+import { DashboardTopbar } from '../dashboard/navigation/DashboardTopbar';
 
 // ============ TYPES ============
 interface Tool {
@@ -55,7 +56,7 @@ const TOOLS: Tool[] = [
     name: 'Virtual Staging',
     description: 'Fill empty rooms with designer furniture in seconds',
     icon: Building2,
-    gradient: 'from-blue-500 to-indigo-600',
+    gradient: 'from-blue-500 to-teal-600',
     route: '/studio/real-estate/virtual-staging',
     credits: 2,
     beforeImage: '/showcase/real-estate/before/virtual-staging.jpg',
@@ -88,7 +89,7 @@ const TOOLS: Tool[] = [
     name: 'Day to Twilight',
     description: 'Transform daytime shots into stunning dusk photos',
     icon: Sparkles,
-    gradient: 'from-violet-500 to-purple-600',
+    gradient: 'from-emerald-500 to-teal-600',
     route: '/studio/real-estate/twilight',
     credits: 4,
     isPremium: true,
@@ -389,7 +390,7 @@ const ToolCard: React.FC<{ tool: Tool; index: number }> = ({ tool, index }) => {
       animate={isInView ? { opacity: 1, y: 0 } : {}}
       transition={{ duration: 0.5, delay: index * 0.1 }}
       whileHover={{ y: -6 }}
-      className="group relative bg-[#121212] rounded-2xl overflow-hidden border border-white/5 hover:border-violet-500/50 hover:shadow-2xl hover:shadow-violet-500/10 transition-all duration-300 flex flex-col h-full"
+      className="group relative bg-[#121212] rounded-2xl overflow-hidden border border-white/5 hover:border-emerald-500/50 hover:shadow-2xl hover:shadow-emerald-500/10 transition-all duration-300 flex flex-col h-full"
     >
       {/* Preview - Slider for before/after or Single image for posters */}
       <div className="relative aspect-[16/10] overflow-hidden bg-zinc-900" onClick={(e) => e.stopPropagation()}>
@@ -448,7 +449,7 @@ const ToolCard: React.FC<{ tool: Tool; index: number }> = ({ tool, index }) => {
           </div>
         </div>
 
-        <h3 className="text-lg font-bold text-white mb-2 tracking-tight group-hover:text-violet-400 transition-colors">
+        <h3 className="text-lg font-bold text-white mb-2 tracking-tight group-hover:text-emerald-400 transition-colors">
           {tool.name}
         </h3>
         <p className="text-sm text-zinc-400 mb-5 leading-relaxed flex-grow">
@@ -457,10 +458,10 @@ const ToolCard: React.FC<{ tool: Tool; index: number }> = ({ tool, index }) => {
 
         <div className="flex items-center justify-between mt-auto pt-4 border-t border-white/5">
           <div className="flex items-center gap-1.5 text-xs font-medium text-zinc-500 bg-zinc-900/50 px-2 py-1 rounded-md">
-            <Zap size={12} className="text-violet-400 fill-violet-400/20" />
+            <Zap size={12} className="text-emerald-400 fill-emerald-400/20" />
             <span>{tool.credits} credits</span>
           </div>
-          <button className="text-xs font-semibold text-white bg-zinc-800 hover:bg-violet-600 px-3 py-1.5 rounded-full flex items-center gap-1.5 transition-all group-hover:bg-violet-600">
+          <button className="text-xs font-semibold text-white bg-zinc-800 hover:bg-emerald-600 px-3 py-1.5 rounded-full flex items-center gap-1.5 transition-all group-hover:bg-emerald-600">
             Try Tool
             <ArrowRight size={12} />
           </button>
@@ -599,7 +600,7 @@ const FeaturedShowcase: React.FC<{ tools: Tool[] }> = ({ tools }) => {
               {/* CTA Button */}
               <button
                 onClick={() => navigate(currentTool.route)}
-                className="hidden md:flex px-5 py-2.5 bg-violet-600 hover:bg-violet-500 text-white font-medium rounded-xl items-center gap-2 transition-colors"
+                className="hidden md:flex px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-medium rounded-xl items-center gap-2 transition-colors"
               >
                 Try Now
                 <ArrowRight size={16} />
@@ -610,7 +611,7 @@ const FeaturedShowcase: React.FC<{ tools: Tool[] }> = ({ tools }) => {
           {/* Progress Bar */}
           <div className="absolute top-0 left-0 right-0 h-1 bg-black/20">
             <motion.div
-              className="h-full bg-violet-500"
+              className="h-full bg-emerald-500"
               initial={{ width: '0%' }}
               animate={{ width: '100%' }}
               transition={{ duration: 5, ease: 'linear' }}
@@ -627,8 +628,8 @@ const FeaturedShowcase: React.FC<{ tools: Tool[] }> = ({ tools }) => {
               onClick={() => goToSlide(index)}
               className={`rounded-full transition-all ${
                 index === currentIndex
-                  ? 'w-6 h-2 bg-violet-500'
-                  : 'w-2 h-2 bg-zinc-700 hover:bg-zinc-500'
+                  ? 'w-6 h-2 bg-emerald-500'
+                  : 'w-2 h-2 bg-zinc-300 dark:bg-zinc-700 hover:bg-zinc-400 dark:hover:bg-zinc-500'
               }`}
             />
           ))}
@@ -644,14 +645,16 @@ export const RealEstatePageV2: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <div className="min-h-screen flex bg-[#0a0a0a]">
+    <div className="min-h-screen flex bg-white dark:bg-[#0a0a0a] text-zinc-900 dark:text-white font-[Space_Grotesk]">
       <NavigationRail isMobileOpen={mobileMenuOpen} onMobileClose={() => setMobileMenuOpen(false)} />
-<div className="flex-1 ml-0 lg:ml-16 overflow-y-auto">
+      <div className="flex-1 flex flex-col ml-0 lg:ml-16">
+        <DashboardTopbar onMenuClick={() => setMobileMenuOpen(true)} />
+        <div className="flex-1 overflow-y-auto">
         {/* ===== HERO SECTION ===== */}
         <section className="relative pt-12 pb-16 px-6 overflow-hidden">
           {/* Subtle gradient bg */}
-          <div className="absolute inset-0 bg-gradient-to-b from-violet-950/20 via-[#0a0a0a] to-[#0a0a0a] pointer-events-none" />
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[500px] bg-violet-600/10 blur-[120px] rounded-full pointer-events-none" />
+          <div className="absolute inset-0 bg-gradient-to-b from-emerald-950/20 via-[#0a0a0a] to-[#0a0a0a] pointer-events-none" />
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[500px] bg-emerald-600/10 blur-[120px] rounded-full pointer-events-none" />
 
           <div className="relative max-w-[1600px] mx-auto">
             {/* Badge */}
@@ -679,7 +682,7 @@ export const RealEstatePageV2: React.FC = () => {
             >
               Transform listings with
               <br className="hidden md:block" />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 via-indigo-400 to-blue-400 animate-gradient-x"> AI-powered </span>
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-400 to-blue-400 animate-gradient-x"> AI-powered </span>
               photo editing
             </motion.h1>
 
@@ -702,7 +705,7 @@ export const RealEstatePageV2: React.FC = () => {
             >
               <button
                 onClick={() => navigate('/studio/real-estate/virtual-staging')}
-                className="px-8 py-4 bg-violet-600 hover:bg-violet-500 text-white font-bold rounded-xl flex items-center gap-2 transition-all shadow-lg shadow-violet-600/20 hover:shadow-violet-600/40 hover:-translate-y-0.5"
+                className="px-8 py-4 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl flex items-center gap-2 transition-all shadow-lg shadow-emerald-600/20 hover:shadow-emerald-600/40 hover:-translate-y-0.5"
               >
                 Start for Free
                 <ArrowRight size={20} />
@@ -760,9 +763,9 @@ export const RealEstatePageV2: React.FC = () => {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1 }}
-                  className="relative p-6 bg-[#121212] rounded-2xl border border-white/5 hover:border-violet-500/30 transition-colors group"
+                  className="relative p-6 bg-[#121212] rounded-2xl border border-white/5 hover:border-emerald-500/30 transition-colors group"
                 >
-                  <div className="w-10 h-10 rounded-xl bg-violet-600/10 border border-violet-600/20 text-violet-400 font-bold flex items-center justify-center mb-4 group-hover:bg-violet-600 group-hover:text-white transition-colors">
+                  <div className="w-10 h-10 rounded-xl bg-emerald-600/10 border border-emerald-600/20 text-emerald-400 font-bold flex items-center justify-center mb-4 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
                     {step.num}
                   </div>
                   <h3 className="text-white font-bold mb-2">{step.title}</h3>
@@ -821,9 +824,9 @@ export const RealEstatePageV2: React.FC = () => {
               ].map((stat, index) => (
                 <div
                   key={index}
-                  className="p-6 bg-[#121212] rounded-2xl border border-white/5 text-center hover:border-violet-500/30 transition-colors group"
+                  className="p-6 bg-[#121212] rounded-2xl border border-white/5 text-center hover:border-emerald-500/30 transition-colors group"
                 >
-                  <stat.icon size={28} className="text-violet-400 mx-auto mb-4 group-hover:scale-110 transition-transform" />
+                  <stat.icon size={28} className="text-emerald-400 mx-auto mb-4 group-hover:scale-110 transition-transform" />
                   <p className="text-3xl font-bold text-white mb-1 tracking-tight">{stat.value}</p>
                   <p className="text-sm text-zinc-500">{stat.label}</p>
                 </div>
@@ -839,7 +842,7 @@ export const RealEstatePageV2: React.FC = () => {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="relative p-10 md:p-16 rounded-3xl bg-gradient-to-br from-violet-600 to-indigo-700 overflow-hidden shadow-2xl shadow-violet-900/20"
+              className="relative p-10 md:p-16 rounded-3xl bg-gradient-to-br from-emerald-600 to-teal-700 overflow-hidden shadow-2xl shadow-emerald-900/20"
             >
               {/* Decorative circles */}
               <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
@@ -855,7 +858,7 @@ export const RealEstatePageV2: React.FC = () => {
                 </p>
                 <button
                   onClick={() => navigate('/studio/real-estate/virtual-staging')}
-                  className="px-8 py-4 bg-white text-violet-700 font-bold rounded-xl hover:bg-zinc-50 transition-all shadow-xl hover:shadow-2xl hover:-translate-y-1 inline-flex items-center gap-2"
+                  className="px-8 py-4 bg-white text-emerald-700 font-bold rounded-xl hover:bg-zinc-50 transition-all shadow-xl hover:shadow-2xl hover:-translate-y-1 inline-flex items-center gap-2"
                 >
                   Get Started Free
                   <ArrowRight size={20} />
@@ -864,6 +867,7 @@ export const RealEstatePageV2: React.FC = () => {
             </motion.div>
           </div>
         </section>
+        </div>
       </div>
     </div>
   );

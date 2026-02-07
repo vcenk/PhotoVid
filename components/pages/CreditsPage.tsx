@@ -1,182 +1,328 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
-  ArrowLeft,
   Zap,
   Check,
-  Sparkles,
   Shield,
   Clock,
   CreditCard,
   AlertCircle,
+  Crown,
+  Settings,
+  Loader2,
+  CheckCircle,
+  XCircle,
 } from 'lucide-react';
 import { NavigationRail } from '../dashboard/navigation/NavigationRail';
+import { DashboardTopbar } from '../dashboard/navigation/DashboardTopbar';
 import { useCredits } from '@/lib/store/contexts/CreditsContext';
-import {
-  CREDIT_PACKAGES,
-  CreditPackage,
-  formatCredits,
-  getTotalCreditsFromPackage,
-  getPricePerCredit,
-  CREDIT_COSTS,
-} from '@/lib/types/credits';
+import { useToast } from '@/components/common/Toast';
+import { TIERS, TIER_ORDER, TierId, formatPrice } from '@/lib/config/tiers';
+import { formatCredits } from '@/lib/types/credits';
 
 export const CreditsPage: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const selectedPackageId = searchParams.get('package');
-  const { balance, loading } = useCredits();
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [selectedPkg, setSelectedPkg] = useState<string | null>(selectedPackageId);
-  const [isProcessing, setIsProcessing] = useState(false);
+  const success = searchParams.get('success');
+  const canceled = searchParams.get('canceled');
 
-  const handlePurchase = async (pkg: CreditPackage) => {
-    setIsProcessing(true);
-    // TODO: Integrate with Stripe
-    // For now, show a message that Stripe is not configured
-    setTimeout(() => {
-      setIsProcessing(false);
-      alert('Stripe integration coming soon! Contact support for manual credit purchases.');
-    }, 1000);
+  const {
+    balance,
+    loading,
+    subscription,
+    fetchSubscription,
+    createCheckoutSession,
+    openCustomerPortal,
+  } = useCredits();
+
+  const toast = useToast();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'yearly'>('monthly');
+  const [processingTier, setProcessingTier] = useState<string | null>(null);
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const [showCanceledMessage, setShowCanceledMessage] = useState(false);
+
+  useEffect(() => {
+    if (success === 'true') {
+      setShowSuccessMessage(true);
+      fetchSubscription();
+      setTimeout(() => setShowSuccessMessage(false), 5000);
+    }
+    if (canceled === 'true') {
+      setShowCanceledMessage(true);
+      setTimeout(() => setShowCanceledMessage(false), 5000);
+    }
+  }, [success, canceled, fetchSubscription]);
+
+  const handleSubscribe = async (tierId: TierId) => {
+    if (tierId === 'free') return;
+
+    setProcessingTier(tierId);
+    try {
+      const url = await createCheckoutSession(tierId, billingPeriod);
+      if (url) {
+        window.location.href = url;
+      } else {
+        toast.error('Checkout Failed', 'Unable to create checkout session. Please try again or contact support.');
+      }
+    } catch (error) {
+      console.error('Error creating checkout:', error);
+      toast.error('Something Went Wrong', 'An unexpected error occurred. Please try again later.');
+    } finally {
+      setProcessingTier(null);
+    }
   };
 
-  // Group tools by category for the pricing guide
-  const toolCategories = [
-    {
-      name: 'Basic Tools',
-      credits: 1,
-      tools: ['Photo Enhancement', 'Watermark Removal', 'Auto Enhance', 'License Blur'],
-    },
-    {
-      name: 'Advanced Tools',
-      credits: 2,
-      tools: ['Virtual Staging', 'Sky Replacement', 'Twilight', 'Item Removal', 'Background Swap'],
-    },
-    {
-      name: 'Premium Tools',
-      credits: 3,
-      tools: ['Virtual Renovation', 'HDR Merge', 'Floor Plan', '360 Staging'],
-    },
-    {
-      name: 'Video Generation',
-      credits: '5-10',
-      tools: ['Room Tour', 'Vehicle 360', 'Text to Video', 'AI Dubbing'],
-    },
-  ];
+  const handleManageSubscription = async () => {
+    setProcessingTier('portal');
+    try {
+      const url = await openCustomerPortal();
+      if (url) {
+        window.location.href = url;
+      } else {
+        toast.error('Portal Unavailable', 'Unable to open billing portal. Please try again or contact support.');
+      }
+    } catch (error) {
+      console.error('Error opening portal:', error);
+      toast.error('Something Went Wrong', 'An unexpected error occurred. Please try again later.');
+    } finally {
+      setProcessingTier(null);
+    }
+  };
+
+  const currentTierIndex = TIER_ORDER.indexOf(subscription.tierId);
 
   return (
-    <div className="flex h-screen bg-white dark:bg-[#09090b] text-zinc-900 dark:text-white font-sans overflow-hidden">
-      {/* Navigation Rail */}
+    <div className="flex h-screen bg-white dark:bg-[#09090b] text-zinc-900 dark:text-white font-[Space_Grotesk] overflow-hidden">
       <NavigationRail
         isMobileOpen={mobileMenuOpen}
         onMobileClose={() => setMobileMenuOpen(false)}
       />
 
-      {/* Main Content */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden ml-0 lg:ml-16">
-        {/* Header */}
-        <div className="flex-shrink-0 h-16 border-b border-zinc-200 dark:border-zinc-800 flex items-center px-6">
-          <button
-            onClick={() => navigate('/studio')}
-            className="flex items-center gap-2 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors"
-          >
-            <ArrowLeft size={20} />
-            <span className="text-sm font-medium">Back to Studio</span>
-          </button>
-        </div>
+        <DashboardTopbar onMenuClick={() => setMobileMenuOpen(true)} />
 
-        {/* Content */}
         <div className="flex-1 overflow-y-auto">
           <div className="max-w-6xl mx-auto px-6 py-12">
-            {/* Hero Section */}
-            <div className="text-center mb-12">
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-violet-500/10 border border-violet-500/20 text-violet-400 text-sm font-medium mb-6">
-                <Zap size={16} className="fill-current" />
-                <span>Your Balance: {loading ? '...' : formatCredits(balance)} credits</span>
+            {/* Success/Canceled Messages */}
+            {showSuccessMessage && (
+              <motion.div
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mb-6 p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center gap-3"
+              >
+                <CheckCircle className="text-emerald-500" size={20} />
+                <span className="text-emerald-400">
+                  Subscription activated successfully! Your credits have been added.
+                </span>
+              </motion.div>
+            )}
+
+            {showCanceledMessage && (
+              <motion.div
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mb-6 p-4 rounded-xl bg-yellow-500/10 border border-yellow-500/20 flex items-center gap-3"
+              >
+                <XCircle className="text-yellow-500" size={20} />
+                <span className="text-yellow-400">
+                  Checkout was canceled. No charges were made.
+                </span>
+              </motion.div>
+            )}
+
+            {/* Current Plan Status */}
+            <div className="bg-gradient-to-r from-emerald-600/10 to-teal-600/10 rounded-2xl border border-emerald-500/20 p-6 mb-8">
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <Crown className="text-emerald-400" size={20} />
+                    <span className="text-sm text-emerald-400 font-medium">Current Plan</span>
+                  </div>
+                  <h2 className="text-2xl font-bold">{subscription.tier.name}</h2>
+                  <p className="text-zinc-500 dark:text-zinc-400 text-sm mt-1">
+                    {subscription.monthlyAllowance} credits/month
+                    {subscription.currentPeriodEnd && (
+                      <> • Renews {new Date(subscription.currentPeriodEnd).toLocaleDateString()}</>
+                    )}
+                  </p>
+                </div>
+                <div className="flex items-center gap-4">
+                  <div className="text-right">
+                    <p className="text-sm text-zinc-500">Available Credits</p>
+                    <p className="text-3xl font-bold text-emerald-400">
+                      {loading ? '...' : formatCredits(balance)}
+                    </p>
+                  </div>
+                  {subscription.tierId !== 'free' && (
+                    <button
+                      onClick={handleManageSubscription}
+                      disabled={processingTier === 'portal'}
+                      className="flex items-center gap-2 px-4 py-2 rounded-xl border border-zinc-300 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+                    >
+                      {processingTier === 'portal' ? (
+                        <Loader2 size={16} className="animate-spin" />
+                      ) : (
+                        <Settings size={16} />
+                      )}
+                      <span>Manage</span>
+                    </button>
+                  )}
+                </div>
               </div>
-              <h1 className="text-4xl font-bold mb-4">Get More Credits</h1>
-              <p className="text-zinc-500 dark:text-zinc-400 max-w-2xl mx-auto">
-                Credits are used for AI-powered image and video generation.
-                Choose a package that fits your needs.
+            </div>
+
+            {/* Header */}
+            <div className="text-center mb-8">
+              <h1 className="text-3xl font-bold mb-2">Choose Your Plan</h1>
+              <p className="text-zinc-500 dark:text-zinc-400">
+                Upgrade to unlock more credits and premium features
               </p>
             </div>
 
-            {/* Credit Packages */}
+            {/* Billing Toggle */}
+            <div className="flex justify-center mb-8">
+              <div className="inline-flex items-center p-1 rounded-xl bg-zinc-100 dark:bg-zinc-800">
+                <button
+                  onClick={() => setBillingPeriod('monthly')}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    billingPeriod === 'monthly'
+                      ? 'bg-white dark:bg-zinc-900 shadow-sm'
+                      : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-white'
+                  }`}
+                >
+                  Monthly
+                </button>
+                <button
+                  onClick={() => setBillingPeriod('yearly')}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    billingPeriod === 'yearly'
+                      ? 'bg-white dark:bg-zinc-900 shadow-sm'
+                      : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-white'
+                  }`}
+                >
+                  Yearly
+                  <span className="ml-2 text-xs text-emerald-400">Save 17%</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Pricing Tiers */}
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
-              {CREDIT_PACKAGES.map((pkg) => {
-                const isSelected = selectedPkg === pkg.id;
-                const totalCredits = getTotalCreditsFromPackage(pkg);
-                const pricePerCredit = getPricePerCredit(pkg);
+              {TIER_ORDER.map((tierId, index) => {
+                const tier = TIERS[tierId];
+                const isCurrentPlan = subscription.tierId === tierId;
+                const isDowngrade = index < currentTierIndex;
+                const price = billingPeriod === 'monthly' ? tier.priceMonthly : tier.priceYearly;
+                const monthlyEquivalent = billingPeriod === 'yearly' ? price / 12 : price;
 
                 return (
                   <motion.div
-                    key={pkg.id}
+                    key={tierId}
                     whileHover={{ scale: 1.02 }}
                     className={`
-                      relative rounded-2xl border-2 overflow-hidden transition-all cursor-pointer
-                      ${isSelected
-                        ? 'border-violet-500 bg-violet-500/5'
+                      relative rounded-2xl border-2 overflow-hidden transition-all
+                      ${tier.popular
+                        ? 'border-emerald-500 bg-emerald-500/5'
+                        : isCurrentPlan
+                        ? 'border-emerald-500/50 bg-emerald-500/5'
                         : 'border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700'
                       }
-                      ${pkg.popular ? 'ring-2 ring-violet-500/20' : ''}
                     `}
-                    onClick={() => setSelectedPkg(pkg.id)}
                   >
-                    {/* Popular Badge */}
-                    {pkg.popular && (
-                      <div className="absolute top-0 right-0 bg-violet-500 text-white text-xs font-bold px-3 py-1 rounded-bl-lg">
+                    {tier.popular && (
+                      <div className="absolute top-0 right-0 bg-emerald-500 text-white text-xs font-bold px-3 py-1 rounded-bl-lg">
                         Most Popular
                       </div>
                     )}
 
+                    {isCurrentPlan && (
+                      <div className="absolute top-0 left-0 bg-emerald-600 text-white text-xs font-bold px-3 py-1 rounded-br-lg">
+                        Current Plan
+                      </div>
+                    )}
+
                     <div className="p-6">
-                      <h3 className="text-xl font-bold mb-2">{pkg.name}</h3>
+                      <h3 className="text-xl font-bold mb-1">{tier.name}</h3>
+                      <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-4">
+                        {tier.description}
+                      </p>
 
-                      <div className="flex items-baseline gap-1 mb-4">
-                        <span className="text-4xl font-bold">${pkg.price.toFixed(0)}</span>
-                        <span className="text-zinc-500">.{(pkg.price % 1).toFixed(2).slice(2)}</span>
-                      </div>
-
-                      <div className="space-y-2 mb-6">
-                        <div className="flex items-center gap-2 text-sm">
-                          <Zap size={16} className="text-violet-400 fill-violet-400" />
-                          <span>{pkg.credits} credits</span>
-                        </div>
-                        {pkg.bonusCredits > 0 && (
-                          <div className="flex items-center gap-2 text-sm text-green-400">
-                            <Sparkles size={16} />
-                            <span>+{pkg.bonusCredits} bonus credits</span>
-                          </div>
+                      <div className="flex items-baseline gap-1 mb-2">
+                        {price === 0 ? (
+                          <span className="text-4xl font-bold">Free</span>
+                        ) : (
+                          <>
+                            <span className="text-4xl font-bold">
+                              {formatPrice(monthlyEquivalent)}
+                            </span>
+                            <span className="text-zinc-500">/mo</span>
+                          </>
                         )}
-                        <div className="flex items-center gap-2 text-sm text-zinc-500">
-                          <span>${pricePerCredit.toFixed(3)}/credit</span>
-                        </div>
                       </div>
 
-                      {pkg.savings && (
-                        <div className="text-sm text-violet-400 font-medium mb-4">
-                          {pkg.savings}
-                        </div>
+                      {billingPeriod === 'yearly' && price > 0 && (
+                        <p className="text-sm text-zinc-500 mb-4">
+                          Billed {formatPrice(price)}/year
+                        </p>
                       )}
 
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handlePurchase(pkg);
-                        }}
-                        disabled={isProcessing}
-                        className={`
-                          w-full py-3 rounded-xl font-semibold transition-all
-                          ${isSelected || pkg.popular
-                            ? 'bg-violet-600 hover:bg-violet-700 text-white'
-                            : 'bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-900 dark:text-white'
-                          }
-                          disabled:opacity-50 disabled:cursor-not-allowed
-                        `}
-                      >
-                        {isProcessing ? 'Processing...' : 'Buy Now'}
-                      </button>
+                      <div className="flex items-center gap-2 py-3 px-4 rounded-xl bg-emerald-500/10 mb-4">
+                        <Zap size={18} className="text-emerald-400 fill-emerald-400" />
+                        <span className="font-semibold text-emerald-400">
+                          {tier.monthlyCredits} credits/month
+                        </span>
+                      </div>
+
+                      <ul className="space-y-2 mb-6">
+                        {tier.features.map((feature, i) => (
+                          <li key={i} className="flex items-start gap-2 text-sm">
+                            <Check size={16} className="text-emerald-400 mt-0.5 shrink-0" />
+                            <span className="text-zinc-600 dark:text-zinc-300">{feature}</span>
+                          </li>
+                        ))}
+                      </ul>
+
+                      {isCurrentPlan ? (
+                        <button
+                          disabled
+                          className="w-full py-3 rounded-xl font-semibold bg-zinc-200 dark:bg-zinc-700 text-zinc-500 cursor-not-allowed"
+                        >
+                          Current Plan
+                        </button>
+                      ) : tierId === 'free' ? (
+                        <button
+                          disabled
+                          className="w-full py-3 rounded-xl font-semibold bg-zinc-100 dark:bg-zinc-800 text-zinc-500"
+                        >
+                          Free Forever
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() => handleSubscribe(tierId)}
+                          disabled={processingTier === tierId}
+                          className={`
+                            w-full py-3 rounded-xl font-semibold transition-all flex items-center justify-center gap-2
+                            ${tier.popular || isDowngrade
+                              ? 'bg-emerald-600 hover:bg-emerald-700 text-white'
+                              : 'bg-zinc-900 dark:bg-white hover:bg-zinc-800 dark:hover:bg-zinc-100 text-white dark:text-zinc-900'
+                            }
+                            disabled:opacity-50 disabled:cursor-not-allowed
+                          `}
+                        >
+                          {processingTier === tierId ? (
+                            <>
+                              <Loader2 size={18} className="animate-spin" />
+                              Processing...
+                            </>
+                          ) : isDowngrade ? (
+                            'Downgrade'
+                          ) : (
+                            'Upgrade'
+                          )}
+                        </button>
+                      )}
                     </div>
                   </motion.div>
                 );
@@ -191,7 +337,7 @@ export const CreditsPage: React.FC = () => {
               </div>
               <div className="flex items-center gap-2 text-zinc-500">
                 <Clock size={20} />
-                <span className="text-sm">Instant Delivery</span>
+                <span className="text-sm">Cancel Anytime</span>
               </div>
               <div className="flex items-center gap-2 text-zinc-500">
                 <CreditCard size={20} />
@@ -199,52 +345,34 @@ export const CreditsPage: React.FC = () => {
               </div>
             </div>
 
-            {/* Credit Pricing Guide */}
-            <div className="bg-zinc-50 dark:bg-zinc-900/50 rounded-2xl border border-zinc-200 dark:border-zinc-800 p-8">
-              <h2 className="text-2xl font-bold mb-6 text-center">Credit Usage Guide</h2>
-
-              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {toolCategories.map((category) => (
-                  <div key={category.name} className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <h3 className="font-semibold">{category.name}</h3>
-                      <span className="text-sm text-violet-400 font-medium">
-                        {category.credits} credit{typeof category.credits === 'number' && category.credits === 1 ? '' : 's'}
-                      </span>
-                    </div>
-                    <ul className="space-y-1">
-                      {category.tools.map((tool) => (
-                        <li key={tool} className="text-sm text-zinc-500 flex items-center gap-2">
-                          <Check size={14} className="text-green-400" />
-                          {tool}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                ))}
-              </div>
-            </div>
-
             {/* FAQ Section */}
-            <div className="mt-16">
+            <div className="mt-8">
               <h2 className="text-2xl font-bold mb-8 text-center">Frequently Asked Questions</h2>
 
               <div className="max-w-3xl mx-auto space-y-4">
                 <div className="bg-zinc-50 dark:bg-zinc-900/50 rounded-xl p-6">
-                  <h3 className="font-semibold mb-2">Do credits expire?</h3>
-                  <p className="text-sm text-zinc-500">No, your credits never expire. Use them whenever you need.</p>
+                  <h3 className="font-semibold mb-2">When do my credits reset?</h3>
+                  <p className="text-sm text-zinc-500">
+                    Credits reset on your billing date each month. Unused credits do not roll over.
+                  </p>
                 </div>
                 <div className="bg-zinc-50 dark:bg-zinc-900/50 rounded-xl p-6">
-                  <h3 className="font-semibold mb-2">Can I get a refund?</h3>
-                  <p className="text-sm text-zinc-500">Credits are non-refundable once purchased. Contact support if you have issues with a generation.</p>
+                  <h3 className="font-semibold mb-2">Can I change my plan?</h3>
+                  <p className="text-sm text-zinc-500">
+                    Yes! You can upgrade or downgrade anytime. Changes take effect on your next billing cycle.
+                  </p>
                 </div>
                 <div className="bg-zinc-50 dark:bg-zinc-900/50 rounded-xl p-6">
-                  <h3 className="font-semibold mb-2">What payment methods are accepted?</h3>
-                  <p className="text-sm text-zinc-500">We accept all major credit cards, debit cards, and select digital wallets through Stripe.</p>
+                  <h3 className="font-semibold mb-2">What happens if I run out of credits?</h3>
+                  <p className="text-sm text-zinc-500">
+                    You can wait for your monthly reset or upgrade to a higher tier for more credits.
+                  </p>
                 </div>
                 <div className="bg-zinc-50 dark:bg-zinc-900/50 rounded-xl p-6">
-                  <h3 className="font-semibold mb-2">Do you offer enterprise plans?</h3>
-                  <p className="text-sm text-zinc-500">Yes! Contact us for custom enterprise pricing with volume discounts and dedicated support.</p>
+                  <h3 className="font-semibold mb-2">How do I cancel?</h3>
+                  <p className="text-sm text-zinc-500">
+                    Click "Manage" on your current plan to access the billing portal where you can cancel anytime.
+                  </p>
                 </div>
               </div>
             </div>
@@ -255,7 +383,7 @@ export const CreditsPage: React.FC = () => {
                 <AlertCircle size={16} />
                 <span className="text-sm">
                   Need help? Contact us at{' '}
-                  <a href="mailto:support@photovid.studio" className="text-violet-400 hover:underline">
+                  <a href="mailto:support@photovid.studio" className="text-emerald-400 hover:underline">
                     support@photovid.studio
                   </a>
                 </span>
@@ -264,6 +392,7 @@ export const CreditsPage: React.FC = () => {
           </div>
         </div>
       </div>
+
     </div>
   );
 };

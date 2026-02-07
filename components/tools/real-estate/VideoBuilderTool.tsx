@@ -70,7 +70,7 @@ const CollapsibleSection: React.FC<{
                     <span className="text-zinc-400">{icon}</span>
                     <span className="text-sm font-medium text-white">{title}</span>
                     {badge && (
-                        <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-purple-500/20 text-purple-400">
+                        <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-teal-500/20 text-teal-400">
                             {badge}
                         </span>
                     )}
@@ -130,7 +130,7 @@ const InputField: React.FC<{
                 placeholder={placeholder}
                 value={value || ''}
                 onChange={(e) => onChange(e.target.value)}
-                className={`w-full py-2.5 bg-zinc-800/50 border border-white/10 rounded-lg text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/20 transition-all ${
+                className={`w-full py-2.5 bg-zinc-800/50 border border-white/10 rounded-lg text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-teal-500/50 focus:ring-1 focus:ring-teal-500/20 transition-all ${
                     icon ? 'pl-10 pr-3' : prefix ? 'pl-7 pr-3' : 'px-3'
                 }`}
             />
@@ -256,7 +256,7 @@ function VideoBuilderContent() {
                             </button>
                             <div className="flex-1">
                                 <h1 className="text-base font-semibold text-white flex items-center gap-2">
-                                    <Film size={18} className="text-purple-400" />
+                                    <Film size={18} className="text-teal-400" />
                                     Video Builder
                                 </h1>
                                 <p className="text-xs text-zinc-500">Create stunning property videos</p>
@@ -279,7 +279,7 @@ function VideoBuilderContent() {
                                 onDragLeave={handleDragLeave}
                                 className={`relative border-2 border-dashed rounded-xl p-4 text-center transition-all cursor-pointer mb-3 ${
                                     isDraggingOver
-                                        ? 'border-purple-500 bg-purple-500/10'
+                                        ? 'border-teal-500 bg-teal-500/10'
                                         : 'border-white/10 hover:border-white/20 bg-white/[0.02]'
                                 }`}
                             >
@@ -290,7 +290,7 @@ function VideoBuilderContent() {
                                     className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                                     onChange={handleFileUpload}
                                 />
-                                <Upload size={20} className={`mx-auto mb-2 ${isDraggingOver ? 'text-purple-400' : 'text-zinc-500'}`} />
+                                <Upload size={20} className={`mx-auto mb-2 ${isDraggingOver ? 'text-teal-400' : 'text-zinc-500'}`} />
                                 <p className="text-sm text-zinc-400">
                                     {isDraggingOver ? 'Drop images here' : 'Drag & drop images'}
                                 </p>
@@ -426,7 +426,7 @@ function VideoBuilderContent() {
                                         onClick={() => setTemplate(template.id as VideoTemplate)}
                                         className={`relative p-3 rounded-xl text-left transition-all ${
                                             selectedTemplate === template.id
-                                                ? 'bg-purple-500/20 ring-2 ring-purple-500'
+                                                ? 'bg-teal-500/20 ring-2 ring-teal-500'
                                                 : 'bg-zinc-800/50 hover:bg-zinc-800 ring-1 ring-white/5'
                                         }`}
                                     >
@@ -441,7 +441,7 @@ function VideoBuilderContent() {
                                             {template.description.split(' ').slice(0, 3).join(' ')}
                                         </div>
                                         {selectedTemplate === template.id && (
-                                            <div className="absolute top-2 right-2 w-2 h-2 rounded-full bg-purple-500" />
+                                            <div className="absolute top-2 right-2 w-2 h-2 rounded-full bg-teal-500" />
                                         )}
                                     </button>
                                 ))}
@@ -460,7 +460,7 @@ function VideoBuilderContent() {
                         </div>
                         <button
                             disabled={!canPreview}
-                            className="w-full py-3 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-medium relative overflow-hidden disabled:opacity-40 disabled:cursor-not-allowed hover:from-purple-500 hover:to-indigo-500 transition-all shadow-lg shadow-purple-500/20"
+                            className="w-full py-3 rounded-xl bg-gradient-to-r from-teal-600 to-teal-600 text-white font-medium relative overflow-hidden disabled:opacity-40 disabled:cursor-not-allowed hover:from-teal-500 hover:to-teal-500 transition-all shadow-lg shadow-teal-500/20"
                         >
                             <span className="relative z-10 flex items-center justify-center gap-2">
                                 <Film size={18} />
@@ -492,11 +492,11 @@ function VideoBuilderContent() {
                                     onClick={() => setPreviewFormat(format.id)}
                                     className={`flex flex-col items-center px-4 py-2 rounded-xl transition-all ${
                                         previewFormat === format.id
-                                            ? 'bg-purple-500/20 ring-1 ring-purple-500'
+                                            ? 'bg-teal-500/20 ring-1 ring-teal-500'
                                             : 'bg-zinc-900 hover:bg-zinc-800 ring-1 ring-white/5'
                                     }`}
                                 >
-                                    <span className={previewFormat === format.id ? 'text-purple-400' : 'text-zinc-400'}>
+                                    <span className={previewFormat === format.id ? 'text-teal-400' : 'text-zinc-400'}>
                                         {format.icon}
                                     </span>
                                     <span className={`text-xs mt-1 ${previewFormat === format.id ? 'text-white' : 'text-zinc-500'}`}>
@@ -575,7 +575,7 @@ function VideoBuilderContent() {
                                     </div>
                                     <h3 className="text-lg font-medium text-white mb-1">No Preview Available</h3>
                                     <p className="text-sm text-zinc-500 mb-4">Upload property images to see your video</p>
-                                    <label className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-purple-600 hover:bg-purple-500 text-white text-sm font-medium cursor-pointer transition-colors">
+                                    <label className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-teal-600 hover:bg-teal-500 text-white text-sm font-medium cursor-pointer transition-colors">
                                         <Upload size={16} />
                                         Upload Images
                                         <input

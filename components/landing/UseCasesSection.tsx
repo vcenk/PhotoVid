@@ -23,7 +23,7 @@ const PERSONAS = [
     features: ["Virtual Staging", "Sky Replacement", "Twilight Conversion"],
     image: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&q=80&w=1200",
     icon: UserCircle,
-    color: "bg-indigo-500"
+    color: "bg-teal-500"
   },
   {
     id: "photographers",
@@ -43,7 +43,7 @@ const PERSONAS = [
     features: ["Team Presets", "Brand Watermarks", "Usage Analytics"],
     image: "https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?auto=format&fit=crop&q=80&w=1200",
     icon: Building2,
-    color: "bg-violet-500"
+    color: "bg-emerald-500"
   },
   {
     id: "managers",
@@ -126,7 +126,7 @@ export const UseCasesSection = () => {
                 {isActive && (
                   <motion.div
                     layoutId="activeTabBg"
-                    className="absolute inset-0 bg-indigo-600 rounded-full"
+                    className="absolute inset-0 bg-teal-600 rounded-full"
                     transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
                   />
                 )}
@@ -175,7 +175,7 @@ export const UseCasesSection = () => {
                   <div className="flex flex-wrap gap-3">
                     {activeTab.features.map((feature) => (
                       <div key={feature} className="px-4 py-2 rounded-lg bg-zinc-900 border border-white/5 text-xs font-bold text-zinc-300 flex items-center gap-2">
-                        <CheckCircle2 size={14} className="text-indigo-500" />
+                        <CheckCircle2 size={14} className="text-teal-500" />
                         {feature}
                       </div>
                     ))}
@@ -183,10 +183,10 @@ export const UseCasesSection = () => {
                 </div>
 
                 <div className="pt-4">
-                  <button className="flex items-center gap-2 text-sm font-bold text-white border-b-2 border-zinc-700 pb-1 hover:border-indigo-500 transition-colors group">
+                  <a href="/auth" className="flex items-center gap-2 text-sm font-bold text-white border-b-2 border-zinc-700 pb-1 hover:border-teal-500 transition-colors group">
                     Get Started Free
                     <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
-                  </button>
+                  </a>
                 </div>
               </div>
 

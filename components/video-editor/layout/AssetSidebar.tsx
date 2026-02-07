@@ -79,9 +79,9 @@ const GlassCard: React.FC<{
     onClick={disabled ? undefined : onClick}
     className={`
       relative overflow-hidden rounded-2xl
-      bg-white/5 backdrop-blur-md
-      border border-white/5
-      ${hover && !disabled ? 'hover:bg-white/10 hover:border-purple-500/30 hover:shadow-xl hover:shadow-purple-900/10 cursor-pointer active:scale-[0.98]' : ''}
+      bg-zinc-50 dark:bg-white/5 backdrop-blur-md
+      border border-zinc-200 dark:border-white/5
+      ${hover && !disabled ? 'hover:bg-zinc-100 dark:hover:bg-white/10 hover:border-teal-500/30 hover:shadow-xl hover:shadow-teal-600/10 dark:hover:shadow-teal-900/10 cursor-pointer active:scale-[0.98]' : ''}
       ${disabled ? 'opacity-30 cursor-not-allowed' : ''}
       transition-all duration-300
       ${className}
@@ -99,10 +99,10 @@ export const AssetSidebar: React.FC = () => {
   const [activeTab, setActiveTab] = useState<TabId>('media');
 
   return (
-    <div className="w-[380px] flex-shrink-0 bg-zinc-950/40 backdrop-blur-2xl border-r border-white/5 flex flex-col relative z-20">
+    <div className="w-[380px] flex-shrink-0 bg-white/80 dark:bg-zinc-950/40 backdrop-blur-2xl border-r border-zinc-200 dark:border-white/5 flex flex-col relative z-20">
       {/* Tab Navigation */}
       <div className="flex-shrink-0 p-3">
-        <div className="flex bg-black/40 rounded-2xl p-1.5 gap-1 overflow-x-auto scrollbar-hide border border-white/5 shadow-inner shadow-black/50">
+        <div className="flex bg-zinc-100 dark:bg-black/40 rounded-2xl p-1.5 gap-1 overflow-x-auto scrollbar-hide border border-zinc-200 dark:border-white/5 shadow-inner shadow-zinc-200/50 dark:shadow-black/50">
           {TABS.map((tab) => (
             <button
               key={tab.id}
@@ -110,13 +110,13 @@ export const AssetSidebar: React.FC = () => {
               className={`flex flex-col items-center justify-center gap-1.5 px-2 py-2.5 rounded-xl transition-all duration-300 flex-1 min-w-[50px] relative group ${
                 activeTab === tab.id
                   ? 'text-white'
-                  : 'text-zinc-500 hover:text-zinc-300'
+                  : 'text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'
               }`}
             >
               {activeTab === tab.id && (
                 <motion.div
                   layoutId="activeTabSidebar"
-                  className="absolute inset-0 rounded-xl bg-gradient-to-br from-purple-600 to-indigo-600 shadow-lg shadow-purple-900/30"
+                  className="absolute inset-0 rounded-xl bg-gradient-to-br from-teal-600 to-teal-600 shadow-lg shadow-teal-900/30"
                   transition={{ type: 'spring', bounce: 0.2, duration: 0.5 }}
                 />
               )}
@@ -211,9 +211,9 @@ const MediaTab: React.FC = () => {
         onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
         onDragLeave={() => setIsDragging(false)}
         className={`relative p-8 text-center rounded-2xl border-2 border-dashed transition-all duration-300 group overflow-hidden ${
-          isDragging 
-            ? 'border-purple-500 bg-purple-600/10 scale-[1.02]' 
-            : 'border-white/10 bg-white/5 hover:border-white/20 hover:bg-white/10'
+          isDragging
+            ? 'border-teal-500 bg-teal-600/10 scale-[1.02]'
+            : 'border-zinc-300 dark:border-white/10 bg-zinc-100 dark:bg-white/5 hover:border-zinc-400 dark:hover:border-white/20 hover:bg-zinc-200 dark:hover:bg-white/10'
         }`}
       >
         <input
@@ -225,12 +225,12 @@ const MediaTab: React.FC = () => {
         />
         <div className={`w-12 h-12 mx-auto mb-3 rounded-2xl flex items-center justify-center transition-all duration-300 ${
           isDragging
-            ? 'bg-purple-600 text-white shadow-lg shadow-purple-900/40'
-            : 'bg-white/5 text-zinc-400 group-hover:bg-purple-600/20 group-hover:text-purple-300'
+            ? 'bg-teal-600 text-white shadow-lg shadow-teal-900/40'
+            : 'bg-zinc-200 dark:bg-white/5 text-zinc-400 group-hover:bg-teal-600/20 group-hover:text-teal-300'
         }`}>
           <Upload size={20} />
         </div>
-        <p className="text-sm font-semibold text-white">Upload Assets</p>
+        <p className="text-sm font-semibold text-zinc-900 dark:text-white">Upload Assets</p>
         <p className="text-[10px] text-zinc-500 mt-1 uppercase tracking-widest font-bold">Images & Videos</p>
         
         <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:12px_12px]" />
@@ -241,7 +241,7 @@ const MediaTab: React.FC = () => {
         <div className="space-y-3">
           <div className="flex items-center justify-between px-1">
             <span className="text-[10px] font-black text-zinc-500 uppercase tracking-widest">Your Gallery</span>
-            <span className="text-[10px] font-bold bg-white/5 px-2 py-0.5 rounded-full text-zinc-400">{mediaAssets.length}</span>
+            <span className="text-[10px] font-bold bg-zinc-200 dark:bg-white/5 px-2 py-0.5 rounded-full text-zinc-500 dark:text-zinc-400">{mediaAssets.length}</span>
           </div>
           <div className="grid grid-cols-2 gap-3">
             {mediaAssets.map((asset) => (
@@ -254,12 +254,12 @@ const MediaTab: React.FC = () => {
                       className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                     />
                   ) : (
-                    <div className="w-full h-full bg-gradient-to-br from-blue-500/20 to-purple-500/20 flex items-center justify-center">
+                    <div className="w-full h-full bg-gradient-to-br from-blue-500/20 to-teal-500/20 flex items-center justify-center">
                       <FileVideo size={24} className="text-blue-400" />
                     </div>
                   )}
                   {/* Hover overlay */}
-                  <div className="absolute inset-0 bg-black/0 group-hover:bg-purple-600/40 transition-all flex items-center justify-center opacity-0 group-hover:opacity-100">
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-teal-600/40 transition-all flex items-center justify-center opacity-0 group-hover:opacity-100">
                     <div className="bg-white text-black p-1.5 rounded-full shadow-lg">
                         <Plus size={18} />
                     </div>
@@ -282,7 +282,7 @@ const MediaTab: React.FC = () => {
       <div className="space-y-3">
         <div className="flex items-center justify-between px-1">
           <span className="text-[10px] font-black text-zinc-500 uppercase tracking-widest">Quick Templates</span>
-          <span className="text-[10px] font-bold text-purple-400">Premium</span>
+          <span className="text-[10px] font-bold text-teal-400">Premium</span>
         </div>
         <div className="grid grid-cols-2 gap-3">
           {STOCK_IMAGES.map((stock) => (
@@ -406,7 +406,7 @@ const AudioTab: React.FC<{ type: 'music' | 'sfx' }> = ({ type }) => {
           onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
           onDragLeave={() => setIsDragging(false)}
           className={`relative p-3 text-center transition-all cursor-pointer ${
-            isDragging ? 'bg-purple-500/10' : ''
+            isDragging ? 'bg-teal-500/10' : ''
           }`}
         >
           <input
@@ -418,12 +418,12 @@ const AudioTab: React.FC<{ type: 'music' | 'sfx' }> = ({ type }) => {
           />
           <div className="flex items-center justify-center gap-3">
             <div className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all ${
-              isDragging ? 'bg-purple-500/20' : 'bg-white/[0.06]'
+              isDragging ? 'bg-teal-500/20' : 'bg-zinc-200 dark:bg-white/[0.06]'
             }`}>
-              <Upload size={14} className={isDragging ? 'text-purple-400' : 'text-zinc-400'} />
+              <Upload size={14} className={isDragging ? 'text-teal-400' : 'text-zinc-400'} />
             </div>
             <div className="text-left">
-              <p className="text-[11px] font-medium text-zinc-300">Upload your own</p>
+              <p className="text-[11px] font-medium text-zinc-600 dark:text-zinc-300">Upload your own</p>
               <p className="text-[9px] text-zinc-500">MP3, WAV, M4A</p>
             </div>
           </div>
@@ -438,11 +438,11 @@ const AudioTab: React.FC<{ type: 'music' | 'sfx' }> = ({ type }) => {
             {audioAssets.map((asset) => (
               <GlassCard key={asset.id} onClick={() => handleAddToTimeline(asset.id)}>
                 <div className="flex items-center gap-2 p-2 group">
-                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500/20 to-indigo-500/20 flex items-center justify-center flex-shrink-0">
-                    {type === 'music' ? <Music size={14} className="text-purple-400" /> : <Volume2 size={14} className="text-purple-400" />}
+                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-teal-500/20 to-teal-500/20 flex items-center justify-center flex-shrink-0">
+                    {type === 'music' ? <Music size={14} className="text-teal-400" /> : <Volume2 size={14} className="text-teal-400" />}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-[11px] text-white truncate">{asset.name}</p>
+                    <p className="text-[11px] text-zinc-900 dark:text-white truncate">{asset.name}</p>
                     <p className="text-[9px] text-zinc-500">{formatDuration(asset.duration)}</p>
                   </div>
                   <button
@@ -473,8 +473,8 @@ const AudioTab: React.FC<{ type: 'music' | 'sfx' }> = ({ type }) => {
             onClick={() => setSelectedGenre(null)}
             className={`px-2 py-1 rounded-lg text-[9px] font-bold uppercase tracking-wider transition-all ${
               selectedGenre === null
-                ? 'bg-purple-500/30 text-purple-300 border border-purple-500/30'
-                : 'bg-white/5 text-zinc-500 border border-white/5 hover:bg-white/10'
+                ? 'bg-teal-500/30 text-teal-700 dark:text-teal-300 border border-teal-500/30'
+                : 'bg-zinc-200 dark:bg-white/5 text-zinc-500 border border-zinc-300 dark:border-white/5 hover:bg-zinc-300 dark:hover:bg-white/10'
             }`}
           >
             All
@@ -485,7 +485,7 @@ const AudioTab: React.FC<{ type: 'music' | 'sfx' }> = ({ type }) => {
               onClick={() => setSelectedGenre(genre)}
               className={`px-2 py-1 rounded-lg text-[9px] font-bold uppercase tracking-wider transition-all ${
                 selectedGenre === genre
-                  ? 'bg-purple-500/30 text-purple-300 border border-purple-500/30'
+                  ? 'bg-teal-500/30 text-teal-300 border border-teal-500/30'
                   : 'bg-white/5 text-zinc-500 border border-white/5 hover:bg-white/10'
               }`}
             >
@@ -498,7 +498,7 @@ const AudioTab: React.FC<{ type: 'music' | 'sfx' }> = ({ type }) => {
         <div className="space-y-1.5 max-h-[400px] overflow-y-auto custom-scrollbar">
           {filteredLibrary.map((item: any, i: number) => {
             const genre = type === 'music' ? item.genre : item.category;
-            const gradientClass = colorMap[genre as keyof typeof colorMap] || 'from-purple-500/20 to-indigo-500/20';
+            const gradientClass = colorMap[genre as keyof typeof colorMap] || 'from-teal-500/20 to-teal-500/20';
             const isLoading = loadingTrack === item.id;
 
             return (
@@ -523,7 +523,7 @@ const AudioTab: React.FC<{ type: 'music' | 'sfx' }> = ({ type }) => {
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-[12px] text-white font-medium truncate">{item.name}</p>
+                      <p className="text-[12px] text-zinc-900 dark:text-white font-medium truncate">{item.name}</p>
                       <div className="flex items-center gap-2 mt-0.5">
                         <span className="text-[9px] text-zinc-500 uppercase">{genre}</span>
                         <span className="text-[9px] text-zinc-600">•</span>
@@ -601,10 +601,10 @@ const TextTab: React.FC = () => {
                 </span>
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-[13px] text-white font-medium">{preset.name}</p>
+                <p className="text-[13px] text-zinc-900 dark:text-white font-medium">{preset.name}</p>
                 <p className="text-[11px] text-zinc-500 truncate">{preset.description}</p>
               </div>
-              <Plus size={14} className="text-zinc-600 group-hover:text-purple-400 transition-colors flex-shrink-0" />
+              <Plus size={14} className="text-zinc-600 group-hover:text-teal-400 transition-colors flex-shrink-0" />
             </div>
           </GlassCard>
         </motion.div>
@@ -637,10 +637,10 @@ const transitionGradients: Record<string, string> = {
   'slide-right': 'from-cyan-500/20 to-blue-500/20',
   'slide-up': 'from-emerald-500/20 to-green-500/20',
   'slide-down': 'from-green-500/20 to-emerald-500/20',
-  'wipe-left': 'from-violet-500/20 to-purple-500/20',
-  'wipe-right': 'from-purple-500/20 to-violet-500/20',
-  'zoom-in': 'from-indigo-500/20 to-blue-500/20',
-  'zoom-out': 'from-blue-500/20 to-indigo-500/20',
+  'wipe-left': 'from-emerald-500/20 to-teal-500/20',
+  'wipe-right': 'from-teal-500/20 to-emerald-500/20',
+  'zoom-in': 'from-teal-500/20 to-blue-500/20',
+  'zoom-out': 'from-blue-500/20 to-teal-500/20',
 };
 
 const TransitionsTab: React.FC = () => {
@@ -705,12 +705,12 @@ const TransitionsTab: React.FC = () => {
               disabled={!selectedClipId}
             >
               <div className="p-3 text-center group">
-                <div className={`w-full h-14 rounded-lg bg-gradient-to-br ${transitionGradients[preset.id] || 'from-purple-500/20 to-indigo-500/20'} border border-white/[0.04] flex items-center justify-center mb-2`}>
+                <div className={`w-full h-14 rounded-lg bg-gradient-to-br ${transitionGradients[preset.id] || 'from-teal-500/20 to-teal-500/20'} border border-white/[0.04] flex items-center justify-center mb-2`}>
                   <span className="text-white/70 group-hover:text-white transition-colors">
                     {transitionIcons[preset.id] || <Layers size={18} />}
                   </span>
                 </div>
-                <span className="text-[11px] text-zinc-300 font-medium">{preset.name}</span>
+                <span className="text-[11px] text-zinc-600 dark:text-zinc-300 font-medium">{preset.name}</span>
               </div>
             </GlassCard>
           </motion.div>
@@ -744,7 +744,7 @@ const effectGradients: Record<string, string> = {
   'grayscale': 'from-zinc-500/20 to-slate-500/20',
   'blur': 'from-sky-500/20 to-blue-500/20',
   'glitch': 'from-red-500/20 to-pink-500/20',
-  'vignette': 'from-indigo-500/20 to-purple-500/20',
+  'vignette': 'from-teal-500/20 to-teal-500/20',
   'light-leak': 'from-orange-500/20 to-yellow-500/20',
 };
 
@@ -800,12 +800,12 @@ const EffectsTab: React.FC = () => {
                   disabled={!selectedClipId}
                 >
                   <div className="p-2 text-center group">
-                    <div className={`w-full h-10 rounded-lg bg-gradient-to-br ${effectGradients[effect.id] || 'from-purple-500/20 to-indigo-500/20'} border border-white/[0.04] flex items-center justify-center mb-1.5`}>
+                    <div className={`w-full h-10 rounded-lg bg-gradient-to-br ${effectGradients[effect.id] || 'from-teal-500/20 to-teal-500/20'} border border-white/[0.04] flex items-center justify-center mb-1.5`}>
                       <span className="text-white/70 group-hover:text-white transition-colors">
                         {effectIcons[effect.id] || <Sparkles size={16} />}
                       </span>
                     </div>
-                    <span className="text-[10px] text-zinc-300 font-medium">{effect.name}</span>
+                    <span className="text-[10px] text-zinc-600 dark:text-zinc-300 font-medium">{effect.name}</span>
                   </div>
                 </GlassCard>
               </motion.div>

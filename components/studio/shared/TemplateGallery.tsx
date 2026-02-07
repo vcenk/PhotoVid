@@ -89,7 +89,7 @@ export const TemplateGallery: React.FC<TemplateGalleryProps> = ({ onSelectTempla
                         placeholder="Search templates..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="pl-9 pr-4 py-2 w-full sm:w-64 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 text-sm text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all"
+                        className="pl-9 pr-4 py-2 w-full sm:w-64 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 text-sm text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all"
                     />
                 </div>
             </div>
@@ -121,7 +121,7 @@ export const TemplateGallery: React.FC<TemplateGalleryProps> = ({ onSelectTempla
                     <select
                         value={styleFilter}
                         onChange={(e) => setStyleFilter(e.target.value as StylePreset | 'all')}
-                        className="px-3 py-1.5 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 text-xs font-medium text-zinc-600 dark:text-zinc-300 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                        className="px-3 py-1.5 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 text-xs font-medium text-zinc-600 dark:text-zinc-300 focus:outline-none focus:ring-2 focus:ring-teal-500/20"
                     >
                         {STYLE_FILTERS.map(style => (
                             <option key={style.value} value={style.value}>{style.label}</option>

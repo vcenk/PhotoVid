@@ -9,7 +9,7 @@ export function ListingPage() {
 
   return (
     <PropertyProvider>
-      <div className="flex h-screen bg-white dark:bg-[#09090b] text-zinc-900 dark:text-white overflow-hidden">
+      <div className="flex h-screen bg-white dark:bg-[#09090b] text-zinc-900 dark:text-white font-[Space_Grotesk] overflow-hidden">
         <NavigationRail
           isMobileOpen={mobileMenuOpen}
           onMobileClose={() => setMobileMenuOpen(false)}

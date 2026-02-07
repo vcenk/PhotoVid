@@ -58,11 +58,11 @@ export const EditorLayout: React.FC = () => {
   }, [undo, redo]);
 
   return (
-    <div className="h-screen w-screen flex bg-[#050505] overflow-hidden selection:bg-purple-500/30">
+    <div className="h-screen w-screen flex bg-zinc-50 dark:bg-[#050505] text-zinc-900 dark:text-white font-[Space_Grotesk] overflow-hidden selection:bg-teal-500/30">
       {/* Background Gradients */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
-        <div className="absolute top-[-10%] left-[-10%] w-[30%] h-[30%] bg-purple-600/10 rounded-full blur-[120px] opacity-40" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[30%] h-[30%] bg-indigo-600/10 rounded-full blur-[120px] opacity-40" />
+        <div className="absolute top-[-10%] left-[-10%] w-[30%] h-[30%] bg-teal-600/10 rounded-full blur-[120px] opacity-40" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[30%] h-[30%] bg-teal-600/10 rounded-full blur-[120px] opacity-40" />
       </div>
 
       {/* Navigation Rail - hideable */}
@@ -75,51 +75,51 @@ export const EditorLayout: React.FC = () => {
       {/* Main Content - takes remaining space after nav rail */}
       <div className={`flex-1 flex flex-col min-h-0 min-w-0 relative z-10 transition-all duration-500 ${navHidden ? '' : 'ml-0 lg:ml-16'}`}>
         {/* ===== TOP HEADER BAR (compact h-12) ===== */}
-        <header className="h-12 flex-shrink-0 bg-zinc-900/40 backdrop-blur-xl border-b border-white/5 flex items-center justify-between px-4 shadow-lg shadow-black/20 relative z-30">
+        <header className="h-12 flex-shrink-0 bg-white/80 dark:bg-zinc-900/40 backdrop-blur-xl border-b border-zinc-200 dark:border-white/5 flex items-center justify-between px-4 shadow-lg shadow-zinc-200/50 dark:shadow-black/20 relative z-30">
           {/* Left: Back + Project Name */}
           <div className="flex items-center gap-3">
             <button
               onClick={() => setNavHidden(!navHidden)}
-              className="p-2 hover:bg-white/10 rounded-xl transition-all group"
+              className="p-2 hover:bg-zinc-100 dark:hover:bg-white/10 rounded-xl transition-all group"
               title={navHidden ? 'Show sidebar' : 'Hide sidebar'}
             >
               {navHidden ? (
-                <PanelLeftOpen size={18} className="text-zinc-400 group-hover:text-white transition-colors" />
+                <PanelLeftOpen size={18} className="text-zinc-500 dark:text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-white transition-colors" />
               ) : (
-                <PanelLeftClose size={18} className="text-zinc-400 group-hover:text-white transition-colors" />
+                <PanelLeftClose size={18} className="text-zinc-500 dark:text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-white transition-colors" />
               )}
             </button>
-            <div className="w-px h-5 bg-white/10" />
+            <div className="w-px h-5 bg-zinc-300 dark:bg-white/10" />
             <button
               onClick={() => navigate('/studio/real-estate')}
-              className="p-2 hover:bg-white/10 rounded-xl transition-all group"
+              className="p-2 hover:bg-zinc-100 dark:hover:bg-white/10 rounded-xl transition-all group"
               title="Back"
             >
-              <ArrowLeft size={18} className="text-zinc-400 group-hover:text-white transition-colors" />
+              <ArrowLeft size={18} className="text-zinc-500 dark:text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-white transition-colors" />
             </button>
             
-            <div className="flex items-center gap-2 px-3 py-1 bg-white/5 rounded-full border border-white/5">
-                <Film size={16} className="text-purple-400" />
+            <div className="flex items-center gap-2 px-3 py-1 bg-zinc-100 dark:bg-white/5 rounded-full border border-zinc-200 dark:border-white/5">
+                <Film size={16} className="text-teal-500 dark:text-teal-400" />
                 <input
                 type="text"
                 value={project.name}
                 onChange={(e) => setProjectName(e.target.value)}
-                className="bg-transparent text-white font-semibold text-sm focus:outline-none w-40 placeholder-zinc-600"
+                className="bg-transparent text-zinc-900 dark:text-white font-semibold text-sm focus:outline-none w-40 placeholder-zinc-400 dark:placeholder-zinc-600"
                 placeholder="Untitled Project"
                 />
             </div>
           </div>
 
           {/* Center: Format Selector */}
-          <div className="flex items-center p-1 bg-black/40 backdrop-blur-md rounded-xl border border-white/5 shadow-inner shadow-black/50">
+          <div className="flex items-center p-1 bg-zinc-100 dark:bg-black/40 backdrop-blur-md rounded-xl border border-zinc-200 dark:border-white/5 shadow-inner shadow-zinc-200/50 dark:shadow-black/50">
             {FORMAT_OPTIONS.map((format) => (
               <button
                 key={format.id}
                 onClick={() => setFormat(format.id)}
                 className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold tracking-tight transition-all duration-300 ${
                   project.format === format.id
-                    ? 'bg-purple-600 text-white shadow-lg shadow-purple-900/40'
-                    : 'text-zinc-500 hover:text-zinc-300 hover:bg-white/5'
+                    ? 'bg-teal-600 text-white shadow-lg shadow-teal-600/40 dark:shadow-teal-900/40'
+                    : 'text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-white/5'
                 }`}
               >
                 {format.icon}
@@ -130,26 +130,26 @@ export const EditorLayout: React.FC = () => {
 
           {/* Right: Actions */}
           <div className="flex items-center gap-2">
-            <div className="flex items-center bg-black/20 rounded-xl p-1 border border-white/5">
+            <div className="flex items-center bg-zinc-100 dark:bg-black/20 rounded-xl p-1 border border-zinc-200 dark:border-white/5">
                 <button
                 onClick={undo}
                 disabled={!canUndo}
-                className="p-1.5 hover:bg-white/10 rounded-lg transition-all disabled:opacity-20 disabled:cursor-not-allowed group"
+                className="p-1.5 hover:bg-zinc-100 dark:hover:bg-white/10 rounded-lg transition-all disabled:opacity-20 disabled:cursor-not-allowed group"
                 title="Undo (Ctrl+Z)"
                 >
-                <Undo2 size={16} className="text-zinc-400 group-hover:text-white transition-colors" />
+                <Undo2 size={16} className="text-zinc-500 dark:text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-white transition-colors" />
                 </button>
                 <button
                 onClick={redo}
                 disabled={!canRedo}
-                className="p-1.5 hover:bg-white/10 rounded-lg transition-all disabled:opacity-20 disabled:cursor-not-allowed group"
+                className="p-1.5 hover:bg-zinc-100 dark:hover:bg-white/10 rounded-lg transition-all disabled:opacity-20 disabled:cursor-not-allowed group"
                 title="Redo (Ctrl+Shift+Z)"
                 >
-                <Redo2 size={16} className="text-zinc-400 group-hover:text-white transition-colors" />
+                <Redo2 size={16} className="text-zinc-500 dark:text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-white transition-colors" />
                 </button>
             </div>
             
-            <button className="group flex items-center gap-2 px-4 py-1.5 bg-gradient-to-r from-purple-600 to-indigo-600 text-white text-xs font-bold rounded-xl hover:from-purple-500 hover:to-indigo-500 transition-all shadow-lg shadow-purple-900/20 hover:shadow-purple-600/40 hover:-translate-y-0.5 relative">
+            <button className="group flex items-center gap-2 px-4 py-1.5 bg-gradient-to-r from-teal-600 to-teal-600 text-white text-xs font-bold rounded-xl hover:from-teal-500 hover:to-teal-500 transition-all shadow-lg shadow-teal-900/20 hover:shadow-teal-600/40 hover:-translate-y-0.5 relative">
               <Download size={16} className="group-hover:scale-110 transition-transform" />
               Export
               <span className="absolute -top-1.5 -right-1.5 text-[7px] bg-amber-500 text-black px-1.5 py-0.5 rounded-full font-black leading-none uppercase tracking-tighter shadow-md">

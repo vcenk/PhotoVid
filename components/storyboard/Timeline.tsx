@@ -53,7 +53,7 @@ export const Timeline: React.FC = () => {
             const statusColors = {
               pending: 'bg-zinc-700',
               uploading: 'bg-blue-600',
-              generating: 'bg-violet-600',
+              generating: 'bg-emerald-600',
               completed: 'bg-green-600',
               failed: 'bg-red-600',
             };
@@ -99,7 +99,7 @@ export const Timeline: React.FC = () => {
           <span className="text-[9px] text-zinc-500">Pending</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <div className="w-2 h-2 rounded-full bg-violet-600" />
+          <div className="w-2 h-2 rounded-full bg-emerald-600" />
           <span className="text-[9px] text-zinc-500">Generating</span>
         </div>
         <div className="flex items-center gap-1.5">

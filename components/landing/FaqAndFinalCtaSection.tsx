@@ -63,7 +63,7 @@ const AccordionItem: React.FC<AccordionItemProps> = ({ item, isOpen, onClick }) 
         </span>
         <motion.div
           animate={{ rotate: isOpen ? 180 : 0 }}
-          className={`p-2 rounded-full transition-colors flex-shrink-0 ml-4 ${isOpen ? 'bg-indigo-600 text-white' : 'text-zinc-500'}`}
+          className={`p-2 rounded-full transition-colors flex-shrink-0 ml-4 ${isOpen ? 'bg-teal-600 text-white' : 'text-zinc-500'}`}
         >
           <ChevronDown size={18} />
         </motion.div>
@@ -138,7 +138,7 @@ export const FaqAndFinalCtaSection: React.FC = () => {
                   { icon: Zap, title: "Instant processing", desc: "Most edits complete in under 10 seconds with priority queue." }
                 ].map((item, idx) => (
                   <div key={idx} className="flex gap-5 group">
-                    <div className="p-3 rounded-2xl bg-white/5 border border-white/10 text-indigo-400 group-hover:scale-110 transition-transform">
+                    <div className="p-3 rounded-2xl bg-white/5 border border-white/10 text-teal-400 group-hover:scale-110 transition-transform">
                       <item.icon size={22} />
                     </div>
                     <div>
@@ -155,7 +155,7 @@ export const FaqAndFinalCtaSection: React.FC = () => {
                 </div>
                 <div>
                   <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest">Need help?</p>
-                  <a href="mailto:support@photovid.ai" className="text-sm font-bold text-white hover:text-indigo-400 transition-colors">Contact Support</a>
+                  <a href="mailto:support@photovid.ai" className="text-sm font-bold text-white hover:text-teal-400 transition-colors">Contact Support</a>
                 </div>
               </div>
             </motion.div>
@@ -171,13 +171,13 @@ export const FaqAndFinalCtaSection: React.FC = () => {
           className="relative group rounded-[60px] overflow-hidden p-12 md:p-24 text-center border border-white/10 bg-gradient-to-br from-zinc-900 to-zinc-900/50"
         >
           {/* Ambient glow */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-indigo-600/10 rounded-full blur-[150px] pointer-events-none" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-teal-600/10 rounded-full blur-[150px] pointer-events-none" />
 
           <div className="relative z-10 max-w-3xl mx-auto">
             <motion.div
               className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-xs font-bold text-zinc-400 mb-10"
             >
-              <Sparkles size={14} className="text-indigo-400" /> Free to start — no credit card required
+              <Sparkles size={14} className="text-teal-400" /> Free to start — no credit card required
             </motion.div>
 
             <h2 className="text-5xl md:text-8xl font-bold text-white tracking-tighter leading-[0.9] mb-10 font-serif">
@@ -191,8 +191,8 @@ export const FaqAndFinalCtaSection: React.FC = () => {
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link
-                to="/login"
-                className="w-full sm:w-auto px-12 py-5 rounded-full bg-gradient-to-r from-indigo-500 to-violet-500 text-white text-sm font-black uppercase tracking-widest shadow-xl shadow-indigo-500/30 hover:shadow-2xl hover:shadow-indigo-500/40 transition-all text-center"
+                to="/auth"
+                className="w-full sm:w-auto px-12 py-5 rounded-full bg-gradient-to-r from-teal-500 to-emerald-500 text-white text-sm font-black uppercase tracking-widest shadow-xl shadow-teal-500/30 hover:shadow-2xl hover:shadow-teal-500/40 transition-all text-center"
               >
                 Get Started Free
               </Link>

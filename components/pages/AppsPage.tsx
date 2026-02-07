@@ -101,7 +101,7 @@ export const AppsPage: React.FC = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="h-screen flex bg-white dark:bg-[#09090b] text-zinc-900 dark:text-white font-sans overflow-hidden">
+    <div className="h-screen flex bg-white dark:bg-[#09090b] text-zinc-900 dark:text-white font-[Space_Grotesk] overflow-hidden">
       <NavigationRail isMobileOpen={mobileMenuOpen} onMobileClose={() => setMobileMenuOpen(false)} />
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden ml-0 lg:ml-16">
         <DashboardTopbar onMenuClick={() => setMobileMenuOpen(true)} />
@@ -125,7 +125,7 @@ const HeroBanner: React.FC = () => {
   return (
     <section className="px-6 pt-6 pb-2">
       <div className="max-w-7xl mx-auto">
-        <div className="relative rounded-2xl overflow-hidden bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-700 py-12 px-8">
+        <div className="relative rounded-2xl overflow-hidden bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 py-12 px-8">
           {/* Background image */}
           {config?.heroPreviewImage && (
             <img
@@ -233,7 +233,7 @@ const FeaturedCarousel: React.FC = () => {
           <motion.div key={item.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }} className="snap-start flex-shrink-0 w-[340px]">
             <div
               onClick={() => navigate(item.route || '/studio/real-estate')}
-              className="rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 overflow-hidden cursor-pointer group hover:border-indigo-500 dark:hover:border-indigo-500 transition-all hover:shadow-lg hover:shadow-indigo-500/5"
+              className="rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 overflow-hidden cursor-pointer group hover:border-teal-500 dark:hover:border-teal-500 transition-all hover:shadow-lg hover:shadow-teal-500/5"
             >
               <div className="relative aspect-video overflow-hidden">
                 <img src={item.image} alt={item.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
@@ -252,11 +252,11 @@ const FeaturedCarousel: React.FC = () => {
                 })()}
               </div>
               <div className="p-5">
-                <h3 className="text-base font-bold text-zinc-900 dark:text-white mb-1.5 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">{item.name}</h3>
+                <h3 className="text-base font-bold text-zinc-900 dark:text-white mb-1.5 group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">{item.name}</h3>
                 <p className="text-sm text-zinc-500 dark:text-zinc-400 line-clamp-2 mb-4">{item.description}</p>
                 <div className="flex items-center justify-between">
-                  <span className="px-3 py-1 rounded-full bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 text-xs font-medium">{item.tag}</span>
-                  <span className="text-sm font-medium text-zinc-600 dark:text-zinc-300 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 flex items-center gap-1 transition-colors">
+                  <span className="px-3 py-1 rounded-full bg-teal-50 dark:bg-teal-500/10 text-teal-600 dark:text-teal-400 text-xs font-medium">{item.tag}</span>
+                  <span className="text-sm font-medium text-zinc-600 dark:text-zinc-300 group-hover:text-teal-600 dark:group-hover:text-teal-400 flex items-center gap-1 transition-colors">
                     Use Tool <ArrowRight size={14} />
                   </span>
                 </div>
@@ -319,7 +319,7 @@ const ToolsBrowser: React.FC = () => {
       {/* Section header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-500 to-emerald-600 flex items-center justify-center">
             <Sparkles size={20} className="text-white" />
           </div>
           <div>
@@ -334,7 +334,7 @@ const ToolsBrowser: React.FC = () => {
             value={search}
             onChange={(e) => { setSearch(e.target.value); setShowAll(false); }}
             placeholder="Search tools..."
-            className="w-full pl-9 pr-3 py-2 text-sm bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:border-indigo-500"
+            className="w-full pl-9 pr-3 py-2 text-sm bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:border-teal-500"
           />
         </div>
       </div>
@@ -351,7 +351,7 @@ const ToolsBrowser: React.FC = () => {
               className={`
                 flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium transition-all border
                 ${isActive
-                  ? 'bg-indigo-600 text-white border-indigo-600'
+                  ? 'bg-teal-600 text-white border-teal-600'
                   : 'bg-white dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400 border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700'
                 }
               `}
@@ -381,7 +381,7 @@ const ToolsBrowser: React.FC = () => {
               >
                 <div
                   onClick={() => navigate(item.route || '/studio/real-estate')}
-                  className="rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 overflow-hidden cursor-pointer group hover:border-indigo-500 dark:hover:border-indigo-500 transition-all hover:shadow-md"
+                  className="rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 overflow-hidden cursor-pointer group hover:border-teal-500 dark:hover:border-teal-500 transition-all hover:shadow-md"
                 >
                   <div className="relative aspect-video overflow-hidden">
                     <img src={item.image} alt={item.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
@@ -402,7 +402,7 @@ const ToolsBrowser: React.FC = () => {
                     )}
                   </div>
                   <div className="p-4">
-                    <h3 className="text-sm font-bold text-zinc-900 dark:text-white mb-1 truncate group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                    <h3 className="text-sm font-bold text-zinc-900 dark:text-white mb-1 truncate group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">
                       {item.name}
                     </h3>
                     <p className="text-xs text-zinc-500 dark:text-zinc-400 line-clamp-1 mb-3">
@@ -414,7 +414,7 @@ const ToolsBrowser: React.FC = () => {
                           {item.tags[0]}
                         </span>
                       )}
-                      <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400 group-hover:text-indigo-500 flex items-center gap-1 transition-colors ml-auto">
+                      <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400 group-hover:text-teal-500 flex items-center gap-1 transition-colors ml-auto">
                         Use Tool <ArrowRight size={12} />
                       </span>
                     </div>
@@ -430,7 +430,7 @@ const ToolsBrowser: React.FC = () => {
         <div className="flex justify-center pt-2">
           <button
             onClick={() => setShowAll(true)}
-            className="flex items-center gap-2 px-6 py-2.5 text-sm font-medium text-zinc-600 dark:text-zinc-300 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl hover:border-indigo-500 dark:hover:border-indigo-500 transition-all"
+            className="flex items-center gap-2 px-6 py-2.5 text-sm font-medium text-zinc-600 dark:text-zinc-300 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl hover:border-teal-500 dark:hover:border-teal-500 transition-all"
           >
             Show All ({filtered.length})
             <ChevronDown size={16} />

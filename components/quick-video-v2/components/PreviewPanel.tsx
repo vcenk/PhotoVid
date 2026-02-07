@@ -228,10 +228,10 @@ function EmptyPreview() {
 
   return (
     <div className="flex-1 flex flex-col items-center justify-center p-8 text-center">
-      <div className="w-20 h-20 rounded-3xl bg-white/5 flex items-center justify-center mb-6">
-        <ImageIcon size={32} className="text-zinc-600" />
+      <div className="w-20 h-20 rounded-3xl bg-zinc-100 dark:bg-white/5 flex items-center justify-center mb-6">
+        <ImageIcon size={32} className="text-zinc-400 dark:text-zinc-600" />
       </div>
-      <h3 className="text-lg font-semibold text-white mb-2">
+      <h3 className="text-lg font-semibold text-zinc-900 dark:text-white mb-2">
         {project.images.length === 0
           ? 'Upload property images'
           : 'Generate your script'}
@@ -371,7 +371,7 @@ function SimplePreview() {
 
           {/* Preview indicator */}
           <div className="absolute top-4 left-4 flex items-center gap-2 px-3 py-1.5 bg-black/50 backdrop-blur-sm rounded-full z-20">
-            <Sparkles size={14} className="text-violet-400" />
+            <Sparkles size={14} className="text-emerald-400" />
             <span className="text-xs font-medium text-white">Preview Mode</span>
           </div>
 
@@ -383,7 +383,7 @@ function SimplePreview() {
                 <motion.div
                   key={i}
                   className={`h-1.5 rounded-full transition-all duration-300 ${
-                    i === currentIndex ? 'bg-violet-500 w-4' : 'bg-white/30 w-1.5'
+                    i === currentIndex ? 'bg-emerald-500 w-4' : 'bg-white/30 w-1.5'
                   }`}
                 />
               ))}
@@ -397,10 +397,10 @@ function SimplePreview() {
 
       {/* Simple Controls */}
       <div className="flex-shrink-0 px-6 pb-6">
-        <div className="flex items-center justify-center gap-4 p-4 bg-white/5 backdrop-blur-xl rounded-2xl border border-white/5">
+        <div className="flex items-center justify-center gap-4 p-4 bg-white dark:bg-white/5 backdrop-blur-xl rounded-2xl border border-zinc-200 dark:border-white/5 shadow-lg dark:shadow-none">
           <button
             onClick={togglePlayback}
-            className="p-3 bg-violet-600 hover:bg-violet-500 rounded-full transition-colors"
+            className="p-3 bg-emerald-600 hover:bg-emerald-500 rounded-full transition-colors"
           >
             {isPlaying ? (
               <Pause size={20} className="text-white" />
@@ -409,7 +409,7 @@ function SimplePreview() {
             )}
           </button>
 
-          <p className="text-sm text-zinc-400">
+          <p className="text-sm text-zinc-500 dark:text-zinc-400">
             Generate a script to see the full preview with voice narration
           </p>
         </div>
@@ -566,9 +566,9 @@ function FullPreview() {
       {/* Audio Loading Status */}
       {project.synthesizedVoice?.audioUrl && !isAudioReady && (
         <div className="flex-shrink-0 px-4 pt-2">
-          <div className="flex items-center gap-2 px-3 py-2 bg-violet-500/10 border border-violet-500/20 rounded-lg">
-            <div className="w-3 h-3 border-2 border-violet-500/30 border-t-violet-500 rounded-full animate-spin" />
-            <span className="text-xs text-violet-400">
+          <div className="flex items-center gap-2 px-3 py-2 bg-emerald-500/10 border border-emerald-500/20 rounded-lg">
+            <div className="w-3 h-3 border-2 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin" />
+            <span className="text-xs text-emerald-400">
               Loading audio with Web Audio API...
             </span>
           </div>
@@ -625,7 +625,7 @@ function FullPreview() {
 
       {/* Transport Controls */}
       <div className="flex-shrink-0 px-6 pb-6">
-        <div className="p-4 bg-white/5 backdrop-blur-xl rounded-2xl border border-white/5">
+        <div className="p-4 bg-white dark:bg-white/5 backdrop-blur-xl rounded-2xl border border-zinc-200 dark:border-white/5 shadow-lg dark:shadow-none">
           {/* Progress Bar */}
           <div className="mb-4">
             <input
@@ -637,8 +637,8 @@ function FullPreview() {
               onChange={handleSeek}
               className="w-full h-1.5 bg-white/10 rounded-full appearance-none cursor-pointer
                 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3
-                [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-violet-500
-                [&::-webkit-slider-thumb]:hover:bg-violet-400 [&::-webkit-slider-thumb]:transition-colors"
+                [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-emerald-500
+                [&::-webkit-slider-thumb]:hover:bg-emerald-400 [&::-webkit-slider-thumb]:transition-colors"
               style={{
                 background: `linear-gradient(to right, #8b5cf6 ${(displayTime / actualAudioDuration) * 100}%, rgba(255,255,255,0.1) ${(displayTime / actualAudioDuration) * 100}%)`,
               }}
@@ -669,7 +669,7 @@ function FullPreview() {
                 className={`p-3 rounded-full transition-colors ${
                   project.synthesizedVoice?.audioUrl && !isAudioReady
                     ? 'bg-zinc-600 cursor-wait'
-                    : 'bg-violet-600 hover:bg-violet-500'
+                    : 'bg-emerald-600 hover:bg-emerald-500'
                 }`}
                 title={project.synthesizedVoice?.audioUrl && !isAudioReady ? 'Loading audio...' : undefined}
               >
@@ -835,20 +835,24 @@ function SegmentCaptions({ segmentText, wordTimings, segmentStartTime, segmentEn
     >
       <div
         style={{
-          backgroundColor: 'rgba(0, 0, 0, 0.75)',
-          padding: '12px 20px',
-          borderRadius: 8,
-          maxWidth: '90%',
+          backgroundColor: 'rgba(0, 0, 0, 0.85)',
+          padding: '18px 28px',
+          borderRadius: 14,
+          maxWidth: '92%',
+          boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
         }}
       >
         <p
           style={{
-            fontSize: 18,
+            fontSize: 36,
             fontFamily: template.fonts.body,
             color: '#ffffff',
-            lineHeight: 1.4,
+            lineHeight: 1.5,
             textAlign: 'center',
             margin: 0,
+            fontWeight: 500,
+            wordWrap: 'break-word',
+            overflowWrap: 'break-word',
           }}
         >
           {textWords.map((word, i) => {
@@ -860,9 +864,11 @@ function SegmentCaptions({ segmentText, wordTimings, segmentStartTime, segmentEn
               <span
                 key={`${word}-${i}`}
                 style={{
-                  color: isCurrentWord ? '#a78bfa' : isSpoken ? '#ffffff' : '#9ca3af',
-                  fontWeight: isCurrentWord ? 700 : 400,
-                  marginRight: 6,
+                  display: 'inline',
+                  color: isCurrentWord ? '#10b981' : isSpoken ? '#10b981' : 'rgba(255,255,255,0.7)',
+                  fontWeight: isCurrentWord ? 700 : 500,
+                  marginRight: 10,
+                  textShadow: '0 2px 8px rgba(0,0,0,0.5)',
                 }}
               >
                 {word}

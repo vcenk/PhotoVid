@@ -43,7 +43,7 @@ export const IndustryToolCard: React.FC<IndustryToolCardProps> = ({ tool, accent
                 {/* Premium Badge */}
                 {tool.isPremium && (
                     <div className="absolute top-3 right-3">
-                        <span className="px-2 py-1 bg-gradient-to-r from-amber-400 to-yellow-500 text-black text-[10px] font-bold uppercase rounded-full flex items-center gap-1">
+                        <span className="px-2 py-1 bg-gradient-to-r from-amber-400 to-yellow-500 text-amber-900 text-[10px] font-bold uppercase rounded-full flex items-center gap-1">
                             <Crown size={10} />
                             Pro
                         </span>
@@ -66,7 +66,7 @@ export const IndustryToolCard: React.FC<IndustryToolCardProps> = ({ tool, accent
             </div>
 
             {/* Arrow */}
-            <div className={`absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity ${accentColor === 'red' ? 'text-red-600 dark:text-red-400' : 'text-indigo-600 dark:text-indigo-400'}`}>
+            <div className={`absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity ${accentColor === 'red' ? 'text-red-600 dark:text-red-400' : 'text-teal-600 dark:text-teal-400'}`}>
                 <ArrowRight size={20} />
             </div>
         </motion.div>

@@ -207,7 +207,7 @@ export const WorkflowCanvas: React.FC<WorkflowCanvasProps> = ({
 
             <button
               onClick={() => setIsTemplatesPanelOpen(true)}
-              className="px-4 py-2 bg-indigo-600 text-white border border-indigo-600 rounded-xl text-sm font-medium hover:bg-indigo-700 transition-colors flex items-center gap-2 shadow-lg shadow-indigo-500/20"
+              className="px-4 py-2 bg-teal-600 text-white border border-teal-600 rounded-xl text-sm font-medium hover:bg-teal-700 transition-colors flex items-center gap-2 shadow-lg shadow-teal-500/20"
             >
               <Layout size={16} />
               Templates
@@ -237,7 +237,7 @@ export const WorkflowCanvas: React.FC<WorkflowCanvasProps> = ({
             <button
               onClick={handleExecute}
               disabled={nodes.length === 0 || isExecuting}
-              className="px-6 py-2 bg-indigo-600 text-white rounded-xl text-sm font-bold hover:bg-indigo-700 transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-indigo-500/20"
+              className="px-6 py-2 bg-teal-600 text-white rounded-xl text-sm font-bold hover:bg-teal-700 transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-teal-500/20"
             >
               {isExecuting ? (
                 <>
@@ -257,8 +257,8 @@ export const WorkflowCanvas: React.FC<WorkflowCanvasProps> = ({
           {nodes.length === 0 && (
             <Panel position="top-center" className="pointer-events-none">
               <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-8 text-center shadow-xl max-w-md mt-20">
-                <div className="w-16 h-16 rounded-full bg-indigo-50 dark:bg-indigo-950/30 flex items-center justify-center mx-auto mb-4">
-                  <Plus size={32} className="text-indigo-600 dark:text-indigo-400" />
+                <div className="w-16 h-16 rounded-full bg-teal-50 dark:bg-teal-950/30 flex items-center justify-center mx-auto mb-4">
+                  <Plus size={32} className="text-teal-600 dark:text-teal-400" />
                 </div>
                 <h3 className="text-lg font-bold text-zinc-900 dark:text-white mb-2">
                   Start Building Your Workflow

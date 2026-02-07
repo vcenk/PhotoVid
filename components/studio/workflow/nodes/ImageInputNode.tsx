@@ -31,7 +31,7 @@ export const ImageInputNode = memo(({ id, data, selected }: NodeProps) => {
       className={cn(
         'rounded-xl border-2 bg-white dark:bg-zinc-900 transition-all duration-200 min-w-[280px]',
         'border-blue-300 dark:border-blue-700',
-        selected && 'ring-4 ring-indigo-500/30'
+        selected && 'ring-4 ring-teal-500/30'
       )}
     >
       {/* Header */}

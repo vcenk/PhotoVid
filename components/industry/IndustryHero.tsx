@@ -46,7 +46,7 @@ export const IndustryHero: React.FC<IndustryHeroProps> = ({ config }) => {
                     {/* Accent color glow */}
                     <div className={`absolute inset-0 mix-blend-overlay opacity-40 ${isDarkHero
                             ? 'bg-gradient-to-tr from-red-600/30 via-transparent to-orange-500/20'
-                            : 'bg-gradient-to-tr from-blue-600/30 via-transparent to-violet-500/20'
+                            : 'bg-gradient-to-tr from-emerald-600/30 via-transparent to-teal-500/20'
                         }`} />
 
                     {/* Mute button */}
@@ -91,7 +91,7 @@ export const IndustryHero: React.FC<IndustryHeroProps> = ({ config }) => {
                         >
                             <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${isDarkHero
                                     ? 'bg-gradient-to-br from-red-500 to-orange-500'
-                                    : 'bg-gradient-to-br from-blue-500 to-violet-500'
+                                    : 'bg-gradient-to-br from-blue-500 to-emerald-500'
                                 }`}>
                                 <Icon size={16} className="text-white" />
                             </div>
@@ -161,7 +161,7 @@ export const IndustryHero: React.FC<IndustryHeroProps> = ({ config }) => {
                             {/* Glow effect behind card */}
                             <div className={`absolute -inset-4 rounded-3xl blur-2xl opacity-40 ${isDarkHero
                                     ? 'bg-gradient-to-br from-red-500 to-orange-600'
-                                    : 'bg-gradient-to-br from-blue-500 to-violet-600'
+                                    : 'bg-gradient-to-br from-blue-500 to-emerald-600'
                                 }`} />
 
                             {/* Glassmorphism Card */}

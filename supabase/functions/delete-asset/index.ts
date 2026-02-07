@@ -78,11 +78,12 @@ serve(async (req) => {
       )
     }
 
-    // Delete asset
-    const { error: deleteError } = await supabaseAdmin
+    // Delete asset and verify it was actually deleted
+    const { data: deletedRows, error: deleteError } = await supabaseAdmin
       .from('assets')
       .delete()
       .eq('id', id)
+      .select()
 
     if (deleteError) {
       console.error('Failed to delete asset:', deleteError)
@@ -92,8 +93,18 @@ serve(async (req) => {
       )
     }
 
+    // Verify at least one row was deleted
+    if (!deletedRows || deletedRows.length === 0) {
+      console.error('No asset was deleted - may not exist or ID mismatch')
+      return new Response(
+        JSON.stringify({ error: 'Asset not found or already deleted', success: false }),
+        { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+
+    console.log('Successfully deleted asset:', id)
     return new Response(
-      JSON.stringify({ success: true }),
+      JSON.stringify({ success: true, deletedCount: deletedRows.length }),
       { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
 

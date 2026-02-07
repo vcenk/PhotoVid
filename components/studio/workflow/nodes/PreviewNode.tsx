@@ -13,7 +13,7 @@ export const PreviewNode = memo(({ id, data, selected }: NodeProps) => {
       className={cn(
         'rounded-xl border-2 bg-white dark:bg-zinc-900 transition-all duration-200 min-w-[280px]',
         'border-zinc-300 dark:border-zinc-700',
-        selected && 'ring-4 ring-indigo-500/30'
+        selected && 'ring-4 ring-teal-500/30'
       )}
     >
       {/* Header */}
@@ -38,7 +38,7 @@ export const PreviewNode = memo(({ id, data, selected }: NodeProps) => {
         type="target"
         position={Position.Left}
         id="video"
-        className="w-3 h-3 bg-violet-500 border-2 border-white dark:border-zinc-900"
+        className="w-3 h-3 bg-emerald-500 border-2 border-white dark:border-zinc-900"
         style={{ top: '50%' }}
       />
       <Handle
@@ -62,7 +62,7 @@ export const PreviewNode = memo(({ id, data, selected }: NodeProps) => {
                 </div>
               )}
               {hasVideoInput && (
-                <div className="flex items-center justify-center gap-2 text-violet-600 dark:text-violet-400">
+                <div className="flex items-center justify-center gap-2 text-emerald-600 dark:text-emerald-400">
                   <Video size={20} />
                   <span className="text-sm font-medium">Video connected</span>
                 </div>
@@ -86,7 +86,7 @@ export const PreviewNode = memo(({ id, data, selected }: NodeProps) => {
 
         {/* Download Button */}
         {(hasImageInput || hasVideoInput || hasAudioInput) && (
-          <button className="w-full mt-3 px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 transition-colors flex items-center justify-center gap-2">
+          <button className="w-full mt-3 px-4 py-2 bg-teal-600 text-white rounded-lg text-sm font-medium hover:bg-teal-700 transition-colors flex items-center justify-center gap-2">
             <Download size={16} />
             Download Result
           </button>

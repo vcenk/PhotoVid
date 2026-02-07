@@ -112,7 +112,7 @@ export const TextDragOverlay: React.FC = () => {
             <div className="relative group">
               {isSelected && (
                 <div
-                  className="absolute -inset-1.5 border-2 border-purple-400/70 rounded pointer-events-none"
+                  className="absolute -inset-1.5 border-2 border-teal-400/70 rounded pointer-events-none"
                   style={{ borderStyle: isDragging ? 'solid' : 'dashed' }}
                 />
               )}
@@ -143,7 +143,7 @@ export const TextDragOverlay: React.FC = () => {
               )}
 
               {isSelected && (
-                <div className="absolute -top-5 left-1/2 -translate-x-1/2 flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-purple-600 text-[8px] text-white font-medium whitespace-nowrap shadow-lg">
+                <div className="absolute -top-5 left-1/2 -translate-x-1/2 flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-teal-600 text-[8px] text-white font-medium whitespace-nowrap shadow-lg">
                   <Move size={8} />
                   drag
                 </div>

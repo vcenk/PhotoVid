@@ -60,11 +60,11 @@ export function WorkflowLibrary() {
               key={workflow.id}
               className={cn(
                 'bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800',
-                'rounded-2xl p-6 hover:border-violet-300 dark:hover:border-violet-700 hover:shadow-lg transition-all group'
+                'rounded-2xl p-6 hover:border-emerald-300 dark:hover:border-emerald-700 hover:shadow-lg transition-all group'
               )}
             >
               <div className="flex items-start gap-4 mb-4">
-                <div className="p-3 bg-zinc-100 dark:bg-zinc-800 rounded-xl group-hover:bg-violet-100 dark:group-hover:bg-violet-950 transition-colors shrink-0">
+                <div className="p-3 bg-zinc-100 dark:bg-zinc-800 rounded-xl group-hover:bg-emerald-100 dark:group-hover:bg-emerald-950 transition-colors shrink-0">
                   <Icon size={24} className="text-zinc-700 dark:text-zinc-300" />
                 </div>
                 <div className="flex-1 min-w-0">
@@ -78,7 +78,7 @@ export function WorkflowLibrary() {
                 {workflow.bestFor.map((industry) => (
                   <span
                     key={industry}
-                    className="px-2.5 py-1 bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-400 rounded-full text-xs font-medium"
+                    className="px-2.5 py-1 bg-teal-50 dark:bg-teal-950/50 text-teal-700 dark:text-teal-400 rounded-full text-xs font-medium"
                   >
                     {industry === 'real-estate'
                       ? 'Real Estate'

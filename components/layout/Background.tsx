@@ -8,20 +8,20 @@ import { motion } from 'framer-motion';
  */
 export const Background: React.FC = () => {
   return (
-    <div className="fixed inset-0 -z-0 overflow-hidden bg-stone-50 pointer-events-none">
+    <div className="fixed inset-0 -z-0 overflow-hidden bg-stone-50 dark:bg-zinc-950 pointer-events-none">
       {/* Subtle Soft Washes (Muted Slate/Stone) */}
-      
+
       {/* Top Left Wash */}
-      <div className="absolute -left-[10%] -top-[5%] h-[70vh] w-[70vw] rounded-full bg-slate-100/40 blur-[140px] opacity-60" />
-      
+      <div className="absolute -left-[10%] -top-[5%] h-[70vh] w-[70vw] rounded-full bg-slate-100/40 dark:bg-emerald-900/20 blur-[140px] opacity-60" />
+
       {/* Center Right Wash */}
-      <div className="absolute right-0 top-[25%] h-[60vh] w-[60vw] rounded-full bg-stone-200/30 blur-[160px] opacity-50" />
-      
+      <div className="absolute right-0 top-[25%] h-[60vh] w-[60vw] rounded-full bg-stone-200/30 dark:bg-teal-900/15 blur-[160px] opacity-50" />
+
       {/* Mid Left Wash */}
-      <div className="absolute -left-[20%] top-[50%] h-[80vh] w-[80vw] rounded-full bg-slate-200/20 blur-[180px] opacity-30" />
-      
+      <div className="absolute -left-[20%] top-[50%] h-[80vh] w-[80vw] rounded-full bg-slate-200/20 dark:bg-teal-900/10 blur-[180px] opacity-30" />
+
       {/* Bottom Right Wash */}
-      <div className="absolute -right-[10%] bottom-[10%] h-[70vh] w-[70vw] rounded-full bg-stone-100/40 blur-[150px] opacity-50" />
+      <div className="absolute -right-[10%] bottom-[10%] h-[70vh] w-[70vw] rounded-full bg-stone-100/40 dark:bg-emerald-950/20 blur-[150px] opacity-50" />
 
       {/* Animated Floating Particles for Depth (Light Version) */}
       <div className="absolute inset-0 z-0">
@@ -40,7 +40,7 @@ export const Background: React.FC = () => {
               ease: "linear",
               delay: i * 2
             }}
-            className="absolute w-1.5 h-1.5 bg-stone-300 rounded-full blur-[1px]"
+            className="absolute w-1.5 h-1.5 bg-stone-300 dark:bg-emerald-400/50 rounded-full blur-[1px]"
             style={{
               top: `${20 + i * 25}%`,
               left: `${15 + i * 30}%`
@@ -49,8 +49,8 @@ export const Background: React.FC = () => {
         ))}
       </div>
 
-      {/* Cinematic Noise Layer (Very subtle light mode version) */}
-      <div className="absolute inset-0 opacity-[0.012] mix-blend-multiply">
+      {/* Cinematic Noise Layer (Very subtle) */}
+      <div className="absolute inset-0 opacity-[0.012] mix-blend-multiply dark:mix-blend-soft-light dark:opacity-[0.03]">
         <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
           <filter id="noiseFilter">
             <feTurbulence 

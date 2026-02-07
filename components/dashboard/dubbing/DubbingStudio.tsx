@@ -209,7 +209,7 @@ export const DubbingStudio: React.FC = () => {
         {/* Header */}
         <div className="p-5 border-b border-zinc-100 dark:border-zinc-800">
           <h2 className="text-lg font-bold text-zinc-900 dark:text-white flex items-center gap-2">
-            <Languages className="text-violet-600" size={20} />
+            <Languages className="text-emerald-600" size={20} />
             AI Dubbing Studio
           </h2>
           <p className="text-xs text-zinc-500 mt-1">Translate videos to any language with voice cloning</p>
@@ -266,8 +266,8 @@ export const DubbingStudio: React.FC = () => {
               <div
                 className={`relative border-2 border-dashed rounded-xl transition-colors ${
                   uploadedVideo
-                    ? 'border-violet-400 dark:border-violet-600 bg-violet-50/50 dark:bg-violet-950/30'
-                    : 'border-zinc-300 dark:border-zinc-700 hover:border-violet-400 dark:hover:border-violet-600'
+                    ? 'border-emerald-400 dark:border-emerald-600 bg-emerald-50/50 dark:bg-emerald-950/30'
+                    : 'border-zinc-300 dark:border-zinc-700 hover:border-emerald-400 dark:hover:border-emerald-600'
                 } ${dubbingState !== 'idle' ? 'pointer-events-none opacity-60' : ''}`}
               >
                 <input
@@ -309,8 +309,8 @@ export const DubbingStudio: React.FC = () => {
                 ) : (
                   <label htmlFor="video-upload" className="cursor-pointer block p-6">
                     <div className="flex flex-col items-center gap-3">
-                      <div className="w-12 h-12 rounded-xl bg-violet-100 dark:bg-violet-900/50 flex items-center justify-center">
-                        <FileVideo size={24} className="text-violet-600" />
+                      <div className="w-12 h-12 rounded-xl bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center">
+                        <FileVideo size={24} className="text-emerald-600" />
                       </div>
                       <div className="text-center">
                         <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
@@ -334,7 +334,7 @@ export const DubbingStudio: React.FC = () => {
                     onChange={(e) => handleUrlChange(e.target.value)}
                     placeholder="https://example.com/video.mp4"
                     disabled={dubbingState !== 'idle'}
-                    className="w-full px-3 py-3 pl-10 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-xl text-sm text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 dark:focus:border-violet-600"
+                    className="w-full px-3 py-3 pl-10 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-xl text-sm text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-400 dark:focus:border-emerald-600"
                   />
                   <Link size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" />
                   {videoUrl && (
@@ -373,14 +373,14 @@ export const DubbingStudio: React.FC = () => {
           {/* Source Language */}
           <div>
             <label className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-2 flex items-center gap-1.5">
-              <Globe size={12} className="text-violet-500" />
+              <Globe size={12} className="text-emerald-500" />
               Source Language
             </label>
             <div className="relative">
               <button
                 onClick={() => setIsSourceDropdownOpen(!isSourceDropdownOpen)}
                 disabled={dubbingState !== 'idle'}
-                className="w-full flex items-center justify-between px-3 py-2.5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-xl hover:border-violet-300 dark:hover:border-violet-600 transition-colors disabled:opacity-60"
+                className="w-full flex items-center justify-between px-3 py-2.5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-xl hover:border-emerald-300 dark:hover:border-emerald-600 transition-colors disabled:opacity-60"
               >
                 <div className="flex items-center gap-2">
                   {sourceLanguage ? (
@@ -392,7 +392,7 @@ export const DubbingStudio: React.FC = () => {
                     </>
                   ) : (
                     <>
-                      <Wand2 size={16} className="text-violet-500" />
+                      <Wand2 size={16} className="text-emerald-500" />
                       <span className="font-medium text-zinc-900 dark:text-white text-sm">
                         Auto-detect
                       </span>
@@ -418,13 +418,13 @@ export const DubbingStudio: React.FC = () => {
                         setSourceLanguage(null);
                         setIsSourceDropdownOpen(false);
                       }}
-                      className={`w-full px-3 py-2.5 text-left hover:bg-violet-50 dark:hover:bg-violet-950/50 transition-colors flex items-center gap-2 border-b border-zinc-100 dark:border-zinc-800 ${
-                        !sourceLanguage ? 'bg-violet-50 dark:bg-violet-950/50' : ''
+                      className={`w-full px-3 py-2.5 text-left hover:bg-emerald-50 dark:hover:bg-emerald-950/50 transition-colors flex items-center gap-2 border-b border-zinc-100 dark:border-zinc-800 ${
+                        !sourceLanguage ? 'bg-emerald-50 dark:bg-emerald-950/50' : ''
                       }`}
                     >
-                      <Wand2 size={16} className="text-violet-500" />
+                      <Wand2 size={16} className="text-emerald-500" />
                       <span className="text-sm text-zinc-900 dark:text-white">Auto-detect</span>
-                      {!sourceLanguage && <Check size={14} className="text-violet-600 ml-auto" />}
+                      {!sourceLanguage && <Check size={14} className="text-emerald-600 ml-auto" />}
                     </button>
                     {sortedLanguages.map((lang) => (
                       <button
@@ -433,14 +433,14 @@ export const DubbingStudio: React.FC = () => {
                           setSourceLanguage(lang);
                           setIsSourceDropdownOpen(false);
                         }}
-                        className={`w-full px-3 py-2 text-left hover:bg-violet-50 dark:hover:bg-violet-950/50 transition-colors flex items-center gap-2 ${
-                          sourceLanguage?.code === lang.code ? 'bg-violet-50 dark:bg-violet-950/50' : ''
+                        className={`w-full px-3 py-2 text-left hover:bg-emerald-50 dark:hover:bg-emerald-950/50 transition-colors flex items-center gap-2 ${
+                          sourceLanguage?.code === lang.code ? 'bg-emerald-50 dark:bg-emerald-950/50' : ''
                         }`}
                       >
                         <span className="text-lg">{lang.flag}</span>
                         <span className="text-sm text-zinc-900 dark:text-white">{lang.name}</span>
                         {sourceLanguage?.code === lang.code && (
-                          <Check size={14} className="text-violet-600 ml-auto" />
+                          <Check size={14} className="text-emerald-600 ml-auto" />
                         )}
                       </button>
                     ))}
@@ -453,14 +453,14 @@ export const DubbingStudio: React.FC = () => {
           {/* Target Language */}
           <div>
             <label className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-2 flex items-center gap-1.5">
-              <Languages size={12} className="text-violet-500" />
+              <Languages size={12} className="text-emerald-500" />
               Translate To
             </label>
             <div className="relative">
               <button
                 onClick={() => setIsTargetDropdownOpen(!isTargetDropdownOpen)}
                 disabled={dubbingState !== 'idle'}
-                className="w-full flex items-center justify-between px-3 py-2.5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-xl hover:border-violet-300 dark:hover:border-violet-600 transition-colors disabled:opacity-60"
+                className="w-full flex items-center justify-between px-3 py-2.5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-xl hover:border-emerald-300 dark:hover:border-emerald-600 transition-colors disabled:opacity-60"
               >
                 <div className="flex items-center gap-2">
                   <span className="text-lg">{targetLanguage.flag}</span>
@@ -492,8 +492,8 @@ export const DubbingStudio: React.FC = () => {
                           setTargetLanguage(lang);
                           setIsTargetDropdownOpen(false);
                         }}
-                        className={`w-full px-3 py-2.5 text-left hover:bg-violet-50 dark:hover:bg-violet-950/50 transition-colors flex items-center gap-2 ${
-                          targetLanguage.code === lang.code ? 'bg-violet-50 dark:bg-violet-950/50' : ''
+                        className={`w-full px-3 py-2.5 text-left hover:bg-emerald-50 dark:hover:bg-emerald-950/50 transition-colors flex items-center gap-2 ${
+                          targetLanguage.code === lang.code ? 'bg-emerald-50 dark:bg-emerald-950/50' : ''
                         }`}
                       >
                         <span className="text-lg">{lang.flag}</span>
@@ -504,7 +504,7 @@ export const DubbingStudio: React.FC = () => {
                           <div className="text-xs text-zinc-500">{lang.nativeName}</div>
                         </div>
                         {targetLanguage.code === lang.code && (
-                          <Check size={14} className="text-violet-600" />
+                          <Check size={14} className="text-emerald-600" />
                         )}
                       </button>
                     ))}
@@ -526,22 +526,22 @@ export const DubbingStudio: React.FC = () => {
 
           {/* Progress Indicator */}
           {(dubbingState === 'uploading' || dubbingState === 'processing') && (
-            <div className="p-4 rounded-xl bg-violet-50 dark:bg-violet-950/30 border border-violet-200 dark:border-violet-800/50">
+            <div className="p-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800/50">
               <div className="flex items-center gap-3 mb-3">
-                <Loader2 size={18} className="text-violet-600 animate-spin" />
-                <span className="text-sm font-medium text-violet-700 dark:text-violet-300">
+                <Loader2 size={18} className="text-emerald-600 animate-spin" />
+                <span className="text-sm font-medium text-emerald-700 dark:text-emerald-300">
                   {dubbingState === 'uploading' ? 'Uploading video...' : 'Translating audio...'}
                 </span>
               </div>
-              <div className="w-full bg-violet-200 dark:bg-violet-800/50 rounded-full h-2">
+              <div className="w-full bg-emerald-200 dark:bg-emerald-800/50 rounded-full h-2">
                 <motion.div
-                  className="bg-violet-600 h-2 rounded-full"
+                  className="bg-emerald-600 h-2 rounded-full"
                   initial={{ width: 0 }}
                   animate={{ width: `${progress}%` }}
                   transition={{ duration: 0.3 }}
                 />
               </div>
-              <p className="text-xs text-violet-600 dark:text-violet-400 mt-2 text-center">
+              <p className="text-xs text-emerald-600 dark:text-emerald-400 mt-2 text-center">
                 {progress}% complete
               </p>
             </div>
@@ -582,7 +582,7 @@ export const DubbingStudio: React.FC = () => {
               w-full py-3.5 rounded-xl font-bold text-white text-sm uppercase tracking-wider transition-all flex items-center justify-center gap-2
               ${
                 isFormValid && dubbingState === 'idle'
-                  ? 'bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 active:scale-[0.98] shadow-lg shadow-violet-500/25'
+                  ? 'bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 active:scale-[0.98] shadow-lg shadow-emerald-500/25'
                   : 'bg-zinc-300 dark:bg-zinc-700 cursor-not-allowed'
               }
             `}
@@ -625,7 +625,7 @@ export const DubbingStudio: React.FC = () => {
         <div className="max-w-5xl mx-auto space-y-8">
           {/* Hero Section */}
           <div className="text-center mb-8">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-violet-50 dark:bg-violet-950/50 text-violet-700 dark:text-violet-300 rounded-full text-sm font-semibold mb-4">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 rounded-full text-sm font-semibold mb-4">
               <Languages size={16} />
               AI Video Dubbing
             </div>
@@ -645,9 +645,9 @@ export const DubbingStudio: React.FC = () => {
           </div>
 
           {/* How It Works */}
-          <div className="bg-gradient-to-br from-violet-50 to-purple-50 dark:from-violet-950/30 dark:to-purple-950/30 rounded-2xl p-6 border border-violet-200 dark:border-violet-800/50">
+          <div className="bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-950/30 dark:to-teal-950/30 rounded-2xl p-6 border border-emerald-200 dark:border-emerald-800/50">
             <h2 className="text-lg font-bold text-zinc-900 dark:text-white mb-4 flex items-center gap-2">
-              <Wand2 size={18} className="text-violet-600" />
+              <Wand2 size={18} className="text-emerald-600" />
               How AI Dubbing Works
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -658,7 +658,7 @@ export const DubbingStudio: React.FC = () => {
                 { step: '4', title: 'Clone & Sync', desc: 'Your voice cloned in new language', icon: Sparkles },
               ].map((item, i) => (
                 <div key={item.step} className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-violet-600 text-white font-bold flex items-center justify-center shrink-0">
+                  <div className="w-10 h-10 rounded-xl bg-emerald-600 text-white font-bold flex items-center justify-center shrink-0">
                     {item.step}
                   </div>
                   <div>
@@ -671,9 +671,9 @@ export const DubbingStudio: React.FC = () => {
           </div>
 
           {/* Demo Video Comparison */}
-          <div className="bg-gradient-to-br from-zinc-50 to-violet-50/30 dark:from-zinc-900 dark:to-violet-950/30 rounded-2xl p-6 border border-zinc-200 dark:border-zinc-800">
+          <div className="bg-gradient-to-br from-zinc-50 to-emerald-50/30 dark:from-zinc-900 dark:to-emerald-950/30 rounded-2xl p-6 border border-zinc-200 dark:border-zinc-800">
             <h2 className="text-lg font-bold text-zinc-900 dark:text-white mb-4 flex items-center gap-2">
-              <Play size={18} className="text-violet-600" />
+              <Play size={18} className="text-emerald-600" />
               See the Magic
             </h2>
             <div className="relative rounded-xl overflow-hidden aspect-video bg-zinc-900">
@@ -708,7 +708,7 @@ export const DubbingStudio: React.FC = () => {
                   className="w-full h-full object-cover"
                   src={SAMPLE_VIDEO}
                 />
-                <div className="absolute top-4 right-4 px-3 py-1 bg-violet-600 text-white rounded-full text-xs font-bold">
+                <div className="absolute top-4 right-4 px-3 py-1 bg-emerald-600 text-white rounded-full text-xs font-bold">
                   DUBBED
                 </div>
               </div>
@@ -743,7 +743,7 @@ export const DubbingStudio: React.FC = () => {
           {/* Language Grid */}
           <div>
             <h2 className="text-lg font-bold text-zinc-900 dark:text-white mb-4 flex items-center gap-2">
-              <Globe size={18} className="text-violet-600" />
+              <Globe size={18} className="text-emerald-600" />
               29+ Languages Supported
             </h2>
             <div className="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3">
@@ -756,8 +756,8 @@ export const DubbingStudio: React.FC = () => {
                   }}
                   className={`bg-white dark:bg-zinc-900 rounded-xl p-3 border text-center transition-colors cursor-pointer ${
                     targetLanguage.code === lang.code
-                      ? 'border-violet-400 dark:border-violet-600 ring-2 ring-violet-200 dark:ring-violet-800'
-                      : 'border-zinc-200 dark:border-zinc-800 hover:border-violet-300 dark:hover:border-violet-600'
+                      ? 'border-emerald-400 dark:border-emerald-600 ring-2 ring-emerald-200 dark:ring-emerald-800'
+                      : 'border-zinc-200 dark:border-zinc-800 hover:border-emerald-300 dark:hover:border-emerald-600'
                   }`}
                 >
                   <span className="text-2xl mb-1 block">{lang.flag}</span>
@@ -772,8 +772,8 @@ export const DubbingStudio: React.FC = () => {
             <h3 className="font-bold text-zinc-900 dark:text-white mb-4">Perfect For Real Estate</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="flex items-start gap-3">
-                <div className="w-10 h-10 rounded-xl bg-violet-100 dark:bg-violet-900/50 flex items-center justify-center shrink-0">
-                  <Home size={18} className="text-violet-600" />
+                <div className="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center shrink-0">
+                  <Home size={18} className="text-emerald-600" />
                 </div>
                 <div>
                   <h4 className="font-semibold text-zinc-900 dark:text-white text-sm">Property Tours</h4>
@@ -783,8 +783,8 @@ export const DubbingStudio: React.FC = () => {
                 </div>
               </div>
               <div className="flex items-start gap-3">
-                <div className="w-10 h-10 rounded-xl bg-violet-100 dark:bg-violet-900/50 flex items-center justify-center shrink-0">
-                  <Users size={18} className="text-violet-600" />
+                <div className="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center shrink-0">
+                  <Users size={18} className="text-emerald-600" />
                 </div>
                 <div>
                   <h4 className="font-semibold text-zinc-900 dark:text-white text-sm">
@@ -796,8 +796,8 @@ export const DubbingStudio: React.FC = () => {
                 </div>
               </div>
               <div className="flex items-start gap-3">
-                <div className="w-10 h-10 rounded-xl bg-violet-100 dark:bg-violet-900/50 flex items-center justify-center shrink-0">
-                  <Star size={18} className="text-violet-600" />
+                <div className="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center shrink-0">
+                  <Star size={18} className="text-emerald-600" />
                 </div>
                 <div>
                   <h4 className="font-semibold text-zinc-900 dark:text-white text-sm">

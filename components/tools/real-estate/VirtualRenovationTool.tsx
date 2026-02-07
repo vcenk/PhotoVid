@@ -19,7 +19,7 @@ const RENOVATION_TYPES = [
 const STYLES = [
     { id: 'modern', name: 'Modern', color: 'bg-blue-500' },
     { id: 'traditional', name: 'Traditional', color: 'bg-amber-600' },
-    { id: 'contemporary', name: 'Contemporary', color: 'bg-violet-500' },
+    { id: 'contemporary', name: 'Contemporary', color: 'bg-emerald-500' },
     { id: 'farmhouse', name: 'Farmhouse', color: 'bg-orange-600' },
     { id: 'luxury', name: 'Luxury', color: 'bg-yellow-500' },
 ];

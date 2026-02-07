@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider } from './components/common/ThemeProvider';
+import { ToastProvider } from './components/common/Toast';
 import { CreditsProvider } from './lib/store/contexts/CreditsContext';
 import { LandingPage } from './components/pages/LandingPage';
 import { StudioPage } from './components/pages/StudioPage';
@@ -66,6 +67,9 @@ import { VideoPage } from './components/pages/VideoPage';
 import { EditPage } from './components/pages/EditPage';
 import { PropertiesPage } from './components/pages/PropertiesPage';
 import { ListingPage } from './components/pages/ListingPage';
+import { ProfilePage } from './components/pages/ProfilePage';
+import { SettingsPage } from './components/pages/SettingsPage';
+import { AdminPage } from './components/pages/AdminPage';
 import { AuthProvider } from './lib/store/contexts/AuthContext';
 
 // Simple Error Boundary to catch crashes
@@ -110,9 +114,10 @@ const App: React.FC = () => {
   return (
     <ErrorBoundary>
       <ThemeProvider>
-        <AuthProvider>
-          <CreditsProvider>
-            <Router>
+        <ToastProvider>
+          <AuthProvider>
+            <CreditsProvider>
+              <Router>
               <Routes>
             <Route path="/" element={<LandingPage />} />
             <Route path="/studio" element={<StudioPage />} />
@@ -171,6 +176,9 @@ const App: React.FC = () => {
             <Route path="/studio/video" element={<VideoPage />} />
             <Route path="/studio/workflow" element={<WorkflowPage />} />
             <Route path="/studio/credits" element={<CreditsPage />} />
+            <Route path="/studio/profile" element={<ProfilePage />} />
+            <Route path="/studio/settings" element={<SettingsPage />} />
+            <Route path="/studio/admin" element={<AdminPage />} />
             {/* Redirect old dashboard routes to studio */}
             <Route path="/dashboard" element={<Navigate to="/studio" replace />} />
             <Route path="/dashboard/lipsync" element={<Navigate to="/studio/dubbing" replace />} />
@@ -182,9 +190,10 @@ const App: React.FC = () => {
             <Route path="/privacy" element={<PrivacyPolicyPage />} />
             <Route path="/terms" element={<TermsOfServicePage />} />
             </Routes>
-            </Router>
-          </CreditsProvider>
-        </AuthProvider>
+              </Router>
+            </CreditsProvider>
+          </AuthProvider>
+        </ToastProvider>
       </ThemeProvider>
     </ErrorBoundary>
   );

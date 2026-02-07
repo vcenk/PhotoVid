@@ -74,7 +74,7 @@ export const CategoryBrowser: React.FC<CategoryBrowserProps> = ({
   return (
     <div>
       <div className="flex items-center gap-3 mb-4">
-        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center">
+        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center">
           <LayoutGrid size={20} className="text-white" />
         </div>
         <div>
@@ -100,18 +100,18 @@ export const CategoryBrowser: React.FC<CategoryBrowserProps> = ({
               className={`
                 flex flex-col items-center gap-2 p-4 rounded-xl border transition-all
                 ${isActive
-                  ? 'bg-indigo-50 dark:bg-indigo-500/10 border-indigo-500 text-indigo-600 dark:text-indigo-400'
+                  ? 'bg-teal-50 dark:bg-teal-500/10 border-teal-500 text-teal-600 dark:text-teal-400'
                   : 'bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 hover:border-zinc-300 dark:hover:border-zinc-700'
                 }
               `}
             >
-              <Icon size={22} className={isActive ? 'text-indigo-500' : 'text-zinc-400 dark:text-zinc-500'} />
-              <span className={`text-xs font-medium text-center ${isActive ? 'text-indigo-600 dark:text-indigo-400' : 'text-zinc-700 dark:text-zinc-300'}`}>
+              <Icon size={22} className={isActive ? 'text-teal-500' : 'text-zinc-400 dark:text-zinc-500'} />
+              <span className={`text-xs font-medium text-center ${isActive ? 'text-teal-600 dark:text-teal-400' : 'text-zinc-700 dark:text-zinc-300'}`}>
                 {cat.label}
               </span>
               <span className={`text-xs px-2 py-0.5 rounded-full ${
                 isActive
-                  ? 'bg-indigo-100 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400'
+                  ? 'bg-teal-100 dark:bg-teal-500/20 text-teal-600 dark:text-teal-400'
                   : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400'
               }`}>
                 {count}

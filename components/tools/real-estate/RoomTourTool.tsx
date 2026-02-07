@@ -169,7 +169,7 @@ const RoomTourToolInner: React.FC = () => {
                                 <ArrowLeft size={18} className="text-zinc-400" />
                             </button>
                             <h1 className="text-base font-semibold text-white flex items-center gap-2">
-                                <Video size={18} className="text-violet-400" />
+                                <Video size={18} className="text-emerald-400" />
                                 Room Tour Video
                             </h1>
                         </div>
@@ -182,7 +182,7 @@ const RoomTourToolInner: React.FC = () => {
                             {!imagePreview ? (
                                 <div
                                     onDragEnter={handleDrag} onDragLeave={handleDrag} onDragOver={handleDrag} onDrop={handleDrop}
-                                    className={`relative border border-dashed rounded-xl p-6 text-center transition-all cursor-pointer ${isDragging ? 'border-violet-500 bg-violet-500/10' : 'border-white/10 hover:border-white/20 bg-white/[0.02]'}`}
+                                    className={`relative border border-dashed rounded-xl p-6 text-center transition-all cursor-pointer ${isDragging ? 'border-emerald-500 bg-emerald-500/10' : 'border-white/10 hover:border-white/20 bg-white/[0.02]'}`}
                                 >
                                     <input type="file" className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" onChange={handleFileChange} accept="image/*" />
                                     <UploadCloud size={28} className="mx-auto mb-2 text-zinc-500" />
@@ -209,13 +209,13 @@ const RoomTourToolInner: React.FC = () => {
                                     <button
                                         key={motion.id}
                                         onClick={() => setSelectedMotion(motion.id)}
-                                        className={`w-full p-3 rounded-xl text-left transition-all flex items-center gap-3 ${selectedMotion === motion.id ? 'bg-violet-600/20 border border-violet-500/50' : 'bg-white/[0.02] border border-transparent hover:bg-white/[0.05]'}`}
+                                        className={`w-full p-3 rounded-xl text-left transition-all flex items-center gap-3 ${selectedMotion === motion.id ? 'bg-emerald-600/20 border border-emerald-500/50' : 'bg-white/[0.02] border border-transparent hover:bg-white/[0.05]'}`}
                                     >
                                         <div className="flex-1">
-                                            <p className={`text-sm font-medium ${selectedMotion === motion.id ? 'text-violet-300' : 'text-zinc-300'}`}>{motion.name}</p>
+                                            <p className={`text-sm font-medium ${selectedMotion === motion.id ? 'text-emerald-300' : 'text-zinc-300'}`}>{motion.name}</p>
                                             <p className="text-xs text-zinc-500">{motion.description}</p>
                                         </div>
-                                        {selectedMotion === motion.id && <Check size={16} className="text-violet-400" />}
+                                        {selectedMotion === motion.id && <Check size={16} className="text-emerald-400" />}
                                     </button>
                                 ))}
                             </div>
@@ -232,7 +232,7 @@ const RoomTourToolInner: React.FC = () => {
                                     <button
                                         key={option.id}
                                         onClick={() => setSelectedDuration(option.id)}
-                                        className={`flex-1 py-2.5 px-3 rounded-lg text-sm font-medium transition-all ${selectedDuration === option.id ? 'bg-violet-600 text-white' : 'bg-white/5 text-zinc-400 hover:bg-white/10'}`}
+                                        className={`flex-1 py-2.5 px-3 rounded-lg text-sm font-medium transition-all ${selectedDuration === option.id ? 'bg-emerald-600 text-white' : 'bg-white/5 text-zinc-400 hover:bg-white/10'}`}
                                     >
                                         {option.label}
                                     </button>
@@ -241,9 +241,9 @@ const RoomTourToolInner: React.FC = () => {
                         </div>
 
                         {/* Info */}
-                        <div className="p-3 rounded-xl bg-violet-500/5 border border-violet-500/10">
-                            <p className="text-xs text-violet-300/80 leading-relaxed">
-                                <strong className="text-violet-300">Pro tip:</strong> Use high-resolution photos for best video quality. The AI will add smooth camera movement.
+                        <div className="p-3 rounded-xl bg-emerald-500/5 border border-emerald-500/10">
+                            <p className="text-xs text-emerald-300/80 leading-relaxed">
+                                <strong className="text-emerald-300">Pro tip:</strong> Use high-resolution photos for best video quality. The AI will add smooth camera movement.
                             </p>
                         </div>
                     </div>
@@ -252,7 +252,7 @@ const RoomTourToolInner: React.FC = () => {
                         <button
                             onClick={handleGenerate}
                             disabled={!uploadedImage || isGenerating}
-                            className={`w-full py-3 rounded-xl font-semibold text-sm transition-all flex items-center justify-center gap-2 ${uploadedImage && !isGenerating ? 'bg-violet-600 hover:bg-violet-500 text-white' : 'bg-white/5 text-zinc-600 cursor-not-allowed'}`}
+                            className={`w-full py-3 rounded-xl font-semibold text-sm transition-all flex items-center justify-center gap-2 ${uploadedImage && !isGenerating ? 'bg-emerald-600 hover:bg-emerald-500 text-white' : 'bg-white/5 text-zinc-600 cursor-not-allowed'}`}
                         >
                             {isGenerating ? <><Loader2 size={18} className="animate-spin" />Generating {generationProgress}%</> : <><Video size={18} />Generate Video</>}
                         </button>
@@ -271,7 +271,7 @@ const RoomTourToolInner: React.FC = () => {
                                 ) : (
                                     <button onClick={async () => { if (resultVideo) { try { await addAsset(resultVideo, 'video', 'Room Tour Video'); setSavedToLibrary(true); } catch {} } }} className="px-3 py-1.5 text-xs font-medium text-zinc-400 hover:text-white bg-white/5 hover:bg-white/10 rounded-lg transition-colors flex items-center gap-1.5"><BookmarkPlus size={14} />Save to Library</button>
                                 )}
-                                <button onClick={() => resultVideo && downloadFile(resultVideo, `room-tour-${Date.now()}.mp4`, 'mp4')} className="px-3 py-1.5 text-xs font-medium text-white bg-violet-600 hover:bg-violet-500 rounded-lg transition-colors flex items-center gap-1.5"><Download size={14} />Download MP4</button>
+                                <button onClick={() => resultVideo && downloadFile(resultVideo, `room-tour-${Date.now()}.mp4`, 'mp4')} className="px-3 py-1.5 text-xs font-medium text-white bg-emerald-600 hover:bg-emerald-500 rounded-lg transition-colors flex items-center gap-1.5"><Download size={14} />Download MP4</button>
                             </div>
                         )}
                     </div>
@@ -286,7 +286,7 @@ const RoomTourToolInner: React.FC = () => {
                                 <p className="text-zinc-500 text-xs max-w-xs">{error}</p>
                                 <button
                                     onClick={() => setError(null)}
-                                    className="mt-4 px-4 py-2 text-xs font-medium text-white bg-violet-600 hover:bg-violet-500 rounded-lg transition-colors"
+                                    className="mt-4 px-4 py-2 text-xs font-medium text-white bg-emerald-600 hover:bg-emerald-500 rounded-lg transition-colors"
                                 >
                                     Try Again
                                 </button>
@@ -299,7 +299,7 @@ const RoomTourToolInner: React.FC = () => {
                         ) : isGenerating ? (
                             <div className="text-center">
                                 <div className="relative w-24 h-24 mx-auto mb-6">
-                                    <svg className="w-full h-full -rotate-90"><circle cx="48" cy="48" r="44" stroke="currentColor" strokeWidth="4" fill="none" className="text-white/10" /><circle cx="48" cy="48" r="44" stroke="currentColor" strokeWidth="4" fill="none" strokeDasharray={276.46} strokeDashoffset={276.46 - (276.46 * generationProgress) / 100} className="text-violet-500 transition-all duration-300" strokeLinecap="round" /></svg>
+                                    <svg className="w-full h-full -rotate-90"><circle cx="48" cy="48" r="44" stroke="currentColor" strokeWidth="4" fill="none" className="text-white/10" /><circle cx="48" cy="48" r="44" stroke="currentColor" strokeWidth="4" fill="none" strokeDasharray={276.46} strokeDashoffset={276.46 - (276.46 * generationProgress) / 100} className="text-emerald-500 transition-all duration-300" strokeLinecap="round" /></svg>
                                     <span className="absolute inset-0 flex items-center justify-center text-xl font-semibold text-white">{generationProgress}%</span>
                                 </div>
                                 <p className="text-zinc-400 font-medium">Generating video...</p>
@@ -315,7 +315,7 @@ const RoomTourToolInner: React.FC = () => {
                                     loop
                                     muted
                                 />
-                                <div className="absolute top-4 right-4 px-3 py-1.5 bg-violet-500/80 backdrop-blur rounded-lg text-xs text-white font-medium flex items-center gap-1.5">
+                                <div className="absolute top-4 right-4 px-3 py-1.5 bg-emerald-500/80 backdrop-blur rounded-lg text-xs text-white font-medium flex items-center gap-1.5">
                                     <Video size={12} />
                                     {selectedDuration}s Video
                                 </div>

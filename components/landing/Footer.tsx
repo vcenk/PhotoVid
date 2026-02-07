@@ -55,14 +55,14 @@ export const Footer = () => {
           {/* Brand Column */}
           <div className="flex-shrink-0 w-64 space-y-6">
             <div className="flex items-center gap-2">
-              <img src="/photovid.svg" alt="Photovid" className="h-12 w-auto" />
+              <img src="/logo.png" alt="Photovid" className="h-12 w-auto" />
             </div>
             <p className="text-zinc-500 text-sm leading-relaxed font-sans">
               AI-powered photo editing for real estate professionals. Transform listing photos in seconds.
             </p>
             <div className="flex gap-4">
               {[Twitter, Instagram, Linkedin, Youtube].map((Icon, i) => (
-                <a key={i} href="#" className="p-2 rounded-full bg-white/5 text-zinc-500 hover:bg-indigo-600 hover:text-white transition-all">
+                <a key={i} href="#" className="p-2 rounded-full bg-white/5 text-zinc-500 hover:bg-teal-600 hover:text-white transition-all">
                   <Icon size={16} />
                 </a>
               ))}
@@ -82,14 +82,14 @@ export const Footer = () => {
                       {link.href.startsWith('/') ? (
                         <Link
                           to={link.href}
-                          className="text-sm text-zinc-500 hover:text-indigo-400 transition-colors font-medium"
+                          className="text-sm text-zinc-500 hover:text-teal-400 transition-colors font-medium"
                         >
                           {link.label}
                         </Link>
                       ) : (
                         <a
                           href={link.href}
-                          className="text-sm text-zinc-500 hover:text-indigo-400 transition-colors font-medium"
+                          className="text-sm text-zinc-500 hover:text-teal-400 transition-colors font-medium"
                         >
                           {link.label}
                         </a>

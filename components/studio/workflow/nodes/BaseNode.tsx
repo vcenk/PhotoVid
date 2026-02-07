@@ -10,7 +10,7 @@ import { NodeDataType } from '../../../../lib/workflow/types';
 const DATA_TYPE_COLORS: Record<NodeDataType, string> = {
   prompt: 'bg-emerald-500',
   image: 'bg-blue-500',
-  video: 'bg-violet-500',
+  video: 'bg-emerald-500',
   audio: 'bg-pink-500',
   number: 'bg-amber-500',
   boolean: 'bg-cyan-500',
@@ -48,7 +48,7 @@ export const BaseNode = memo(({ id, type, data, selected }: NodeProps) => {
       className={cn(
         'rounded-xl border-2 bg-white dark:bg-zinc-900 transition-all duration-200 min-w-[280px]',
         statusColors[status],
-        selected && 'ring-4 ring-indigo-500/30'
+        selected && 'ring-4 ring-teal-500/30'
       )}
     >
       {/* Header */}

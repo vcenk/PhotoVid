@@ -18,14 +18,14 @@ export const ImageToVideoNode = memo(({ id, data, selected }: NodeProps) => {
         status === 'running' && 'border-blue-500 ring-2 ring-blue-500/20',
         status === 'completed' && 'border-emerald-500 ring-2 ring-emerald-500/20',
         status === 'error' && 'border-red-500 ring-2 ring-red-500/20',
-        status === 'idle' && 'border-violet-300 dark:border-violet-700',
-        selected && 'ring-4 ring-indigo-500/30'
+        status === 'idle' && 'border-emerald-300 dark:border-emerald-700',
+        selected && 'ring-4 ring-teal-500/30'
       )}
     >
       {/* Header */}
-      <div className="flex items-center justify-between p-3 border-b border-zinc-200 dark:border-zinc-800 bg-violet-50 dark:bg-violet-950/30">
+      <div className="flex items-center justify-between p-3 border-b border-zinc-200 dark:border-zinc-800 bg-emerald-50 dark:bg-emerald-950/30">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-violet-100 dark:bg-violet-900/50 text-violet-600 dark:text-violet-400">
+          <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400">
             <Video size={18} />
           </div>
           <div>
@@ -71,7 +71,7 @@ export const ImageToVideoNode = memo(({ id, data, selected }: NodeProps) => {
           <select
             value={data.parameters?.duration || '5'}
             onChange={(e) => handleParameterChange('duration', e.target.value)}
-            className="w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg text-sm text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-violet-500/20"
+            className="w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg text-sm text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
           >
             <option value="5">5 seconds</option>
             <option value="10">10 seconds</option>
@@ -86,7 +86,7 @@ export const ImageToVideoNode = memo(({ id, data, selected }: NodeProps) => {
           <select
             value={data.parameters?.aspect_ratio || '16:9'}
             onChange={(e) => handleParameterChange('aspect_ratio', e.target.value)}
-            className="w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg text-sm text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-violet-500/20"
+            className="w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg text-sm text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
           >
             <option value="16:9">16:9 (Landscape)</option>
             <option value="9:16">9:16 (Vertical)</option>
@@ -103,7 +103,7 @@ export const ImageToVideoNode = memo(({ id, data, selected }: NodeProps) => {
             value={data.parameters?.motion_prompt || ''}
             onChange={(e) => handleParameterChange('motion_prompt', e.target.value)}
             placeholder="Describe the motion..."
-            className="w-full h-16 px-3 py-2 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg text-sm text-zinc-900 dark:text-white placeholder:text-zinc-400 resize-none focus:outline-none focus:ring-2 focus:ring-violet-500/20"
+            className="w-full h-16 px-3 py-2 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg text-sm text-zinc-900 dark:text-white placeholder:text-zinc-400 resize-none focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
           />
         </div>
 
@@ -116,7 +116,7 @@ export const ImageToVideoNode = memo(({ id, data, selected }: NodeProps) => {
             value={data.parameters?.negative_prompt || ''}
             onChange={(e) => handleParameterChange('negative_prompt', e.target.value)}
             placeholder="What to avoid..."
-            className="w-full h-16 px-3 py-2 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg text-sm text-zinc-900 dark:text-white placeholder:text-zinc-400 resize-none focus:outline-none focus:ring-2 focus:ring-violet-500/20"
+            className="w-full h-16 px-3 py-2 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg text-sm text-zinc-900 dark:text-white placeholder:text-zinc-400 resize-none focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
           />
         </div>
 
@@ -144,7 +144,7 @@ export const ImageToVideoNode = memo(({ id, data, selected }: NodeProps) => {
         type="source"
         position={Position.Right}
         id="video"
-        className="w-3 h-3 bg-violet-500 border-2 border-white dark:border-zinc-900"
+        className="w-3 h-3 bg-emerald-500 border-2 border-white dark:border-zinc-900"
         style={{ top: '50%' }}
       />
     </div>

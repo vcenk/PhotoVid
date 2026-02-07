@@ -30,13 +30,13 @@ export const RecentActivity: React.FC = () => {
   if (recentAssets.length === 0) {
     return (
       <div className="flex items-center gap-3 py-4 px-5 bg-zinc-50 dark:bg-zinc-900/50 rounded-xl border border-zinc-200 dark:border-zinc-800">
-        <Sparkles size={18} className="text-indigo-500 flex-shrink-0" />
+        <Sparkles size={18} className="text-teal-500 flex-shrink-0" />
         <p className="text-sm text-zinc-500 dark:text-zinc-400">
           No recent work yet — start creating!
         </p>
         <button
           onClick={() => navigate('/studio/apps')}
-          className="ml-auto text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 flex items-center gap-1 whitespace-nowrap"
+          className="ml-auto text-sm font-medium text-teal-600 dark:text-teal-400 hover:text-teal-700 dark:hover:text-teal-300 flex items-center gap-1 whitespace-nowrap"
         >
           Explore Tools <ArrowRight size={14} />
         </button>
@@ -54,7 +54,7 @@ export const RecentActivity: React.FC = () => {
         </h2>
         <button
           onClick={() => navigate('/studio/library')}
-          className="text-xs font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 flex items-center gap-1"
+          className="text-xs font-medium text-teal-600 dark:text-teal-400 hover:text-teal-700 dark:hover:text-teal-300 flex items-center gap-1"
         >
           View All <ArrowRight size={12} />
         </button>
@@ -95,7 +95,7 @@ export const RecentActivity: React.FC = () => {
             )}
             {/* Type indicator dot */}
             <div className={`absolute top-1 left-1 w-2 h-2 rounded-full ${
-              asset.type === 'image' ? 'bg-blue-500' : 'bg-purple-500'
+              asset.type === 'image' ? 'bg-blue-500' : 'bg-teal-500'
             }`} />
           </div>
         ))}

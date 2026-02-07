@@ -48,9 +48,9 @@ export const FileUploader: React.FC = () => {
         onDrop={handleDrop}
         className={`
           relative border-2 border-dashed rounded-3xl p-12 text-center transition-all duration-200
-          ${isDragging 
-            ? 'border-indigo-500 bg-indigo-50' 
-            : 'border-zinc-300 hover:border-zinc-400 bg-zinc-50'
+          ${isDragging
+            ? 'border-teal-500 bg-teal-50 dark:bg-teal-950/50'
+            : 'border-zinc-300 dark:border-zinc-700 hover:border-zinc-400 dark:hover:border-zinc-600 bg-zinc-50 dark:bg-zinc-900'
           }
         `}
       >
@@ -63,13 +63,13 @@ export const FileUploader: React.FC = () => {
         />
         
         <div className="pointer-events-none">
-          <div className="bg-white w-16 h-16 rounded-full shadow-sm flex items-center justify-center mx-auto mb-4 text-indigo-600">
+          <div className="bg-white dark:bg-zinc-800 w-16 h-16 rounded-full shadow-sm flex items-center justify-center mx-auto mb-4 text-teal-600 dark:text-teal-400">
             <UploadCloud size={32} />
           </div>
-          <h3 className="text-lg font-bold text-zinc-900 mb-2">
+          <h3 className="text-lg font-bold text-zinc-900 dark:text-zinc-100 mb-2">
             Click or drag images here
           </h3>
-          <p className="text-zinc-500 text-sm max-w-xs mx-auto">
+          <p className="text-zinc-500 dark:text-zinc-400 text-sm max-w-xs mx-auto">
             Upload the photos you want to animate. High resolution (2048px+) recommended.
           </p>
         </div>
@@ -78,7 +78,7 @@ export const FileUploader: React.FC = () => {
       {uploadedFiles.length > 0 && (
         <div className="mt-8 grid grid-cols-2 md:grid-cols-4 gap-4">
           {uploadedFiles.map((file, idx) => (
-            <div key={idx} className="relative group aspect-square bg-zinc-100 rounded-xl overflow-hidden border border-zinc-200">
+            <div key={idx} className="relative group aspect-square bg-zinc-100 dark:bg-zinc-800 rounded-xl overflow-hidden border border-zinc-200 dark:border-zinc-700">
               <img 
                 src={URL.createObjectURL(file)} 
                 alt="preview" 
@@ -86,7 +86,7 @@ export const FileUploader: React.FC = () => {
               />
               <button
                 onClick={() => removeFile(idx)}
-                className="absolute top-2 right-2 bg-white/90 p-1.5 rounded-full text-zinc-500 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
+                className="absolute top-2 right-2 bg-white/90 dark:bg-zinc-900/90 p-1.5 rounded-full text-zinc-500 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
               >
                 <X size={14} />
               </button>

@@ -28,7 +28,7 @@ export function IndustryModelsStrip() {
             model.type === 'image'
               ? 'bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-400'
               : model.type === 'video'
-              ? 'bg-purple-100 text-purple-700 dark:bg-purple-950 dark:text-purple-400'
+              ? 'bg-teal-100 text-teal-700 dark:bg-teal-950 dark:text-teal-400'
               : 'bg-green-100 text-green-700 dark:bg-green-950 dark:text-green-400';
 
           return (
@@ -37,11 +37,11 @@ export function IndustryModelsStrip() {
               onClick={() => handleModelClick(model.id, model.type)}
               className={cn(
                 'flex-shrink-0 w-64 p-5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800',
-                'rounded-2xl hover:border-violet-300 dark:hover:border-violet-700 hover:shadow-lg transition-all group text-left'
+                'rounded-2xl hover:border-emerald-300 dark:hover:border-emerald-700 hover:shadow-lg transition-all group text-left'
               )}
             >
               <div className="flex items-start justify-between mb-3">
-                <div className="p-3 bg-zinc-100 dark:bg-zinc-800 rounded-xl group-hover:bg-violet-100 dark:group-hover:bg-violet-950 transition-colors">
+                <div className="p-3 bg-zinc-100 dark:bg-zinc-800 rounded-xl group-hover:bg-emerald-100 dark:group-hover:bg-emerald-950 transition-colors">
                   <Icon size={24} className="text-zinc-700 dark:text-zinc-300" />
                 </div>
                 <span className={cn('px-2.5 py-1 rounded-full text-xs font-medium uppercase', typeBadgeColor)}>

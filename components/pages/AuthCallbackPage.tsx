@@ -123,7 +123,7 @@ export const AuthCallbackPage: React.FC = () => {
       <div className="text-center">
         {status === 'loading' && (
           <>
-            <Loader2 size={48} className="text-violet-500 animate-spin mx-auto mb-4" />
+            <Loader2 size={48} className="text-emerald-500 animate-spin mx-auto mb-4" />
             <h1 className="text-xl font-semibold text-white mb-2">Processing...</h1>
             <p className="text-zinc-400 text-sm">{message}</p>
           </>
@@ -159,7 +159,7 @@ export const AuthCallbackPage: React.FC = () => {
                 }
                 navigate('/auth');
               }}
-              className="px-6 py-2 rounded-xl bg-violet-600 hover:bg-violet-500 text-white font-medium text-sm transition-colors"
+              className="px-6 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-medium text-sm transition-colors"
             >
               Try Again
             </button>

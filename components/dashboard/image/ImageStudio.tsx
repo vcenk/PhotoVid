@@ -152,14 +152,14 @@ export const ImageStudio: React.FC = () => {
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>
                     <h1 className="text-2xl font-bold text-zinc-900 dark:text-white flex items-center gap-2">
-                        <Sparkles className="text-violet-500" size={24} />
+                        <Sparkles className="text-emerald-500" size={24} />
                         AI Image Studio
                     </h1>
                     <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">
                         Transform your imagination into stunning visuals
                     </p>
                 </div>
-                <span className="px-3 py-1 rounded-full bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 text-xs font-medium w-fit">
+                <span className="px-3 py-1 rounded-full bg-teal-500/10 text-teal-600 dark:text-teal-400 text-xs font-medium w-fit">
                     2 credits per image
                 </span>
             </div>
@@ -179,7 +179,7 @@ export const ImageStudio: React.FC = () => {
                             onChange={(e) => setPrompt(e.target.value)}
                             placeholder="A serene Japanese garden at dawn, soft mist rising over a koi pond..."
                             rows={3}
-                            className="w-full px-4 py-3 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-violet-500/30 focus:border-violet-500 text-zinc-900 dark:text-white placeholder:text-zinc-400 text-sm"
+                            className="w-full px-4 py-3 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 text-zinc-900 dark:text-white placeholder:text-zinc-400 text-sm"
                         />
                     </div>
 
@@ -195,7 +195,7 @@ export const ImageStudio: React.FC = () => {
                                     onClick={() => setSelectedRatio(ratio)}
                                     className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium transition-colors ${
                                         selectedRatio.id === ratio.id
-                                            ? 'bg-violet-500 text-white'
+                                            ? 'bg-emerald-500 text-white'
                                             : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-700'
                                     }`}
                                 >
@@ -218,7 +218,7 @@ export const ImageStudio: React.FC = () => {
                                     onClick={() => setNumImages(n)}
                                     className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-colors ${
                                         numImages === n
-                                            ? 'bg-violet-500 text-white'
+                                            ? 'bg-emerald-500 text-white'
                                             : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-700'
                                     }`}
                                 >
@@ -234,7 +234,7 @@ export const ImageStudio: React.FC = () => {
                         disabled={!canGenerate || !hasCredits}
                         className={`w-full py-3 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2 ${
                             canGenerate && hasCredits
-                                ? 'bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white hover:from-violet-700 hover:to-fuchsia-700 shadow-lg shadow-violet-500/20 active:scale-[0.98]'
+                                ? 'bg-gradient-to-r from-emerald-600 to-fuchsia-600 text-white hover:from-emerald-700 hover:to-fuchsia-700 shadow-lg shadow-emerald-500/20 active:scale-[0.98]'
                                 : 'bg-zinc-300 dark:bg-zinc-700 text-zinc-500 dark:text-zinc-400 cursor-not-allowed'
                         }`}
                     >
@@ -278,7 +278,7 @@ export const ImageStudio: React.FC = () => {
                         {/* Loading State */}
                         {isGenerating && !error && (
                             <div className="flex flex-col items-center justify-center flex-1 gap-3 p-6 rounded-2xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900">
-                                <Loader2 size={36} className="text-violet-500 animate-spin" />
+                                <Loader2 size={36} className="text-emerald-500 animate-spin" />
                                 <p className="text-sm text-zinc-500 dark:text-zinc-400">Generating your image...</p>
                             </div>
                         )}
@@ -311,7 +311,7 @@ export const ImageStudio: React.FC = () => {
                                                 </button>
                                                 <button
                                                     onClick={() => handleSaveToLibrary(url)}
-                                                    className="px-3 py-2 bg-violet-500/90 backdrop-blur-sm rounded-lg text-xs font-medium text-white hover:bg-violet-500 transition-colors flex items-center gap-1.5"
+                                                    className="px-3 py-2 bg-emerald-500/90 backdrop-blur-sm rounded-lg text-xs font-medium text-white hover:bg-emerald-500 transition-colors flex items-center gap-1.5"
                                                 >
                                                     <Save size={14} />
                                                     Save
@@ -334,7 +334,7 @@ export const ImageStudio: React.FC = () => {
                         onClick={() => setActiveTab('my-creations')}
                         className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
                             activeTab === 'my-creations'
-                                ? 'bg-violet-500 text-white'
+                                ? 'bg-emerald-500 text-white'
                                 : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-700'
                         }`}
                     >
@@ -344,7 +344,7 @@ export const ImageStudio: React.FC = () => {
                         onClick={() => setActiveTab('community')}
                         className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
                             activeTab === 'community'
-                                ? 'bg-violet-500 text-white'
+                                ? 'bg-emerald-500 text-white'
                                 : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-700'
                         }`}
                     >
@@ -432,7 +432,7 @@ export const ImageStudio: React.FC = () => {
                                                 </p>
                                                 <button
                                                     onClick={() => handleRecreate(image)}
-                                                    className="w-full py-2 px-4 bg-violet-500/80 backdrop-blur-sm rounded-full text-white text-sm font-medium hover:bg-violet-500 transition-colors flex items-center justify-center gap-2"
+                                                    className="w-full py-2 px-4 bg-emerald-500/80 backdrop-blur-sm rounded-full text-white text-sm font-medium hover:bg-emerald-500 transition-colors flex items-center justify-center gap-2"
                                                 >
                                                     <RefreshCw size={14} />
                                                     Recreate

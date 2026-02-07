@@ -103,8 +103,8 @@ export function ImageUploadStep() {
         className={`
           relative group overflow-hidden rounded-3xl border-2 border-dashed transition-all duration-300
           ${isDragging
-            ? 'border-violet-500 bg-violet-600/10 scale-[1.01]'
-            : 'border-white/10 bg-white/5 hover:border-violet-500/50 hover:bg-white/10'
+            ? 'border-emerald-500 bg-emerald-600/10 scale-[1.01]'
+            : 'border-white/10 bg-white/5 hover:border-emerald-500/50 hover:bg-white/10'
           }
         `}
       >
@@ -119,7 +119,7 @@ export function ImageUploadStep() {
         <div className="flex flex-col items-center justify-center p-12 text-center relative">
             <div className={`
                 w-20 h-20 rounded-full flex items-center justify-center mb-6 transition-all duration-300
-                ${isDragging ? 'bg-violet-600 text-white scale-110 shadow-lg shadow-violet-600/30' : 'bg-white/5 text-zinc-400 group-hover:bg-violet-600/20 group-hover:text-violet-300'}
+                ${isDragging ? 'bg-emerald-600 text-white scale-110 shadow-lg shadow-emerald-600/30' : 'bg-white/5 text-zinc-400 group-hover:bg-emerald-600/20 group-hover:text-emerald-300'}
             `}>
                 <Upload size={32} />
             </div>
@@ -209,7 +209,7 @@ export function ImageUploadStep() {
                 {/* Order Number */}
                 <div className={`
                   w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold flex-shrink-0
-                  ${index === 0 ? 'bg-violet-600 text-white shadow-lg shadow-violet-600/20' : 'bg-white/5 text-zinc-500'}
+                  ${index === 0 ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-600/20' : 'bg-white/5 text-zinc-500'}
                 `}>
                   {index + 1}
                 </div>
@@ -222,7 +222,7 @@ export function ImageUploadStep() {
                     className="w-full h-full object-cover"
                   />
                   {index === 0 && (
-                     <div className="absolute inset-0 bg-violet-900/20 flex items-center justify-center">
+                     <div className="absolute inset-0 bg-emerald-900/20 flex items-center justify-center">
                         <span className="text-[10px] font-bold text-white bg-black/50 px-1.5 py-0.5 rounded backdrop-blur-md">HERO</span>
                      </div>
                   )}
@@ -238,7 +238,7 @@ export function ImageUploadStep() {
                         onChange={(e) => setEditLabel(e.target.value)}
                         onKeyDown={(e) => e.key === 'Enter' && saveLabel()}
                         placeholder="e.g., Living Room"
-                        className="flex-1 px-3 py-1.5 bg-black/40 border border-violet-500/50 rounded-lg text-sm text-white focus:outline-none focus:ring-2 focus:ring-violet-500/20"
+                        className="flex-1 px-3 py-1.5 bg-black/40 border border-emerald-500/50 rounded-lg text-sm text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
                         autoFocus
                       />
                       <button
@@ -277,10 +277,10 @@ export function ImageUploadStep() {
 
       {/* Quick Label Suggestions */}
       {images.length > 0 && images.some(img => !img.label) && (
-        <div className="p-5 bg-violet-500/5 border border-violet-500/10 rounded-2xl backdrop-blur-sm">
+        <div className="p-5 bg-emerald-500/5 border border-emerald-500/10 rounded-2xl backdrop-blur-sm">
           <div className="flex items-center gap-2 mb-3">
-             <Sparkles size={16} className="text-violet-400" />
-             <p className="text-sm font-medium text-violet-200">Quick Label Suggestions</p>
+             <Sparkles size={16} className="text-emerald-400" />
+             <p className="text-sm font-medium text-emerald-200">Quick Label Suggestions</p>
           </div>
           <div className="flex flex-wrap gap-2">
             {ROOM_LABELS.slice(0, 10).map((label) => (
@@ -292,7 +292,7 @@ export function ImageUploadStep() {
                     updateImageLabel(unlabeled.id, label);
                   }
                 }}
-                className="px-3 py-1.5 bg-white/5 hover:bg-violet-600/20 border border-white/5 hover:border-violet-500/30 text-zinc-400 hover:text-violet-200 rounded-lg text-xs font-medium transition-all duration-200"
+                className="px-3 py-1.5 bg-white/5 hover:bg-emerald-600/20 border border-white/5 hover:border-emerald-500/30 text-zinc-400 hover:text-emerald-200 rounded-lg text-xs font-medium transition-all duration-200"
               >
                 {label}
               </button>

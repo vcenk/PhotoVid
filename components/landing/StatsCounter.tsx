@@ -64,17 +64,17 @@ const StatItem: React.FC<StatItemProps> = ({
       className="relative group"
     >
       {/* Glow effect on hover */}
-      <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/0 via-indigo-500/10 to-violet-500/0 rounded-3xl opacity-0 group-hover:opacity-100 blur-xl transition-opacity duration-500" />
+      <div className="absolute inset-0 bg-gradient-to-r from-teal-500/0 via-teal-500/10 to-emerald-500/0 rounded-3xl opacity-0 group-hover:opacity-100 blur-xl transition-opacity duration-500" />
 
-      <div className="relative bg-white dark:bg-zinc-900/50 backdrop-blur-sm border border-zinc-200 dark:border-white/10 rounded-3xl p-8 text-center transition-all duration-300 hover:border-indigo-500/30 hover:shadow-xl hover:shadow-indigo-500/5">
+      <div className="relative bg-white dark:bg-zinc-900/50 backdrop-blur-sm border border-zinc-200 dark:border-white/10 rounded-3xl p-8 text-center transition-all duration-300 hover:border-teal-500/30 hover:shadow-xl hover:shadow-teal-500/5">
         {/* Icon */}
         <motion.div
           initial={{ scale: 0 }}
           animate={isInView ? { scale: 1 } : {}}
           transition={{ delay: delay + 0.2, type: "spring", stiffness: 200 }}
-          className="mx-auto mb-4 w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500/10 to-violet-500/10 flex items-center justify-center"
+          className="mx-auto mb-4 w-12 h-12 rounded-2xl bg-gradient-to-br from-teal-500/10 to-emerald-500/10 flex items-center justify-center"
         >
-          <Icon className="w-6 h-6 text-indigo-500" />
+          <Icon className="w-6 h-6 text-teal-500" />
         </motion.div>
 
         {/* Animated Number */}
@@ -95,7 +95,7 @@ const StatItem: React.FC<StatItemProps> = ({
 
         {/* Pulse ring on hover */}
         <motion.div
-          className="absolute inset-0 rounded-3xl border-2 border-indigo-500/50 opacity-0 group-hover:opacity-100"
+          className="absolute inset-0 rounded-3xl border-2 border-teal-500/50 opacity-0 group-hover:opacity-100"
           animate={{ scale: [1, 1.02, 1] }}
           transition={{ duration: 2, repeat: Infinity }}
         />
@@ -146,7 +146,7 @@ export const StatsCounter: React.FC = () => {
       <div className="absolute inset-0 bg-gradient-to-b from-white via-zinc-50 to-white dark:from-zinc-950 dark:via-zinc-900 dark:to-zinc-950" />
 
       {/* Ambient glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-indigo-500/5 dark:bg-indigo-500/10 rounded-full blur-[100px] pointer-events-none" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-teal-500/5 dark:bg-teal-500/10 rounded-full blur-[100px] pointer-events-none" />
 
       <div className="relative max-w-7xl mx-auto px-6">
         {/* Header */}
@@ -159,7 +159,7 @@ export const StatsCounter: React.FC = () => {
             initial={{ opacity: 0, scale: 0.9 }}
             animate={isInView ? { opacity: 1, scale: 1 } : {}}
             transition={{ delay: 0.1 }}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 text-xs font-bold uppercase tracking-widest mb-6"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-teal-500/10 text-teal-600 dark:text-teal-400 text-xs font-bold uppercase tracking-widest mb-6"
           >
             <TrendingUp size={14} />
             Trusted by creators worldwide
@@ -167,7 +167,7 @@ export const StatsCounter: React.FC = () => {
 
           <h2 className="text-3xl md:text-5xl font-bold text-zinc-900 dark:text-white tracking-tight">
             Numbers that speak{' '}
-            <span className="bg-gradient-to-r from-indigo-500 to-violet-500 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-teal-500 to-emerald-500 bg-clip-text text-transparent">
               volumes
             </span>
           </h2>
@@ -189,7 +189,7 @@ export const StatsCounter: React.FC = () => {
           initial={{ scaleX: 0 }}
           animate={isInView ? { scaleX: 1 } : {}}
           transition={{ delay: 0.6, duration: 0.8 }}
-          className="mt-16 mx-auto w-24 h-1 bg-gradient-to-r from-indigo-500 to-violet-500 rounded-full"
+          className="mt-16 mx-auto w-24 h-1 bg-gradient-to-r from-teal-500 to-emerald-500 rounded-full"
         />
       </div>
     </section>

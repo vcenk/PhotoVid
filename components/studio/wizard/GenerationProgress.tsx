@@ -15,7 +15,7 @@ export const GenerationProgress: React.FC = () => {
         <p className="text-zinc-500 mb-8">{error}</p>
         <button 
           onClick={resetWizard}
-          className="inline-flex items-center gap-2 text-indigo-600 font-bold hover:text-indigo-700"
+          className="inline-flex items-center gap-2 text-teal-600 font-bold hover:text-teal-700"
         >
           <ArrowLeft size={18} /> Try again
         </button>
@@ -28,7 +28,7 @@ export const GenerationProgress: React.FC = () => {
       <div className="relative w-32 h-32 mx-auto mb-8 flex items-center justify-center">
          <div className="absolute inset-0 border-4 border-zinc-100 rounded-full"></div>
          <div 
-           className="absolute inset-0 border-4 border-indigo-600 rounded-full border-t-transparent animate-spin"
+           className="absolute inset-0 border-4 border-teal-600 rounded-full border-t-transparent animate-spin"
            style={{ borderTopColor: 'transparent' }}
          ></div>
          <span className="text-2xl font-bold text-zinc-900">{progress}%</span>

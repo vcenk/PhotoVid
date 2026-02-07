@@ -76,7 +76,7 @@ export function PropertySelector({ selectedProperty, onSelect }: PropertySelecto
   };
 
   return (
-    <div className="rounded-2xl border border-white/10 bg-zinc-900/50 p-4">
+    <div className="rounded-2xl border border-zinc-200 dark:border-white/10 bg-white dark:bg-zinc-900/50 p-4">
       <div className="flex items-center gap-3 flex-wrap">
         {/* Dropdown trigger */}
         <div className="relative flex-1 min-w-[240px]">
@@ -85,8 +85,8 @@ export function PropertySelector({ selectedProperty, onSelect }: PropertySelecto
             className={cn(
               'w-full flex items-center justify-between gap-2 px-4 py-2.5 rounded-xl border transition-colors text-sm',
               selectedProperty
-                ? 'border-violet-500/30 bg-violet-500/10 text-white'
-                : 'border-white/10 bg-white/5 text-zinc-400 hover:text-white hover:border-white/20'
+                ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-white'
+                : 'border-zinc-200 dark:border-white/10 bg-zinc-50 dark:bg-white/5 text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:border-zinc-300 dark:hover:border-white/20'
             )}
           >
             <span className="truncate">
@@ -107,9 +107,9 @@ export function PropertySelector({ selectedProperty, onSelect }: PropertySelecto
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -4 }}
                 transition={{ duration: 0.15 }}
-                className="absolute top-full left-0 right-0 mt-2 rounded-xl border border-white/10 bg-zinc-900 shadow-2xl z-30 overflow-hidden"
+                className="absolute top-full left-0 right-0 mt-2 rounded-xl border border-zinc-200 dark:border-white/10 bg-white dark:bg-zinc-900 shadow-2xl z-30 overflow-hidden"
               >
-                <div className="p-2 border-b border-white/5">
+                <div className="p-2 border-b border-zinc-200 dark:border-white/5">
                   <div className="relative">
                     <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" />
                     <input
@@ -117,7 +117,7 @@ export function PropertySelector({ selectedProperty, onSelect }: PropertySelecto
                       placeholder="Search properties..."
                       value={search}
                       onChange={(e) => setSearch(e.target.value)}
-                      className="w-full pl-8 pr-3 py-2 rounded-lg bg-white/5 border border-white/5 text-sm text-white placeholder:text-zinc-500 focus:outline-none focus:border-violet-500/30"
+                      className="w-full pl-8 pr-3 py-2 rounded-lg bg-zinc-50 dark:bg-white/5 border border-zinc-200 dark:border-white/5 text-sm text-zinc-900 dark:text-white placeholder:text-zinc-500 focus:outline-none focus:border-emerald-500/30"
                       autoFocus
                     />
                   </div>
@@ -137,19 +137,19 @@ export function PropertySelector({ selectedProperty, onSelect }: PropertySelecto
                           setSearch('');
                         }}
                         className={cn(
-                          'w-full flex items-start gap-3 px-3 py-2.5 text-left hover:bg-white/5 transition-colors',
-                          selectedProperty?.id === p.id && 'bg-violet-500/10'
+                          'w-full flex items-start gap-3 px-3 py-2.5 text-left hover:bg-zinc-100 dark:hover:bg-white/5 transition-colors',
+                          selectedProperty?.id === p.id && 'bg-emerald-500/10'
                         )}
                       >
                         {p.thumbnailUrl ? (
                           <img src={p.thumbnailUrl} alt="" className="w-10 h-10 rounded-lg object-cover shrink-0" />
                         ) : (
-                          <div className="w-10 h-10 rounded-lg bg-zinc-800 flex items-center justify-center shrink-0">
+                          <div className="w-10 h-10 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center shrink-0">
                             <MapPin size={16} className="text-zinc-600" />
                           </div>
                         )}
                         <div className="min-w-0">
-                          <div className="text-sm text-white truncate">{p.address || p.name}</div>
+                          <div className="text-sm text-zinc-900 dark:text-white truncate">{p.address || p.name}</div>
                           <div className="text-xs text-zinc-500">
                             {p.city}, {p.state}
                             {p.price ? ` · $${p.price.toLocaleString()}` : ''}
@@ -168,7 +168,7 @@ export function PropertySelector({ selectedProperty, onSelect }: PropertySelecto
 
         <button
           onClick={() => setShowQuickAdd(true)}
-          className="flex items-center gap-1.5 px-3 py-2.5 rounded-xl border border-white/10 text-sm text-zinc-400 hover:text-white hover:bg-white/5 transition-colors"
+          className="flex items-center gap-1.5 px-3 py-2.5 rounded-xl border border-zinc-200 dark:border-white/10 text-sm text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-white/5 transition-colors"
         >
           <Plus size={14} />
           Quick Add
@@ -176,7 +176,7 @@ export function PropertySelector({ selectedProperty, onSelect }: PropertySelecto
 
         <button
           onClick={() => navigate('/studio/properties')}
-          className="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-sm text-zinc-500 hover:text-violet-400 transition-colors"
+          className="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-sm text-zinc-500 hover:text-emerald-400 transition-colors"
         >
           Manage Properties
           <ExternalLink size={12} />
@@ -231,10 +231,10 @@ export function PropertySelector({ selectedProperty, onSelect }: PropertySelecto
             exit={{ opacity: 0, height: 0 }}
             className="overflow-hidden"
           >
-            <div className="mt-4 pt-4 border-t border-white/5">
+            <div className="mt-4 pt-4 border-t border-zinc-200 dark:border-white/5">
               <div className="flex items-center justify-between mb-3">
-                <h4 className="text-sm font-medium text-white">Quick Add Property</h4>
-                <button onClick={() => setShowQuickAdd(false)} className="text-zinc-500 hover:text-white">
+                <h4 className="text-sm font-medium text-zinc-900 dark:text-white">Quick Add Property</h4>
+                <button onClick={() => setShowQuickAdd(false)} className="text-zinc-500 hover:text-zinc-900 dark:hover:text-white">
                   <X size={16} />
                 </button>
               </div>
@@ -243,54 +243,54 @@ export function PropertySelector({ selectedProperty, onSelect }: PropertySelecto
                   placeholder="Address *"
                   value={quickForm.address}
                   onChange={(e) => setQuickForm((p) => ({ ...p, address: e.target.value }))}
-                  className="col-span-2 px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:border-violet-500/30"
+                  className="col-span-2 px-3 py-2 rounded-lg bg-zinc-50 dark:bg-white/5 border border-zinc-200 dark:border-white/10 text-sm text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus:outline-none focus:border-emerald-500/30"
                 />
                 <input
                   placeholder="City"
                   value={quickForm.city}
                   onChange={(e) => setQuickForm((p) => ({ ...p, city: e.target.value }))}
-                  className="px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:border-violet-500/30"
+                  className="px-3 py-2 rounded-lg bg-zinc-50 dark:bg-white/5 border border-zinc-200 dark:border-white/10 text-sm text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus:outline-none focus:border-emerald-500/30"
                 />
                 <input
                   placeholder="State"
                   value={quickForm.state}
                   onChange={(e) => setQuickForm((p) => ({ ...p, state: e.target.value }))}
-                  className="px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:border-violet-500/30"
+                  className="px-3 py-2 rounded-lg bg-zinc-50 dark:bg-white/5 border border-zinc-200 dark:border-white/10 text-sm text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus:outline-none focus:border-emerald-500/30"
                 />
                 <input
                   placeholder="Beds"
                   type="number"
                   value={quickForm.bedrooms}
                   onChange={(e) => setQuickForm((p) => ({ ...p, bedrooms: e.target.value }))}
-                  className="px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:border-violet-500/30"
+                  className="px-3 py-2 rounded-lg bg-zinc-50 dark:bg-white/5 border border-zinc-200 dark:border-white/10 text-sm text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus:outline-none focus:border-emerald-500/30"
                 />
                 <input
                   placeholder="Baths"
                   type="number"
                   value={quickForm.bathrooms}
                   onChange={(e) => setQuickForm((p) => ({ ...p, bathrooms: e.target.value }))}
-                  className="px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:border-violet-500/30"
+                  className="px-3 py-2 rounded-lg bg-zinc-50 dark:bg-white/5 border border-zinc-200 dark:border-white/10 text-sm text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus:outline-none focus:border-emerald-500/30"
                 />
                 <input
                   placeholder="Price"
                   type="number"
                   value={quickForm.price}
                   onChange={(e) => setQuickForm((p) => ({ ...p, price: e.target.value }))}
-                  className="px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:border-violet-500/30"
+                  className="px-3 py-2 rounded-lg bg-zinc-50 dark:bg-white/5 border border-zinc-200 dark:border-white/10 text-sm text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus:outline-none focus:border-emerald-500/30"
                 />
                 <input
                   placeholder="Sqft"
                   type="number"
                   value={quickForm.squareFeet}
                   onChange={(e) => setQuickForm((p) => ({ ...p, squareFeet: e.target.value }))}
-                  className="px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:border-violet-500/30"
+                  className="px-3 py-2 rounded-lg bg-zinc-50 dark:bg-white/5 border border-zinc-200 dark:border-white/10 text-sm text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus:outline-none focus:border-emerald-500/30"
                 />
               </div>
               <div className="mt-3 flex justify-end">
                 <button
                   onClick={handleQuickAdd}
                   disabled={!quickForm.address}
-                  className="px-4 py-2 rounded-xl bg-violet-600 text-white text-sm font-medium hover:bg-violet-500 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="px-4 py-2 rounded-xl bg-emerald-600 text-white text-sm font-medium hover:bg-emerald-500 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   Add & Select
                 </button>

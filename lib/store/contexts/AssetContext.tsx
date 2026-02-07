@@ -238,9 +238,12 @@ export function AssetProvider({ children }: { children: ReactNode }) {
 
       try {
         // SECURE: Call Edge Function instead of direct database delete
+        console.log('Attempting to delete asset via Edge Function:', id);
         const { data: response, error } = await supabase.functions.invoke('delete-asset', {
           body: { id },
         });
+
+        console.log('Delete asset response:', response, 'error:', error);
 
         if (error) {
           console.error('Error deleting asset via Edge Function:', error);
@@ -248,41 +251,60 @@ export function AssetProvider({ children }: { children: ReactNode }) {
           setAssets(previousAssets);
 
           // If edge function fails, try direct delete with RLS
-          const { error: directError } = await supabase
+          console.log('Trying direct delete with RLS...');
+          const { data: deletedRows, error: directError } = await supabase
             .from('assets')
             .delete()
             .eq('id', id)
-            .eq('user_id', userData.user.id);
+            .eq('user_id', userData.user.id)
+            .select();
 
           if (directError) {
             console.error('Direct delete also failed:', directError);
             return false;
           }
 
+          if (!deletedRows || deletedRows.length === 0) {
+            console.error('Direct delete returned no rows - asset may not exist or ID mismatch');
+            return false;
+          }
+
           // Direct delete succeeded
+          console.log('Direct delete succeeded:', deletedRows);
           setAssets(prev => prev.filter(a => a.id !== id));
           return true;
         }
 
         if (response?.success) {
+          console.log('Asset deleted successfully via Edge Function');
           return true;
         }
 
+        // Check for specific error from edge function
+        if (response?.error) {
+          console.error('Edge function returned error:', response.error);
+        }
+
         // Restore if not successful
+        console.error('Delete was not successful, restoring UI');
         setAssets(previousAssets);
         return false;
       } catch (funcError) {
         console.error('Edge function call failed:', funcError);
         // Try direct delete as fallback
-        const { error: directError } = await supabase
+        console.log('Trying direct delete as fallback...');
+        const { data: deletedRows, error: directError } = await supabase
           .from('assets')
           .delete()
           .eq('id', id)
-          .eq('user_id', userData.user.id);
+          .eq('user_id', userData.user.id)
+          .select();
 
-        if (!directError) {
+        if (!directError && deletedRows && deletedRows.length > 0) {
+          console.log('Fallback direct delete succeeded');
           return true;
         }
+        console.error('Fallback delete failed:', directError);
         setAssets(previousAssets);
         return false;
       }

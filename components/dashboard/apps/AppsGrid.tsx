@@ -56,7 +56,7 @@ export const AppsGrid: React.FC<AppsGridProps> = ({ onAppSelect }) => {
                     <div className="flex items-center justify-between mb-6">
                         <div>
                             <h1 className="text-3xl font-bold text-zinc-900 dark:text-white flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-fuchsia-600 flex items-center justify-center">
+                                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-fuchsia-600 flex items-center justify-center">
                                     <Sparkles size={22} className="text-white" />
                                 </div>
                                 AI Apps
@@ -77,7 +77,7 @@ export const AppsGrid: React.FC<AppsGridProps> = ({ onAppSelect }) => {
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 placeholder="Search apps..."
-                                className="w-full pl-11 pr-4 py-3 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 transition-colors"
+                                className="w-full pl-11 pr-4 py-3 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-colors"
                             />
                             {searchQuery && (
                                 <button
@@ -94,7 +94,7 @@ export const AppsGrid: React.FC<AppsGridProps> = ({ onAppSelect }) => {
                             <button
                                 onClick={() => setActiveCategory('all')}
                                 className={`px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-all ${activeCategory === 'all'
-                                        ? 'bg-violet-600 text-white shadow-lg shadow-violet-200 dark:shadow-violet-900/30'
+                                        ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-200 dark:shadow-emerald-900/30'
                                         : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-700'
                                     }`}
                             >
@@ -114,7 +114,7 @@ export const AppsGrid: React.FC<AppsGridProps> = ({ onAppSelect }) => {
                                     key={cat.id}
                                     onClick={() => setActiveCategory(cat.id)}
                                     className={`px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-all flex items-center gap-1.5 ${activeCategory === cat.id
-                                            ? 'bg-violet-600 text-white shadow-lg shadow-violet-200 dark:shadow-violet-900/30'
+                                            ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-200 dark:shadow-emerald-900/30'
                                             : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-700'
                                         }`}
                                 >
@@ -148,7 +148,7 @@ export const AppsGrid: React.FC<AppsGridProps> = ({ onAppSelect }) => {
                                         </h2>
                                         <button
                                             onClick={() => setActiveCategory('trending')}
-                                            className="text-sm text-violet-600 dark:text-violet-400 font-medium hover:underline flex items-center gap-1"
+                                            className="text-sm text-emerald-600 dark:text-emerald-400 font-medium hover:underline flex items-center gap-1"
                                         >
                                             See all <ChevronRight size={16} />
                                         </button>
@@ -172,7 +172,7 @@ export const AppsGrid: React.FC<AppsGridProps> = ({ onAppSelect }) => {
                                                 </h2>
                                                 <button
                                                     onClick={() => setActiveCategory(categoryId as AppCategory)}
-                                                    className="text-sm text-violet-600 dark:text-violet-400 font-medium hover:underline flex items-center gap-1"
+                                                    className="text-sm text-emerald-600 dark:text-emerald-400 font-medium hover:underline flex items-center gap-1"
                                                 >
                                                     See all <ChevronRight size={16} />
                                                 </button>
@@ -224,7 +224,7 @@ export const AppsGrid: React.FC<AppsGridProps> = ({ onAppSelect }) => {
                                                 setSearchQuery('');
                                                 setActiveCategory('all');
                                             }}
-                                            className="mt-4 px-4 py-2 bg-violet-600 text-white rounded-xl text-sm font-medium hover:bg-violet-700 transition-colors"
+                                            className="mt-4 px-4 py-2 bg-emerald-600 text-white rounded-xl text-sm font-medium hover:bg-emerald-700 transition-colors"
                                         >
                                             Clear filters
                                         </button>

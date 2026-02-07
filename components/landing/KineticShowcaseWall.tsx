@@ -87,7 +87,7 @@ const SHOWCASE_ITEMS_BOTTOM = [
   },
   {
     id: 14,
-    image: "https://images.unsplash.com/photo-1600563438938-a9a27215b4b4?q=80&w=1000&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?q=80&w=1000&auto=format&fit=crop",
     title: "Backyard Oasis",
     tag: "Lawn Enhancement"
   },
@@ -126,7 +126,7 @@ const ShowcaseCard: React.FC<ShowcaseItemProps> = ({ item }) => {
           scale: isHovered ? 1.1 : 1,
         }}
         transition={{ duration: 0.4 }}
-        className="absolute -inset-4 bg-gradient-to-r from-indigo-500/30 via-violet-500/30 to-fuchsia-500/30 blur-2xl z-0"
+        className="absolute -inset-4 bg-gradient-to-r from-teal-500/30 via-emerald-500/30 to-fuchsia-500/30 blur-2xl z-0"
       />
 
       {/* Card container */}
@@ -164,7 +164,7 @@ const ShowcaseCard: React.FC<ShowcaseItemProps> = ({ item }) => {
             }}
             transition={{ duration: 0.3 }}
           >
-            <span className="text-[10px] font-bold uppercase tracking-widest text-indigo-400 block mb-1">
+            <span className="text-[10px] font-bold uppercase tracking-widest text-teal-400 block mb-1">
               {item.tag}
             </span>
             <span className="text-xl font-bold text-white">
@@ -187,7 +187,7 @@ const ShowcaseCard: React.FC<ShowcaseItemProps> = ({ item }) => {
 
         {/* Border glow on hover */}
         <motion.div
-          className="absolute inset-0 rounded-2xl border-2 border-indigo-500/0"
+          className="absolute inset-0 rounded-2xl border-2 border-teal-500/0"
           animate={{
             borderColor: isHovered ? 'rgba(99, 102, 241, 0.5)' : 'rgba(99, 102, 241, 0)',
           }}
@@ -229,11 +229,11 @@ export const KineticShowcaseWall = () => {
       <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-transparent to-black/80 z-10 pointer-events-none" />
 
       {/* Center ambient glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-indigo-600/10 blur-[200px] rounded-full pointer-events-none" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-teal-600/10 blur-[200px] rounded-full pointer-events-none" />
 
       {/* Mouse-following spotlight */}
       <div
-        className="absolute w-[400px] h-[400px] bg-violet-500/10 blur-[100px] rounded-full pointer-events-none transition-all duration-300 ease-out z-5"
+        className="absolute w-[400px] h-[400px] bg-emerald-500/10 blur-[100px] rounded-full pointer-events-none transition-all duration-300 ease-out z-5"
         style={{
           left: mousePosition.x - 200,
           top: mousePosition.y - 200,

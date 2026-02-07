@@ -90,7 +90,7 @@ export const BeforeAfterSlider: React.FC<BeforeAfterSliderProps> = ({
         {isLoading && !hasError && (
           <div className="absolute inset-0 bg-zinc-900 flex items-center justify-center z-30">
             <div className="text-center">
-              <Loader2 size={32} className="text-violet-500 animate-spin mx-auto mb-2" />
+              <Loader2 size={32} className="text-emerald-500 animate-spin mx-auto mb-2" />
               <p className="text-zinc-400 text-sm">Loading images...</p>
             </div>
           </div>
@@ -107,7 +107,7 @@ export const BeforeAfterSlider: React.FC<BeforeAfterSliderProps> = ({
               <p className="text-zinc-500 text-sm mb-4">Network error. Please try again.</p>
               <button
                 onClick={handleRetry}
-                className="px-4 py-2 text-sm font-medium text-white bg-violet-600 hover:bg-violet-500 rounded-lg transition-colors flex items-center gap-2 mx-auto"
+                className="px-4 py-2 text-sm font-medium text-white bg-emerald-600 hover:bg-emerald-500 rounded-lg transition-colors flex items-center gap-2 mx-auto"
               >
                 <RefreshCw size={16} />
                 Retry
@@ -143,7 +143,7 @@ export const BeforeAfterSlider: React.FC<BeforeAfterSliderProps> = ({
             <div className="absolute top-4 left-4 px-3 py-1.5 bg-black/60 backdrop-blur-sm rounded-full text-white text-sm font-medium">
               {beforeLabel}
             </div>
-            <div className="absolute top-4 right-4 px-3 py-1.5 bg-violet-600/80 backdrop-blur-sm rounded-full text-white text-sm font-medium">
+            <div className="absolute top-4 right-4 px-3 py-1.5 bg-emerald-600/80 backdrop-blur-sm rounded-full text-white text-sm font-medium">
               {afterLabel}
             </div>
           </>

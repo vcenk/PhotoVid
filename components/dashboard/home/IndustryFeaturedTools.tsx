@@ -55,7 +55,7 @@ export const IndustryFeaturedTools: React.FC = () => {
     featured: { label: 'Featured', icon: Star, className: 'bg-amber-500/90 text-white' },
     popular: { label: 'Most Used', icon: TrendingUp, className: 'bg-gradient-to-r from-orange-500 to-pink-500 text-white' },
     new: { label: 'New', icon: Zap, className: 'bg-emerald-500 text-white' },
-    pro: { label: 'Pro', icon: Crown, className: 'bg-gradient-to-r from-amber-400 to-yellow-500 text-black' },
+    pro: { label: 'Pro', icon: Crown, className: 'bg-gradient-to-r from-amber-400 to-yellow-500 text-amber-900' },
   };
 
   return (
@@ -79,7 +79,7 @@ export const IndustryFeaturedTools: React.FC = () => {
         <div className="flex items-center gap-3">
           <button
             onClick={() => navigate('/studio/real-estate')}
-            className="hidden sm:flex items-center gap-2 px-4 py-2 text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/30 rounded-lg transition-colors"
+            className="hidden sm:flex items-center gap-2 px-4 py-2 text-sm font-medium text-teal-600 dark:text-teal-400 hover:bg-teal-50 dark:hover:bg-teal-950/30 rounded-lg transition-colors"
           >
             View All Tools
             <ArrowRight size={16} />
@@ -116,7 +116,7 @@ export const IndustryFeaturedTools: React.FC = () => {
           >
             <div
               onClick={() => handleCardClick(item)}
-              className="rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 overflow-hidden cursor-pointer group hover:border-indigo-500 dark:hover:border-indigo-500 transition-all hover:shadow-lg hover:shadow-indigo-500/5"
+              className="rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 overflow-hidden cursor-pointer group hover:border-teal-500 dark:hover:border-teal-500 transition-all hover:shadow-lg hover:shadow-teal-500/5"
             >
               {/* Image */}
               <div className="relative aspect-video overflow-hidden">
@@ -144,17 +144,17 @@ export const IndustryFeaturedTools: React.FC = () => {
 
               {/* Content */}
               <div className="p-5">
-                <h3 className="text-base font-bold text-zinc-900 dark:text-white mb-1.5 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                <h3 className="text-base font-bold text-zinc-900 dark:text-white mb-1.5 group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">
                   {item.name}
                 </h3>
                 <p className="text-sm text-zinc-500 dark:text-zinc-400 line-clamp-2 mb-4">
                   {item.description}
                 </p>
                 <div className="flex items-center justify-between">
-                  <span className="px-3 py-1 rounded-full bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 text-xs font-medium">
+                  <span className="px-3 py-1 rounded-full bg-teal-50 dark:bg-teal-500/10 text-teal-600 dark:text-teal-400 text-xs font-medium">
                     {item.tag}
                   </span>
-                  <span className="text-sm font-medium text-zinc-600 dark:text-zinc-300 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 flex items-center gap-1 transition-colors">
+                  <span className="text-sm font-medium text-zinc-600 dark:text-zinc-300 group-hover:text-teal-600 dark:group-hover:text-teal-400 flex items-center gap-1 transition-colors">
                     Use Tool <ArrowRight size={14} />
                   </span>
                 </div>

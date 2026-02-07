@@ -2,7 +2,7 @@ import React from 'react';
 import { Navbar } from '../layout/Navbar';
 import { Hero } from '../landing/Hero';
 import { LogoMarquee } from '../landing/LogoMarquee';
-import { BeforeAfterShowcase } from '../landing/BeforeAfterShowcase';
+import { TransformShowcase } from '../landing/TransformShowcase';
 import { WorkflowDemo } from '../landing/WorkflowDemo';
 import { FeatureGrid } from '../landing/FeatureGrid';
 import { MosaicSlideshow } from '../landing/MosaicSlideshow';
@@ -22,7 +22,7 @@ const SectionWrapper = ({ children, id, className = "" }: { children: React.Reac
 
 export const LandingPage: React.FC = () => {
   return (
-    <div className="relative min-h-screen bg-zinc-950 text-white selection:bg-indigo-500/30 overflow-x-hidden scroll-smooth">
+    <div className="relative min-h-screen bg-zinc-950 text-white selection:bg-teal-500/30 overflow-x-hidden scroll-smooth">
 
       <Navbar />
 
@@ -33,8 +33,8 @@ export const LandingPage: React.FC = () => {
         {/* Tool Marquee strip */}
         <LogoMarquee />
 
-        {/* Before/After Showcase - Interactive comparison */}
-        <BeforeAfterShowcase />
+        {/* Transform Showcase - Magic before/after with AI animation */}
+        <TransformShowcase />
 
         {/* Workflow Demo - How it works */}
         <SectionWrapper id="workflow" className="py-24 bg-zinc-950">
@@ -43,7 +43,7 @@ export const LandingPage: React.FC = () => {
               How It Works
             </span>
             <h2 className="text-4xl md:text-5xl font-bold tracking-tighter text-white mb-6">
-              From Photo to <span className="bg-gradient-to-r from-indigo-400 to-violet-400 bg-clip-text text-transparent">Listing-Ready</span>
+              From Photo to <span className="bg-gradient-to-r from-teal-400 to-emerald-400 bg-clip-text text-transparent">Listing-Ready</span>
             </h2>
             <p className="text-zinc-400 max-w-2xl mx-auto">
               Three steps. One platform. Transform any property photo into a polished, listing-ready image in seconds.

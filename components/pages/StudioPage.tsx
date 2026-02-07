@@ -30,7 +30,7 @@ const StudioContent: React.FC = () => {
   };
 
   return (
-    <div className="flex h-screen bg-white dark:bg-[#09090b] text-zinc-900 dark:text-white font-sans overflow-hidden">
+    <div className="flex h-screen bg-white dark:bg-[#09090b] text-zinc-900 dark:text-white font-[Space_Grotesk] overflow-hidden">
       {/* Navigation Rail - Left Sidebar */}
       <NavigationRail
         isMobileOpen={mobileMenuOpen}
@@ -97,7 +97,7 @@ const StudioContent: React.FC = () => {
 
               {currentView === 'canvas' && (
                 <div className="p-8 max-w-7xl mx-auto w-full text-center">
-                  <div className="bg-indigo-50 dark:bg-indigo-950/30 rounded-2xl p-8 border border-indigo-200 dark:border-indigo-800">
+                  <div className="bg-teal-50 dark:bg-teal-950/30 rounded-2xl p-8 border border-teal-200 dark:border-teal-800">
                     <h3 className="text-lg font-bold text-zinc-900 dark:text-white mb-2">
                       Canvas Mode Moved!
                     </h3>
@@ -106,7 +106,7 @@ const StudioContent: React.FC = () => {
                     </p>
                     <button
                       onClick={() => navigate('/studio/workflow')}
-                      className="px-6 py-3 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 transition-colors"
+                      className="px-6 py-3 bg-teal-600 text-white rounded-xl font-bold hover:bg-teal-700 transition-colors"
                     >
                       Go to Workflow Canvas
                     </button>

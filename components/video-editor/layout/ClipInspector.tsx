@@ -46,25 +46,25 @@ export const ClipInspector: React.FC = () => {
         animate={{ width: 300, opacity: 1 }}
         exit={{ width: 0, opacity: 0 }}
         transition={{ type: 'spring', damping: 20, stiffness: 100 }}
-        className="flex-shrink-0 bg-zinc-950/60 backdrop-blur-2xl border-l border-white/5 overflow-y-auto overflow-x-hidden relative z-20 custom-scrollbar shadow-[-10px_0_30px_rgba(0,0,0,0.3)]"
+        className="flex-shrink-0 bg-white/80 dark:bg-zinc-950/60 backdrop-blur-2xl border-l border-zinc-200 dark:border-white/5 overflow-y-auto overflow-x-hidden relative z-20 custom-scrollbar shadow-[-10px_0_30px_rgba(0,0,0,0.1)] dark:shadow-[-10px_0_30px_rgba(0,0,0,0.3)]"
       >
         <div className="p-5 w-[300px] space-y-6">
           {/* Header */}
-          <div className="flex items-center justify-between pb-4 border-b border-white/5">
+          <div className="flex items-center justify-between pb-4 border-b border-zinc-200 dark:border-white/5">
             <div className="flex items-center gap-3">
-              <div className={`p-2 rounded-xl bg-white/5 border border-white/5 ${isTextClip ? 'text-purple-400' : 'text-blue-400'}`}>
+              <div className={`p-2 rounded-xl bg-zinc-100 dark:bg-white/5 border border-zinc-200 dark:border-white/5 ${isTextClip ? 'text-teal-400' : 'text-blue-400'}`}>
                 {isTextClip ? <Type size={18} /> : <Film size={18} />}
               </div>
               <div className="flex flex-col">
                 <span className="text-[10px] font-black uppercase tracking-widest text-zinc-500">Inspector</span>
-                <span className="text-xs font-bold text-white">
+                <span className="text-xs font-bold text-zinc-900 dark:text-white">
                   {isTextClip ? 'Text Properties' : isImageClip ? 'Image Properties' : 'Clip Properties'}
                 </span>
               </div>
             </div>
             <button 
                 onClick={() => selectClip(null)} 
-                className="p-2 hover:bg-white/10 rounded-xl transition-all text-zinc-500 hover:text-white"
+                className="p-2 hover:bg-zinc-100 dark:hover:bg-white/10 rounded-xl transition-all text-zinc-500 hover:text-zinc-900 dark:hover:text-white"
             >
               <X size={16} />
             </button>
@@ -80,7 +80,7 @@ export const ClipInspector: React.FC = () => {
                     <textarea
                     value={selectedClip.textContent.text}
                     onChange={(e) => updateTextContent({ text: e.target.value })}
-                    className="w-full bg-white/5 border border-white/5 hover:border-white/10 focus:border-purple-500/50 rounded-2xl p-4 text-sm text-white focus:outline-none focus:ring-4 focus:ring-purple-500/10 transition-all min-h-[100px] resize-none"
+                    className="w-full bg-zinc-100 dark:bg-white/5 border border-zinc-200 dark:border-white/5 hover:border-zinc-300 dark:hover:border-white/10 focus:border-teal-500/50 rounded-2xl p-4 text-sm text-zinc-900 dark:text-white focus:outline-none focus:ring-4 focus:ring-teal-500/10 transition-all min-h-[100px] resize-none"
                     placeholder="Enter text content..."
                     autoFocus
                     />
@@ -91,7 +91,7 @@ export const ClipInspector: React.FC = () => {
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 ml-1">Size</label>
-                  <div className="bg-white/5 rounded-xl border border-white/5 p-1 flex items-center">
+                  <div className="bg-zinc-100 dark:bg-white/5 rounded-xl border border-zinc-200 dark:border-white/5 p-1 flex items-center">
                     <input
                         type="number"
                         value={selectedClip.textContent.fontSize}
@@ -99,7 +99,7 @@ export const ClipInspector: React.FC = () => {
                         if (e.target.value === '') return;
                         updateTextContent({ fontSize: Number(e.target.value) });
                         }}
-                        className="w-full bg-transparent px-3 py-1.5 text-xs text-white focus:outline-none font-bold"
+                        className="w-full bg-transparent px-3 py-1.5 text-xs text-zinc-900 dark:text-white focus:outline-none font-bold"
                         min={10}
                         max={200}
                     />
@@ -107,11 +107,11 @@ export const ClipInspector: React.FC = () => {
                 </div>
                 <div className="space-y-2">
                   <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 ml-1">Weight</label>
-                  <div className="bg-white/5 rounded-xl border border-white/5 p-1">
+                  <div className="bg-zinc-100 dark:bg-white/5 rounded-xl border border-zinc-200 dark:border-white/5 p-1">
                     <select
                         value={selectedClip.textContent.fontWeight}
                         onChange={(e) => updateTextContent({ fontWeight: Number(e.target.value) })}
-                        className="w-full bg-transparent px-2 py-1.5 text-xs text-white focus:outline-none font-bold [&>option]:bg-zinc-900"
+                        className="w-full bg-transparent px-2 py-1.5 text-xs text-zinc-900 dark:text-white focus:outline-none font-bold [&>option]:bg-zinc-900"
                     >
                         <option value={300}>Light</option>
                         <option value={400}>Regular</option>
@@ -128,11 +128,11 @@ export const ClipInspector: React.FC = () => {
               <div className="grid grid-cols-3 gap-4">
                  <div className="col-span-2 space-y-2">
                     <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 ml-1">Font Family</label>
-                    <div className="bg-white/5 rounded-xl border border-white/5 p-1">
+                    <div className="bg-zinc-100 dark:bg-white/5 rounded-xl border border-zinc-200 dark:border-white/5 p-1">
                         <select
                             value={selectedClip.textContent.fontFamily}
                             onChange={(e) => updateTextContent({ fontFamily: e.target.value })}
-                            className="w-full bg-transparent px-2 py-1.5 text-[11px] text-white focus:outline-none font-bold [&>option]:bg-zinc-900"
+                            className="w-full bg-transparent px-2 py-1.5 text-[11px] text-zinc-900 dark:text-white focus:outline-none font-bold [&>option]:bg-zinc-900"
                         >
                             {FONT_OPTIONS.map(f => (
                             <option key={f.id} value={f.value}>{f.name}</option>
@@ -156,11 +156,11 @@ export const ClipInspector: React.FC = () => {
               {/* Animation */}
               <div className="space-y-2">
                 <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 ml-1">In Animation</label>
-                <div className="bg-white/5 rounded-xl border border-white/5 p-1">
+                <div className="bg-zinc-100 dark:bg-white/5 rounded-xl border border-zinc-200 dark:border-white/5 p-1">
                     <select
                     value={selectedClip.textContent.animation}
                     onChange={(e) => updateTextContent({ animation: e.target.value as TextAnimation })}
-                    className="w-full bg-transparent px-3 py-2 text-xs text-white focus:outline-none font-bold [&>option]:bg-zinc-900"
+                    className="w-full bg-transparent px-3 py-2 text-xs text-zinc-900 dark:text-white focus:outline-none font-bold [&>option]:bg-zinc-900"
                     >
                     <option value="none">None</option>
                     <option value="fade">Fade</option>
@@ -175,7 +175,7 @@ export const ClipInspector: React.FC = () => {
               {/* Position */}
               <div className="space-y-2">
                 <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 ml-1">Placement</label>
-                <div className="bg-white/5 rounded-xl border border-white/5 p-1">
+                <div className="bg-zinc-100 dark:bg-white/5 rounded-xl border border-zinc-200 dark:border-white/5 p-1">
                     <select
                     value={selectedClip.textContent.x !== undefined ? 'free' : selectedClip.textContent.position}
                     onChange={(e) => {
@@ -186,7 +186,7 @@ export const ClipInspector: React.FC = () => {
                         updateTextContent({ position: val as TextPosition, x: undefined, y: undefined });
                         }
                     }}
-                    className="w-full bg-transparent px-3 py-2 text-xs text-white focus:outline-none font-bold [&>option]:bg-zinc-900"
+                    className="w-full bg-transparent px-3 py-2 text-xs text-zinc-900 dark:text-white focus:outline-none font-bold [&>option]:bg-zinc-900"
                     >
                     <option value="top">Top Header</option>
                     <option value="center">Center Stage</option>
@@ -200,7 +200,7 @@ export const ClipInspector: React.FC = () => {
               {/* Alignment */}
               <div className="space-y-2">
                 <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 ml-1">Text Alignment</label>
-                <div className="flex bg-black/40 p-1 rounded-xl border border-white/5 gap-1 shadow-inner">
+                <div className="flex bg-zinc-100 dark:bg-black/40 p-1 rounded-xl border border-zinc-200 dark:border-white/5 gap-1 shadow-inner">
                   {[
                     { value: 'left', icon: <AlignLeft size={16} /> },
                     { value: 'center', icon: <AlignCenter size={16} /> },
@@ -211,8 +211,8 @@ export const ClipInspector: React.FC = () => {
                       onClick={() => updateTextContent({ alignment: value })}
                       className={`flex-1 flex justify-center py-2 rounded-lg transition-all ${
                         selectedClip.textContent?.alignment === value
-                          ? 'bg-purple-600 text-white shadow-lg shadow-purple-900/40'
-                          : 'text-zinc-500 hover:text-zinc-300 hover:bg-white/5'
+                          ? 'bg-teal-600 text-white shadow-lg shadow-teal-900/40'
+                          : 'text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-white/5'
                       }`}
                     >
                       {icon}
@@ -223,11 +223,11 @@ export const ClipInspector: React.FC = () => {
 
               {/* Free Position sliders */}
               {selectedClip.textContent?.x !== undefined && (
-                <div className="p-4 bg-white/5 rounded-2xl border border-white/5 space-y-4">
+                <div className="p-4 bg-zinc-100 dark:bg-white/5 rounded-2xl border border-zinc-200 dark:border-white/5 space-y-4">
                   <div className="space-y-2">
                     <div className="flex justify-between items-center">
                         <label className="text-[9px] font-black uppercase tracking-widest text-zinc-500">Horizontal</label>
-                        <span className="text-[9px] font-bold text-white">{selectedClip.textContent.x}%</span>
+                        <span className="text-[9px] font-bold text-zinc-900 dark:text-white">{selectedClip.textContent.x}%</span>
                     </div>
                     <input
                         type="range"
@@ -235,13 +235,13 @@ export const ClipInspector: React.FC = () => {
                         max={98}
                         value={selectedClip.textContent.x ?? 50}
                         onChange={(e) => updateTextContent({ x: Number(e.target.value) })}
-                        className="w-full h-1.5 bg-black rounded-lg appearance-none cursor-pointer accent-purple-500"
+                        className="w-full h-1.5 bg-black rounded-lg appearance-none cursor-pointer accent-teal-500"
                     />
                   </div>
                   <div className="space-y-2">
                     <div className="flex justify-between items-center">
                         <label className="text-[9px] font-black uppercase tracking-widest text-zinc-500">Vertical</label>
-                        <span className="text-[9px] font-bold text-white">{selectedClip.textContent.y}%</span>
+                        <span className="text-[9px] font-bold text-zinc-900 dark:text-white">{selectedClip.textContent.y}%</span>
                     </div>
                     <input
                         type="range"
@@ -249,10 +249,10 @@ export const ClipInspector: React.FC = () => {
                         max={98}
                         value={selectedClip.textContent.y ?? 50}
                         onChange={(e) => updateTextContent({ y: Number(e.target.value) })}
-                        className="w-full h-1.5 bg-black rounded-lg appearance-none cursor-pointer accent-purple-500"
+                        className="w-full h-1.5 bg-black rounded-lg appearance-none cursor-pointer accent-teal-500"
                     />
                   </div>
-                  <div className="flex items-center gap-2 text-[9px] text-zinc-500 bg-black/20 p-2 rounded-lg italic">
+                  <div className="flex items-center gap-2 text-[9px] text-zinc-500 bg-zinc-200 dark:bg-black/20 p-2 rounded-lg italic">
                     <Move size={10} />
                     <span>Tip: You can drag text directly on preview</span>
                   </div>
@@ -272,8 +272,8 @@ export const ClipInspector: React.FC = () => {
                     onClick={() => removeKenBurns(selectedClip.id)}
                     className={`px-3 py-2 text-[10px] font-bold rounded-xl border transition-all ${
                       !selectedClip.kenBurns
-                        ? 'bg-purple-600 border-purple-500 text-white shadow-lg shadow-purple-900/40'
-                        : 'bg-white/5 border-white/5 text-zinc-500 hover:text-zinc-300 hover:bg-white/10'
+                        ? 'bg-teal-600 border-teal-500 text-white shadow-lg shadow-teal-900/40'
+                        : 'bg-zinc-100 dark:bg-white/5 border-zinc-200 dark:border-white/5 text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-white/10'
                     }`}
                   >
                     Static
@@ -284,8 +284,8 @@ export const ClipInspector: React.FC = () => {
                       onClick={() => setKenBurns(selectedClip.id, kb.direction, kb.intensity)}
                       className={`px-3 py-2 text-[10px] font-bold rounded-xl border transition-all ${
                         selectedClip.kenBurns?.direction === kb.direction && selectedClip.kenBurns?.intensity === kb.intensity
-                          ? 'bg-purple-600 border-purple-500 text-white shadow-lg shadow-purple-900/40'
-                          : 'bg-white/5 border-white/5 text-zinc-500 hover:text-zinc-300 hover:bg-white/10'
+                          ? 'bg-teal-600 border-teal-500 text-white shadow-lg shadow-teal-900/40'
+                          : 'bg-zinc-100 dark:bg-white/5 border-zinc-200 dark:border-white/5 text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-white/10'
                       }`}
                     >
                       {kb.name}
@@ -300,12 +300,12 @@ export const ClipInspector: React.FC = () => {
                  <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-1.5">
                         <span className="text-[9px] font-bold text-zinc-600 uppercase ml-1">Fade In</span>
-                        <div className="bg-white/5 rounded-xl border border-white/5 p-1 flex items-center">
+                        <div className="bg-zinc-100 dark:bg-white/5 rounded-xl border border-zinc-200 dark:border-white/5 p-1 flex items-center">
                             <input
                                 type="number"
                                 value={selectedClip.fadeIn || 0}
                                 onChange={(e) => updateClip(selectedClip.id, { fadeIn: Number(e.target.value) })}
-                                className="w-full bg-transparent px-3 py-1 text-xs text-white focus:outline-none font-bold"
+                                className="w-full bg-transparent px-3 py-1 text-xs text-zinc-900 dark:text-white focus:outline-none font-bold"
                                 min={0}
                                 max={60}
                             />
@@ -313,12 +313,12 @@ export const ClipInspector: React.FC = () => {
                     </div>
                     <div className="space-y-1.5">
                         <span className="text-[9px] font-bold text-zinc-600 uppercase ml-1">Fade Out</span>
-                        <div className="bg-white/5 rounded-xl border border-white/5 p-1 flex items-center">
+                        <div className="bg-zinc-100 dark:bg-white/5 rounded-xl border border-zinc-200 dark:border-white/5 p-1 flex items-center">
                             <input
                                 type="number"
                                 value={selectedClip.fadeOut || 0}
                                 onChange={(e) => updateClip(selectedClip.id, { fadeOut: Number(e.target.value) })}
-                                className="w-full bg-transparent px-3 py-1 text-xs text-white focus:outline-none font-bold"
+                                className="w-full bg-transparent px-3 py-1 text-xs text-zinc-900 dark:text-white focus:outline-none font-bold"
                                 min={0}
                                 max={60}
                             />
@@ -337,13 +337,13 @@ export const ClipInspector: React.FC = () => {
                 {selectedClip.effects.map(effect => (
                   <span
                     key={effect.id}
-                    className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-purple-600/20 border border-purple-500/20 text-[10px] font-bold text-purple-300 shadow-lg shadow-purple-900/10 group"
+                    className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-teal-600/20 border border-teal-500/20 text-[10px] font-bold text-teal-300 shadow-lg shadow-teal-900/10 group"
                   >
                     <Sparkles size={10} />
                     {effect.type}
                     <button
                       onClick={() => removeEffect(selectedClip.id, effect.id)}
-                      className="ml-1 text-purple-400 hover:text-red-400 transition-colors"
+                      className="ml-1 text-teal-400 hover:text-red-400 transition-colors"
                     >
                       <X size={12} />
                     </button>
@@ -354,29 +354,29 @@ export const ClipInspector: React.FC = () => {
           )}
 
           {/* Clip Timing */}
-          <div className="space-y-3 pt-4 border-t border-white/5">
+          <div className="space-y-3 pt-4 border-t border-zinc-200 dark:border-white/5">
             <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500 ml-1">Timing & Position</label>
             <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
                     <span className="text-[9px] font-bold text-zinc-600 uppercase ml-1">Start Frame</span>
-                    <div className="bg-white/5 rounded-xl border border-white/5 p-1 flex items-center">
+                    <div className="bg-zinc-100 dark:bg-white/5 rounded-xl border border-zinc-200 dark:border-white/5 p-1 flex items-center">
                         <input
                             type="number"
                             value={selectedClip.startFrame}
                             onChange={(e) => updateClip(selectedClip.id, { startFrame: Number(e.target.value) })}
-                            className="w-full bg-transparent px-3 py-1.5 text-xs text-white focus:outline-none font-bold"
+                            className="w-full bg-transparent px-3 py-1.5 text-xs text-zinc-900 dark:text-white focus:outline-none font-bold"
                             min={0}
                         />
                     </div>
                 </div>
                 <div className="space-y-1.5">
                     <span className="text-[9px] font-bold text-zinc-600 uppercase ml-1">Total Frames</span>
-                    <div className="bg-white/5 rounded-xl border border-white/5 p-1 flex items-center">
+                    <div className="bg-zinc-100 dark:bg-white/5 rounded-xl border border-zinc-200 dark:border-white/5 p-1 flex items-center">
                         <input
                             type="number"
                             value={selectedClip.durationFrames}
                             onChange={(e) => updateClip(selectedClip.id, { durationFrames: Number(e.target.value) })}
-                            className="w-full bg-transparent px-3 py-1.5 text-xs text-white focus:outline-none font-bold"
+                            className="w-full bg-transparent px-3 py-1.5 text-xs text-zinc-900 dark:text-white focus:outline-none font-bold"
                             min={1}
                         />
                     </div>

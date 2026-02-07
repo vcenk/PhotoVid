@@ -68,7 +68,7 @@ export const CREDIT_PACKAGES: CreditPackage[] = [
 ];
 
 // Default starting credits for new users (trial)
-export const DEFAULT_STARTING_CREDITS = 10;
+export const DEFAULT_STARTING_CREDITS = 5;
 
 // Credit costs per tool
 export const CREDIT_COSTS = {

@@ -97,7 +97,7 @@ export const Navbar: React.FC = () => {
         className={`
           flex items-center justify-between w-full px-8 md:px-14 transition-all duration-500
           ${isScrolled
-            ? "py-4 bg-black/70 backdrop-blur-xl border-b border-white/5"
+            ? "py-4 bg-white/80 dark:bg-black/70 backdrop-blur-xl border-b border-zinc-200 dark:border-white/5"
             : "py-6 md:py-8 bg-transparent"
           }
         `}
@@ -108,9 +108,9 @@ export const Navbar: React.FC = () => {
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
         >
           <img
-            src="/photovid.svg"
+            src="/logo.png"
             alt="Photovid"
-            className="h-14 md:h-16 w-auto brightness-0 invert"
+            className="h-14 md:h-16 w-auto"
           />
         </div>
 
@@ -123,8 +123,8 @@ export const Navbar: React.FC = () => {
               className={`
                 text-base font-medium transition-all duration-300 relative py-1
                 ${activeId === item.id
-                  ? 'text-white'
-                  : 'text-white/60 hover:text-white'
+                  ? 'text-zinc-900 dark:text-white'
+                  : 'text-zinc-600 hover:text-zinc-900 dark:text-white/60 dark:hover:text-white'
                 }
               `}
             >
@@ -132,7 +132,7 @@ export const Navbar: React.FC = () => {
               {activeId === item.id && (
                 <motion.div
                   layoutId="navUnderline"
-                  className="absolute -bottom-1 left-0 right-0 h-px bg-white/60"
+                  className="absolute -bottom-1 left-0 right-0 h-px bg-zinc-400 dark:bg-white/60"
                   transition={{ type: 'spring', stiffness: 300, damping: 30 }}
                 />
               )}
@@ -145,8 +145,8 @@ export const Navbar: React.FC = () => {
               className={`
                 text-base font-medium transition-all duration-300 py-1
                 ${activeId === SECONDARY_NAV[0].id
-                  ? 'text-white'
-                  : 'text-white/60 hover:text-white'
+                  ? 'text-zinc-900 dark:text-white'
+                  : 'text-zinc-600 hover:text-zinc-900 dark:text-white/60 dark:hover:text-white'
                 }
               `}
             >
@@ -160,7 +160,7 @@ export const Navbar: React.FC = () => {
           {/* Sign In */}
           <button
             onClick={() => navigate(user ? '/studio' : '/login')}
-            className="hidden sm:inline-flex text-base font-medium text-white/70 hover:text-white transition-colors px-5 py-2.5"
+            className="hidden sm:inline-flex text-base font-medium text-zinc-600 hover:text-zinc-900 dark:text-white/70 dark:hover:text-white transition-colors px-5 py-2.5"
           >
             {user ? 'Dashboard' : 'Sign In'}
           </button>
@@ -168,14 +168,14 @@ export const Navbar: React.FC = () => {
           {/* Primary CTA */}
           <button
             onClick={() => navigate(user ? '/studio/real-estate' : '/studio')}
-            className="hidden sm:inline-flex items-center gap-2 px-7 py-2.5 bg-white text-black text-base font-semibold rounded-full hover:bg-white/90 transition-all duration-300"
+            className="hidden sm:inline-flex items-center gap-2 px-7 py-2.5 bg-zinc-900 text-white dark:bg-white dark:text-black text-base font-semibold rounded-full hover:bg-zinc-800 dark:hover:bg-white/90 transition-all duration-300"
           >
             Start For Free
           </button>
 
           {/* Mobile Menu Toggle */}
           <button
-            className="lg:hidden p-2 rounded-full text-white hover:bg-white/10 transition-colors"
+            className="lg:hidden p-2 rounded-full text-zinc-700 dark:text-white hover:bg-zinc-100 dark:hover:bg-white/10 transition-colors"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
           >
@@ -192,7 +192,7 @@ export const Navbar: React.FC = () => {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.2 }}
-            className="fixed top-16 left-0 right-0 bg-black/95 backdrop-blur-xl border-b border-white/10 lg:hidden z-[90]"
+            className="fixed top-16 left-0 right-0 bg-white/95 dark:bg-black/95 backdrop-blur-xl border-b border-zinc-200 dark:border-white/10 lg:hidden z-[90]"
           >
             <div className="flex flex-col px-6 py-6 gap-1">
               {[...PRIMARY_NAV, ...SECONDARY_NAV].map((item) => (
@@ -202,21 +202,21 @@ export const Navbar: React.FC = () => {
                   className={`
                     text-left px-4 py-3 rounded-xl text-base font-medium transition-all
                     ${activeId === item.id
-                      ? 'text-white bg-white/10'
-                      : 'text-white/60 hover:text-white hover:bg-white/5'
+                      ? 'text-zinc-900 bg-zinc-100 dark:text-white dark:bg-white/10'
+                      : 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-50 dark:text-white/60 dark:hover:text-white dark:hover:bg-white/5'
                     }
                   `}
                 >
                   {item.name}
                 </button>
               ))}
-              <div className="h-px bg-white/10 my-3" />
+              <div className="h-px bg-zinc-200 dark:bg-white/10 my-3" />
               <button
                 onClick={() => {
                   navigate(user ? '/studio' : '/login');
                   setIsMobileMenuOpen(false);
                 }}
-                className="w-full py-3 rounded-full bg-white text-black font-semibold text-sm transition-all active:scale-95"
+                className="w-full py-3 rounded-full bg-zinc-900 text-white dark:bg-white dark:text-black font-semibold text-sm transition-all active:scale-95"
               >
                 {user ? 'Launch Studio' : 'Start For Free'}
               </button>

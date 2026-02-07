@@ -132,7 +132,7 @@ const HeadshotRetouchingToolInner: React.FC = () => {
                                 <ArrowLeft size={18} className="text-zinc-400" />
                             </button>
                             <h1 className="text-base font-semibold text-white flex items-center gap-2">
-                                <User size={18} className="text-purple-400" />
+                                <User size={18} className="text-teal-400" />
                                 Headshot Retouching
                             </h1>
                         </div>
@@ -144,7 +144,7 @@ const HeadshotRetouchingToolInner: React.FC = () => {
                             {!imagePreview ? (
                                 <div
                                     onDragEnter={handleDrag} onDragLeave={handleDrag} onDragOver={handleDrag} onDrop={handleDrop}
-                                    className={`relative border border-dashed rounded-xl p-6 text-center transition-all cursor-pointer ${isDragging ? 'border-purple-500 bg-purple-500/10' : 'border-white/10 hover:border-white/20 bg-white/[0.02]'}`}
+                                    className={`relative border border-dashed rounded-xl p-6 text-center transition-all cursor-pointer ${isDragging ? 'border-teal-500 bg-teal-500/10' : 'border-white/10 hover:border-white/20 bg-white/[0.02]'}`}
                                 >
                                     <input type="file" className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" onChange={handleFileChange} accept="image/*" />
                                     <UploadCloud size={28} className="mx-auto mb-2 text-zinc-500" />
@@ -171,14 +171,14 @@ const HeadshotRetouchingToolInner: React.FC = () => {
                                     <button
                                         key={option.id}
                                         onClick={() => option.onChange(!option.checked)}
-                                        className={`w-full p-3 rounded-xl text-left transition-all ${option.checked ? 'bg-purple-500/10 border border-purple-500/30' : 'bg-white/[0.02] border border-white/5 hover:border-white/10'}`}
+                                        className={`w-full p-3 rounded-xl text-left transition-all ${option.checked ? 'bg-teal-500/10 border border-teal-500/30' : 'bg-white/[0.02] border border-white/5 hover:border-white/10'}`}
                                     >
                                         <div className="flex items-center justify-between">
                                             <div>
                                                 <span className="text-sm font-medium text-white">{option.label}</span>
                                                 <p className="text-xs text-zinc-500">{option.desc}</p>
                                             </div>
-                                            <div className={`w-5 h-5 rounded flex items-center justify-center ${option.checked ? 'bg-purple-500' : 'bg-white/10'}`}>
+                                            <div className={`w-5 h-5 rounded flex items-center justify-center ${option.checked ? 'bg-teal-500' : 'bg-white/10'}`}>
                                                 {option.checked && <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>}
                                             </div>
                                         </div>
@@ -190,14 +190,14 @@ const HeadshotRetouchingToolInner: React.FC = () => {
                         <div>
                             <button
                                 onClick={() => setRemoveBackground(!removeBackground)}
-                                className={`w-full p-3 rounded-xl text-left transition-all ${removeBackground ? 'bg-purple-500/10 border border-purple-500/30' : 'bg-white/[0.02] border border-white/5 hover:border-white/10'}`}
+                                className={`w-full p-3 rounded-xl text-left transition-all ${removeBackground ? 'bg-teal-500/10 border border-teal-500/30' : 'bg-white/[0.02] border border-white/5 hover:border-white/10'}`}
                             >
                                 <div className="flex items-center justify-between">
                                     <div>
                                         <span className="text-sm font-medium text-white">Replace Background</span>
                                         <p className="text-xs text-zinc-500">Change to professional background</p>
                                     </div>
-                                    <div className={`w-5 h-5 rounded flex items-center justify-center ${removeBackground ? 'bg-purple-500' : 'bg-white/10'}`}>
+                                    <div className={`w-5 h-5 rounded flex items-center justify-center ${removeBackground ? 'bg-teal-500' : 'bg-white/10'}`}>
                                         {removeBackground && <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>}
                                     </div>
                                 </div>
@@ -209,7 +209,7 @@ const HeadshotRetouchingToolInner: React.FC = () => {
                                         <button
                                             key={bg.id}
                                             onClick={() => setBackgroundType(bg.id as typeof backgroundType)}
-                                            className={`p-2.5 rounded-lg text-xs font-medium transition-all ${backgroundType === bg.id ? 'bg-purple-500/20 text-purple-300 ring-1 ring-purple-500/50' : 'bg-white/5 text-zinc-400 hover:bg-white/10'}`}
+                                            className={`p-2.5 rounded-lg text-xs font-medium transition-all ${backgroundType === bg.id ? 'bg-teal-500/20 text-teal-300 ring-1 ring-teal-500/50' : 'bg-white/5 text-zinc-400 hover:bg-white/10'}`}
                                         >
                                             {bg.name}
                                         </button>
@@ -218,9 +218,9 @@ const HeadshotRetouchingToolInner: React.FC = () => {
                             )}
                         </div>
 
-                        <div className="p-3 rounded-xl bg-purple-500/5 border border-purple-500/10">
-                            <p className="text-xs text-purple-300/80 leading-relaxed">
-                                <strong className="text-purple-300">Perfect for:</strong> Agent headshots, team photos, and professional profiles. Maintains natural appearance.
+                        <div className="p-3 rounded-xl bg-teal-500/5 border border-teal-500/10">
+                            <p className="text-xs text-teal-300/80 leading-relaxed">
+                                <strong className="text-teal-300">Perfect for:</strong> Agent headshots, team photos, and professional profiles. Maintains natural appearance.
                             </p>
                         </div>
                     </div>
@@ -229,7 +229,7 @@ const HeadshotRetouchingToolInner: React.FC = () => {
                         <button
                             onClick={handleGenerate}
                             disabled={!uploadedImage || isGenerating}
-                            className={`w-full py-3 rounded-xl font-semibold text-sm transition-all flex items-center justify-center gap-2 ${uploadedImage && !isGenerating ? 'bg-purple-600 hover:bg-purple-500 text-white' : 'bg-white/5 text-zinc-600 cursor-not-allowed'}`}
+                            className={`w-full py-3 rounded-xl font-semibold text-sm transition-all flex items-center justify-center gap-2 ${uploadedImage && !isGenerating ? 'bg-teal-600 hover:bg-teal-500 text-white' : 'bg-white/5 text-zinc-600 cursor-not-allowed'}`}
                         >
                             {isGenerating ? <><Loader2 size={18} className="animate-spin" />Retouching {generationProgress}%</> : <><Sparkles size={18} />Retouch Headshot</>}
                         </button>
@@ -247,7 +247,7 @@ const HeadshotRetouchingToolInner: React.FC = () => {
                                 ) : (
                                     <button onClick={async () => { if (resultImage) { try { await addAsset(resultImage, 'image', 'Headshot Retouching Result'); setSavedToLibrary(true); } catch {} } }} className="px-3 py-1.5 text-xs font-medium text-zinc-400 hover:text-white bg-white/5 hover:bg-white/10 rounded-lg transition-colors flex items-center gap-1.5"><BookmarkPlus size={14} />Save to Library</button>
                                 )}
-                                <button onClick={() => resultImage && downloadFile(resultImage, `headshot-${Date.now()}.jpg`)} className="px-3 py-1.5 text-xs font-medium text-white bg-purple-600 hover:bg-purple-500 rounded-lg transition-colors flex items-center gap-1.5"><Download size={14} />Download</button>
+                                <button onClick={() => resultImage && downloadFile(resultImage, `headshot-${Date.now()}.jpg`)} className="px-3 py-1.5 text-xs font-medium text-white bg-teal-600 hover:bg-teal-500 rounded-lg transition-colors flex items-center gap-1.5"><Download size={14} />Download</button>
                             </div>
                         )}
                     </div>
@@ -260,7 +260,7 @@ const HeadshotRetouchingToolInner: React.FC = () => {
                                 </div>
                                 <p className="text-red-400 text-sm font-medium mb-2">Retouching Failed</p>
                                 <p className="text-zinc-500 text-xs max-w-xs">{error}</p>
-                                <button onClick={() => setError(null)} className="mt-4 px-4 py-2 text-xs font-medium text-white bg-purple-600 hover:bg-purple-500 rounded-lg transition-colors">Try Again</button>
+                                <button onClick={() => setError(null)} className="mt-4 px-4 py-2 text-xs font-medium text-white bg-teal-600 hover:bg-teal-500 rounded-lg transition-colors">Try Again</button>
                             </div>
                         ) : !imagePreview ? (
                             <div className="text-center">
@@ -270,7 +270,7 @@ const HeadshotRetouchingToolInner: React.FC = () => {
                         ) : isGenerating ? (
                             <div className="text-center">
                                 <div className="relative w-24 h-24 mx-auto mb-6">
-                                    <svg className="w-full h-full -rotate-90"><circle cx="48" cy="48" r="44" stroke="currentColor" strokeWidth="4" fill="none" className="text-white/10" /><circle cx="48" cy="48" r="44" stroke="currentColor" strokeWidth="4" fill="none" strokeDasharray={276.46} strokeDashoffset={276.46 - (276.46 * generationProgress) / 100} className="text-purple-500 transition-all duration-300" strokeLinecap="round" /></svg>
+                                    <svg className="w-full h-full -rotate-90"><circle cx="48" cy="48" r="44" stroke="currentColor" strokeWidth="4" fill="none" className="text-white/10" /><circle cx="48" cy="48" r="44" stroke="currentColor" strokeWidth="4" fill="none" strokeDasharray={276.46} strokeDashoffset={276.46 - (276.46 * generationProgress) / 100} className="text-teal-500 transition-all duration-300" strokeLinecap="round" /></svg>
                                     <span className="absolute inset-0 flex items-center justify-center text-xl font-semibold text-white">{generationProgress}%</span>
                                 </div>
                                 <p className="text-zinc-400 font-medium">Enhancing portrait...</p>
@@ -278,7 +278,7 @@ const HeadshotRetouchingToolInner: React.FC = () => {
                         ) : (
                             <div className="relative rounded-2xl overflow-hidden shadow-2xl">
                                 <img src={resultImage || imagePreview} alt="Preview" className="max-w-full max-h-[calc(100vh-180px)] object-contain" />
-                                {resultImage && <div className="absolute top-4 right-4 px-3 py-1.5 bg-purple-500/80 backdrop-blur rounded-lg text-xs text-white font-medium flex items-center gap-1.5"><User size={12} />Retouched</div>}
+                                {resultImage && <div className="absolute top-4 right-4 px-3 py-1.5 bg-teal-500/80 backdrop-blur rounded-lg text-xs text-white font-medium flex items-center gap-1.5"><User size={12} />Retouched</div>}
                                 {!resultImage && <div className="absolute inset-0 flex items-center justify-center bg-black/40"><div className="text-center text-white"><User size={28} className="mx-auto mb-2 opacity-80" /><p className="text-sm font-medium">Ready to retouch</p></div></div>}
                             </div>
                         )}

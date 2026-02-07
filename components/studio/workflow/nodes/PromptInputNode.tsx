@@ -14,7 +14,7 @@ export const PromptInputNode = memo(({ id, data, selected }: NodeProps) => {
       className={cn(
         'rounded-xl border-2 bg-white dark:bg-zinc-900 transition-all duration-200 min-w-[320px]',
         'border-emerald-300 dark:border-emerald-700',
-        selected && 'ring-4 ring-indigo-500/30'
+        selected && 'ring-4 ring-teal-500/30'
       )}
     >
       {/* Header */}

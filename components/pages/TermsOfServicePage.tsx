@@ -15,7 +15,7 @@ export const TermsOfServicePage: React.FC = () => {
         </Link>
 
         <div className="flex items-center gap-3 mb-8">
-          <FileText className="text-violet-500" size={32} />
+          <FileText className="text-emerald-500" size={32} />
           <h1 className="text-3xl font-bold">Terms of Service</h1>
         </div>
 
@@ -147,7 +147,7 @@ export const TermsOfServicePage: React.FC = () => {
             <p className="text-zinc-300 leading-relaxed">
               For questions about these Terms of Service, please contact us at:
             </p>
-            <p className="text-violet-400 mt-2">legal@photovid.studio</p>
+            <p className="text-emerald-400 mt-2">legal@photovid.studio</p>
           </section>
         </div>
       </div>

@@ -341,7 +341,7 @@ export const VideoStudio: React.FC = () => {
             </button>
             <div>
               <h1 className="text-base font-semibold text-white flex items-center gap-2">
-                <Video size={18} className="text-indigo-400" />
+                <Video size={18} className="text-teal-400" />
                 AI Video Studio
               </h1>
             </div>
@@ -360,7 +360,7 @@ export const VideoStudio: React.FC = () => {
               className={cn(
                 'flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-xs font-semibold transition-all',
                 mode === 'image-to-video'
-                  ? 'bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-lg shadow-indigo-500/20'
+                  ? 'bg-gradient-to-r from-teal-600 to-emerald-600 text-white shadow-lg shadow-teal-500/20'
                   : 'text-zinc-400 hover:text-zinc-300'
               )}
             >
@@ -376,7 +376,7 @@ export const VideoStudio: React.FC = () => {
               className={cn(
                 'flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-xs font-semibold transition-all',
                 mode === 'text-to-video'
-                  ? 'bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-lg shadow-indigo-500/20'
+                  ? 'bg-gradient-to-r from-teal-600 to-emerald-600 text-white shadow-lg shadow-teal-500/20'
                   : 'text-zinc-400 hover:text-zinc-300'
               )}
             >
@@ -405,7 +405,7 @@ export const VideoStudio: React.FC = () => {
                     className={cn(
                       'relative border border-dashed rounded-xl p-6 text-center transition-all cursor-pointer',
                       isDragging
-                        ? 'border-indigo-500 bg-indigo-500/10'
+                        ? 'border-teal-500 bg-teal-500/10'
                         : 'border-white/10 hover:border-white/20 bg-white/[0.02]'
                     )}
                   >
@@ -449,7 +449,7 @@ export const VideoStudio: React.FC = () => {
                   onChange={(e) => setMotionPrompt(e.target.value)}
                   placeholder="Describe the motion... e.g. Smooth camera pan, cinematic zoom"
                   rows={3}
-                  className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-3 py-2.5 text-sm text-zinc-200 placeholder:text-zinc-600 focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/20 resize-none"
+                  className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-3 py-2.5 text-sm text-zinc-200 placeholder:text-zinc-600 focus:outline-none focus:border-teal-500/50 focus:ring-1 focus:ring-teal-500/20 resize-none"
                 />
               </div>
             </>
@@ -465,15 +465,15 @@ export const VideoStudio: React.FC = () => {
                   onChange={(e) => setVideoPrompt(e.target.value)}
                   placeholder="Describe your video scene in detail... e.g. A golden sunset over the ocean with gentle waves, cinematic 4K"
                   rows={5}
-                  className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-3 py-2.5 text-sm text-zinc-200 placeholder:text-zinc-600 focus:outline-none focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/20 resize-none"
+                  className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-3 py-2.5 text-sm text-zinc-200 placeholder:text-zinc-600 focus:outline-none focus:border-teal-500/50 focus:ring-1 focus:ring-teal-500/20 resize-none"
                 />
               </div>
 
               {/* Pipeline Info */}
-              <div className="flex items-start gap-2.5 p-3 rounded-xl bg-indigo-500/5 border border-indigo-500/10">
-                <Info size={16} className="text-indigo-400 mt-0.5 shrink-0" />
+              <div className="flex items-start gap-2.5 p-3 rounded-xl bg-teal-500/5 border border-teal-500/10">
+                <Info size={16} className="text-teal-400 mt-0.5 shrink-0" />
                 <div>
-                  <p className="text-xs font-medium text-indigo-300">Two-step pipeline</p>
+                  <p className="text-xs font-medium text-teal-300">Two-step pipeline</p>
                   <p className="text-xs text-zinc-500 mt-0.5">
                     Your prompt generates an image first, then animates it into video.
                   </p>
@@ -495,7 +495,7 @@ export const VideoStudio: React.FC = () => {
                   className={cn(
                     'flex-1 py-2 rounded-lg text-xs font-semibold transition-all',
                     duration === d
-                      ? 'bg-indigo-600 text-white'
+                      ? 'bg-teal-600 text-white'
                       : 'bg-white/5 text-zinc-400 hover:bg-white/10 hover:text-zinc-300'
                   )}
                 >
@@ -520,7 +520,7 @@ export const VideoStudio: React.FC = () => {
                     className={cn(
                       'flex flex-col items-center gap-1.5 py-3 rounded-xl text-xs font-medium transition-all border',
                       aspectRatio === opt.value
-                        ? 'bg-indigo-600/15 border-indigo-500/40 text-indigo-300'
+                        ? 'bg-teal-600/15 border-teal-500/40 text-teal-300'
                         : 'bg-white/[0.02] border-white/5 text-zinc-500 hover:bg-white/5 hover:text-zinc-300'
                     )}
                   >
@@ -541,7 +541,7 @@ export const VideoStudio: React.FC = () => {
             <span
               className={cn(
                 'flex items-center gap-1',
-                hasCredits ? 'text-violet-400' : 'text-red-400'
+                hasCredits ? 'text-emerald-400' : 'text-red-400'
               )}
             >
               <Zap size={12} className="fill-current" />
@@ -569,7 +569,7 @@ export const VideoStudio: React.FC = () => {
             className={cn(
               'w-full py-3 rounded-xl font-semibold text-sm transition-all flex items-center justify-center gap-2',
               canGenerate && !isGenerating
-                ? 'bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white shadow-lg shadow-indigo-500/20'
+                ? 'bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-500 hover:to-emerald-500 text-white shadow-lg shadow-teal-500/20'
                 : 'bg-white/5 text-zinc-600 cursor-not-allowed'
             )}
           >
@@ -604,7 +604,7 @@ export const VideoStudio: React.FC = () => {
               </button>
               <button
                 onClick={handleDownload}
-                className="px-3 py-1.5 text-xs font-medium text-white bg-indigo-600 hover:bg-indigo-500 rounded-lg transition-colors flex items-center gap-1.5"
+                className="px-3 py-1.5 text-xs font-medium text-white bg-teal-600 hover:bg-teal-500 rounded-lg transition-colors flex items-center gap-1.5"
               >
                 <Download size={14} />
                 Download
@@ -631,7 +631,7 @@ export const VideoStudio: React.FC = () => {
                 <p className="text-zinc-500 text-xs max-w-xs mx-auto">{error}</p>
                 <button
                   onClick={() => setError(null)}
-                  className="mt-4 px-4 py-2 text-xs font-medium text-white bg-indigo-600 hover:bg-indigo-500 rounded-lg transition-colors"
+                  className="mt-4 px-4 py-2 text-xs font-medium text-white bg-teal-600 hover:bg-teal-500 rounded-lg transition-colors"
                 >
                   Try Again
                 </button>
@@ -681,7 +681,7 @@ export const VideoStudio: React.FC = () => {
                       fill="none"
                       strokeDasharray={276.46}
                       strokeDashoffset={276.46 - (276.46 * generationProgress) / 100}
-                      className="text-indigo-500 transition-all duration-300"
+                      className="text-teal-500 transition-all duration-300"
                       strokeLinecap="round"
                     />
                   </svg>
@@ -701,7 +701,7 @@ export const VideoStudio: React.FC = () => {
                         generationProgress > 0
                           ? generationProgress >= 45
                             ? 'bg-green-500/10 text-green-400'
-                            : 'bg-indigo-500/10 text-indigo-400'
+                            : 'bg-teal-500/10 text-teal-400'
                           : 'bg-white/5 text-zinc-600'
                       )}
                     >
@@ -716,7 +716,7 @@ export const VideoStudio: React.FC = () => {
                         generationProgress >= 50
                           ? generationProgress >= 100
                             ? 'bg-green-500/10 text-green-400'
-                            : 'bg-indigo-500/10 text-indigo-400'
+                            : 'bg-teal-500/10 text-teal-400'
                           : 'bg-white/5 text-zinc-600'
                       )}
                     >

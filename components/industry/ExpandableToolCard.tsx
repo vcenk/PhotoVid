@@ -104,10 +104,10 @@ export const ExpandableToolCard: React.FC<ExpandableToolCardProps> = ({
     // Accent color classes
     const accentClasses = {
         indigo: {
-            hover: 'hover:border-indigo-200 dark:hover:border-indigo-900/50',
-            text: 'text-indigo-600 dark:text-indigo-400',
-            bg: 'bg-indigo-600',
-            ring: 'ring-indigo-500',
+            hover: 'hover:border-teal-200 dark:hover:border-teal-900/50',
+            text: 'text-teal-600 dark:text-teal-400',
+            bg: 'bg-teal-600',
+            ring: 'ring-teal-500',
         },
         red: {
             hover: 'hover:border-red-200 dark:hover:border-red-900/50',
@@ -116,10 +116,10 @@ export const ExpandableToolCard: React.FC<ExpandableToolCardProps> = ({
             ring: 'ring-red-500',
         },
     }[accentColor] || {
-        hover: 'hover:border-violet-200 dark:hover:border-violet-900/50',
-        text: 'text-violet-600 dark:text-violet-400',
-        bg: 'bg-violet-600',
-        ring: 'ring-violet-500',
+        hover: 'hover:border-emerald-200 dark:hover:border-emerald-900/50',
+        text: 'text-emerald-600 dark:text-emerald-400',
+        bg: 'bg-emerald-600',
+        ring: 'ring-emerald-500',
     };
 
     const hasBeforeAfter = tool.beforeImage && tool.afterImage;
@@ -185,7 +185,7 @@ export const ExpandableToolCard: React.FC<ExpandableToolCardProps> = ({
                                     {/* Tags on image */}
                                     <div className="absolute bottom-3 left-3 flex gap-2">
                                         {tool.isPremium && (
-                                            <span className="px-2 py-1 bg-gradient-to-r from-amber-400 to-yellow-500 text-black text-[10px] font-bold uppercase rounded-full flex items-center gap-1">
+                                            <span className="px-2 py-1 bg-gradient-to-r from-amber-400 to-yellow-500 text-amber-900 text-[10px] font-bold uppercase rounded-full flex items-center gap-1">
                                                 <Crown size={10} />
                                                 Pro
                                             </span>
@@ -252,7 +252,7 @@ export const ExpandableToolCard: React.FC<ExpandableToolCardProps> = ({
                             {/* Tags */}
                             <div className="absolute top-3 right-3 flex gap-2 pointer-events-none">
                                 {tool.isPremium && (
-                                    <span className="px-2 py-1 bg-gradient-to-r from-amber-400 to-yellow-500 text-black text-[10px] font-bold uppercase rounded-full flex items-center gap-1">
+                                    <span className="px-2 py-1 bg-gradient-to-r from-amber-400 to-yellow-500 text-amber-900 text-[10px] font-bold uppercase rounded-full flex items-center gap-1">
                                         <Crown size={10} />
                                         Pro
                                     </span>

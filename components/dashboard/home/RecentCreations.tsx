@@ -72,7 +72,7 @@ export function RecentCreations() {
             onChange={(e) => setSelectedTeam(e.target.value)}
             className={cn(
               'appearance-none px-4 py-2 pr-10 bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700',
-              'rounded-xl text-sm font-medium cursor-pointer focus:outline-none focus:ring-2 focus:ring-violet-600 transition-all'
+              'rounded-xl text-sm font-medium cursor-pointer focus:outline-none focus:ring-2 focus:ring-emerald-600 transition-all'
             )}
           >
             <option value="personal">Personal</option>
@@ -116,9 +116,9 @@ export function RecentCreations() {
           <button
             onClick={() => navigate('/dashboard/studio')}
             className={cn(
-              'px-6 py-3 bg-gradient-to-r from-violet-600 to-indigo-600 text-white',
-              'rounded-xl text-sm font-bold hover:from-violet-700 hover:to-indigo-700',
-              'transition-all shadow-lg shadow-violet-500/30 hover:shadow-violet-500/40'
+              'px-6 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 text-white',
+              'rounded-xl text-sm font-bold hover:from-emerald-700 hover:to-teal-700',
+              'transition-all shadow-lg shadow-emerald-500/30 hover:shadow-emerald-500/40'
             )}
           >
             Get Started
@@ -134,7 +134,7 @@ export function RecentCreations() {
               key={asset.id}
               className={cn(
                 'bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800',
-                'rounded-2xl overflow-hidden hover:border-violet-300 dark:hover:border-violet-700 hover:shadow-lg transition-all group'
+                'rounded-2xl overflow-hidden hover:border-emerald-300 dark:hover:border-emerald-700 hover:shadow-lg transition-all group'
               )}
             >
               {/* Thumbnail */}
@@ -159,7 +159,7 @@ export function RecentCreations() {
                       'px-2.5 py-1 rounded-full text-xs font-medium uppercase backdrop-blur-sm',
                       asset.type === 'image'
                         ? 'bg-blue-100/90 text-blue-700 dark:bg-blue-950/90 dark:text-blue-400'
-                        : 'bg-purple-100/90 text-purple-700 dark:bg-purple-950/90 dark:text-purple-400'
+                        : 'bg-teal-100/90 text-teal-700 dark:bg-teal-950/90 dark:text-teal-400'
                     )}
                   >
                     {asset.type}
@@ -180,7 +180,7 @@ export function RecentCreations() {
                     {getRelativeTime(asset.createdAt)}
                   </span>
                   <span className="text-zinc-300 dark:text-zinc-700">•</span>
-                  <span className="px-2 py-0.5 bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-400 rounded text-xs font-medium">
+                  <span className="px-2 py-0.5 bg-teal-50 dark:bg-teal-950/50 text-teal-700 dark:text-teal-400 rounded text-xs font-medium">
                     {getIndustryLabel(asset.industry)}
                   </span>
                 </div>
@@ -274,12 +274,12 @@ export function RecentCreations() {
                       'px-2.5 py-1 rounded-full text-xs font-medium uppercase',
                       previewAsset.type === 'image'
                         ? 'bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-400'
-                        : 'bg-purple-100 text-purple-700 dark:bg-purple-950 dark:text-purple-400'
+                        : 'bg-teal-100 text-teal-700 dark:bg-teal-950 dark:text-teal-400'
                     )}
                   >
                     {previewAsset.type}
                   </span>
-                  <span className="px-2.5 py-1 bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-400 rounded-full text-xs font-medium">
+                  <span className="px-2.5 py-1 bg-teal-50 dark:bg-teal-950/50 text-teal-700 dark:text-teal-400 rounded-full text-xs font-medium">
                     {getIndustryLabel(previewAsset.industry)}
                   </span>
                 </div>
@@ -297,8 +297,8 @@ export function RecentCreations() {
                   <button
                     onClick={() => handleDownload(previewAsset.id)}
                     className={cn(
-                      'flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-violet-600 to-indigo-600',
-                      'text-white hover:from-violet-700 hover:to-indigo-700 rounded-lg text-sm font-bold transition-all'
+                      'flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-emerald-600 to-teal-600',
+                      'text-white hover:from-emerald-700 hover:to-teal-700 rounded-lg text-sm font-bold transition-all'
                     )}
                   >
                     <Download size={14} />

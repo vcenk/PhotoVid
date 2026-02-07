@@ -75,8 +75,8 @@ function LanguageSelector({ selected, onSelect }: LanguageSelectorProps) {
             className={`
               flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all
               ${selected === lang.code
-                ? 'bg-violet-600 text-white'
-                : 'bg-white/5 text-zinc-400 hover:bg-white/10 hover:text-white'
+                ? 'bg-emerald-600 text-white'
+                : 'bg-zinc-100 dark:bg-white/5 text-zinc-500 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-white/10 hover:text-zinc-900 dark:hover:text-white'
               }
             `}
           >
@@ -107,11 +107,11 @@ function FilterBar({ gender, onGenderChange, style, onStyleChange, availableStyl
   return (
     <div className="flex items-center gap-2 flex-wrap">
       {/* Gender Filter */}
-      <div className="flex items-center bg-white/5 rounded-lg p-0.5">
+      <div className="flex items-center bg-zinc-100 dark:bg-white/5 rounded-lg p-0.5">
         <button
           onClick={() => onGenderChange(null)}
           className={`px-2.5 py-1 text-xs rounded-md transition-all ${
-            gender === null ? 'bg-violet-600 text-white' : 'text-zinc-400 hover:text-white'
+            gender === null ? 'bg-emerald-600 text-white' : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
           }`}
         >
           All
@@ -119,7 +119,7 @@ function FilterBar({ gender, onGenderChange, style, onStyleChange, availableStyl
         <button
           onClick={() => onGenderChange('female')}
           className={`px-2.5 py-1 text-xs rounded-md transition-all ${
-            gender === 'female' ? 'bg-violet-600 text-white' : 'text-zinc-400 hover:text-white'
+            gender === 'female' ? 'bg-emerald-600 text-white' : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
           }`}
         >
           Female
@@ -127,7 +127,7 @@ function FilterBar({ gender, onGenderChange, style, onStyleChange, availableStyl
         <button
           onClick={() => onGenderChange('male')}
           className={`px-2.5 py-1 text-xs rounded-md transition-all ${
-            gender === 'male' ? 'bg-violet-600 text-white' : 'text-zinc-400 hover:text-white'
+            gender === 'male' ? 'bg-emerald-600 text-white' : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
           }`}
         >
           Male
@@ -139,7 +139,7 @@ function FilterBar({ gender, onGenderChange, style, onStyleChange, availableStyl
         <button
           onClick={() => setShowStyles(!showStyles)}
           className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs transition-all ${
-            style ? 'bg-violet-600 text-white' : 'bg-white/5 text-zinc-400 hover:text-white'
+            style ? 'bg-emerald-600 text-white' : 'bg-white/5 text-zinc-400 hover:text-white'
           }`}
         >
           <Filter size={12} />
@@ -153,11 +153,11 @@ function FilterBar({ gender, onGenderChange, style, onStyleChange, availableStyl
               initial={{ opacity: 0, y: -5 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -5 }}
-              className="absolute top-full left-0 mt-1 w-40 max-h-48 overflow-y-auto bg-zinc-900 border border-white/10 rounded-lg shadow-xl z-10"
+              className="absolute top-full left-0 mt-1 w-40 max-h-48 overflow-y-auto bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 rounded-lg shadow-xl z-10"
             >
               <button
                 onClick={() => { onStyleChange(null); setShowStyles(false); }}
-                className="w-full px-3 py-2 text-left text-xs text-zinc-400 hover:bg-white/5 hover:text-white"
+                className="w-full px-3 py-2 text-left text-xs text-zinc-400 hover:bg-zinc-100 dark:hover:bg-white/5 hover:text-white"
               >
                 All Styles
               </button>
@@ -165,8 +165,8 @@ function FilterBar({ gender, onGenderChange, style, onStyleChange, availableStyl
                 <button
                   key={s}
                   onClick={() => { onStyleChange(s); setShowStyles(false); }}
-                  className={`w-full px-3 py-2 text-left text-xs hover:bg-white/5 ${
-                    style === s ? 'text-violet-400' : 'text-zinc-400 hover:text-white'
+                  className={`w-full px-3 py-2 text-left text-xs hover:bg-zinc-100 dark:hover:bg-white/5 ${
+                    style === s ? 'text-emerald-400' : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'
                   }`}
                 >
                   {s}
@@ -208,21 +208,21 @@ function VoiceCard({ voice, isSelected, isPlaying, isLoading, onSelect, onPrevie
       className={`
         relative p-3 rounded-xl border text-left transition-all w-full cursor-pointer
         ${isSelected
-          ? 'border-violet-500 bg-violet-500/10'
-          : 'border-white/5 hover:border-white/15 bg-white/5 hover:bg-white/[0.07]'
+          ? 'border-emerald-500 bg-emerald-500/10'
+          : 'border-zinc-200 dark:border-white/5 hover:border-zinc-300 dark:hover:border-white/15 bg-zinc-50 dark:bg-white/5 hover:bg-zinc-100 dark:hover:bg-white/[0.07]'
         }
       `}
     >
       {/* Header */}
       <div className="flex items-start justify-between mb-1.5">
         <div>
-          <p className="text-sm font-medium text-white">{voice.name}</p>
+          <p className="text-sm font-medium text-zinc-900 dark:text-white">{voice.name}</p>
           <p className="text-[10px] text-zinc-500">
             {voice.gender === 'female' ? '♀' : '♂'} {voice.accent}
           </p>
         </div>
         {isSelected && (
-          <div className="w-5 h-5 bg-violet-600 rounded-full flex items-center justify-center flex-shrink-0">
+          <div className="w-5 h-5 bg-emerald-600 rounded-full flex items-center justify-center flex-shrink-0">
             <Check size={12} className="text-white" />
           </div>
         )}
@@ -250,7 +250,7 @@ function VoiceCard({ voice, isSelected, isPlaying, isLoading, onSelect, onPrevie
         className={`
           w-full flex items-center justify-center gap-1.5 py-1.5 rounded-lg text-xs font-medium transition-colors
           ${isPlaying
-            ? 'bg-violet-600 text-white'
+            ? 'bg-emerald-600 text-white'
             : isLoading
             ? 'bg-white/5 text-zinc-500 cursor-wait'
             : 'bg-white/10 text-zinc-400 hover:text-white hover:bg-white/15'
@@ -427,8 +427,8 @@ function VoiceSelector() {
     <div className="space-y-4">
       {/* Header */}
       <div className="flex items-center gap-2">
-        <Mic2 size={16} className="text-violet-400" />
-        <span className="text-sm font-medium text-white">Select Voice</span>
+        <Mic2 size={16} className="text-emerald-400" />
+        <span className="text-sm font-medium text-zinc-900 dark:text-white">Select Voice</span>
         <span className="text-xs text-zinc-500">({filteredVoices.length} voices)</span>
       </div>
 
@@ -494,11 +494,11 @@ function SegmentEditor({ segment, index, imageLabel, onUpdate }: SegmentEditorPr
   };
 
   return (
-    <div className="p-3 bg-white/5 rounded-xl border border-white/5 group">
+    <div className="p-3 bg-zinc-50 dark:bg-white/5 rounded-xl border border-zinc-200 dark:border-white/5 group">
       {/* Header */}
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2">
-          <span className="w-6 h-6 rounded-lg bg-violet-500/20 text-violet-400 text-xs font-bold flex items-center justify-center">
+          <span className="w-6 h-6 rounded-lg bg-emerald-500/20 text-emerald-400 text-xs font-bold flex items-center justify-center">
             {index + 1}
           </span>
           <span className="text-xs font-medium text-zinc-400">
@@ -516,7 +516,7 @@ function SegmentEditor({ segment, index, imageLabel, onUpdate }: SegmentEditorPr
           <textarea
             value={text}
             onChange={(e) => setText(e.target.value)}
-            className="w-full p-2 bg-white/5 border border-violet-500/30 rounded-lg text-sm text-white resize-none focus:outline-none focus:border-violet-500"
+            className="w-full p-2 bg-zinc-50 dark:bg-white/5 border border-emerald-500/30 rounded-lg text-sm text-zinc-900 dark:text-white resize-none focus:outline-none focus:border-emerald-500"
             rows={3}
             autoFocus
           />
@@ -529,7 +529,7 @@ function SegmentEditor({ segment, index, imageLabel, onUpdate }: SegmentEditorPr
             </button>
             <button
               onClick={handleSave}
-              className="px-2.5 py-1 text-xs bg-violet-600 hover:bg-violet-500 text-white rounded-lg transition-colors"
+              className="px-2.5 py-1 text-xs bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg transition-colors"
             >
               Save
             </button>
@@ -574,9 +574,9 @@ function ScriptSection() {
       <div className="flex items-center justify-between">
         <button
           onClick={() => setIsExpanded(!isExpanded)}
-          className="flex items-center gap-2 text-sm font-medium text-white"
+          className="flex items-center gap-2 text-sm font-medium text-zinc-900 dark:text-white"
         >
-          <Sparkles size={16} className="text-violet-400" />
+          <Sparkles size={16} className="text-emerald-400" />
           AI Script
           {isExpanded ? (
             <ChevronUp size={14} className="text-zinc-500" />
@@ -640,12 +640,12 @@ function SynthesizeButton() {
   return (
     <div className="space-y-2">
       {selectedVoice && (
-        <div className="flex items-center gap-2 p-2 bg-white/5 rounded-lg">
-          <div className="w-8 h-8 rounded-lg bg-violet-500/20 flex items-center justify-center">
-            <Mic2 size={14} className="text-violet-400" />
+        <div className="flex items-center gap-2 p-2 bg-zinc-50 dark:bg-white/5 rounded-lg">
+          <div className="w-8 h-8 rounded-lg bg-emerald-500/20 flex items-center justify-center">
+            <Mic2 size={14} className="text-emerald-400" />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-xs font-medium text-white truncate">{selectedVoice.name}</p>
+            <p className="text-xs font-medium text-zinc-900 dark:text-white truncate">{selectedVoice.name}</p>
             <p className="text-[10px] text-zinc-500">{selectedVoice.languageName} • {selectedVoice.accent}</p>
           </div>
         </div>
@@ -658,7 +658,7 @@ function SynthesizeButton() {
           w-full flex items-center justify-center gap-2 py-3.5 rounded-xl font-semibold transition-all duration-300
           ${canSynthesizeVoice()
             ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white hover:from-emerald-500 hover:to-teal-500 shadow-lg shadow-emerald-900/25'
-            : 'bg-zinc-800 text-zinc-500 cursor-not-allowed'
+            : 'bg-zinc-200 dark:bg-zinc-800 text-zinc-400 dark:text-zinc-500 cursor-not-allowed'
           }
         `}
       >
@@ -728,10 +728,10 @@ export function VoicePanel({ onClose }: VoicePanelProps) {
   return (
     <div className="h-full flex flex-col w-[340px]">
       {/* Header */}
-      <div className="flex-shrink-0 flex items-center justify-between p-4 border-b border-white/5">
+      <div className="flex-shrink-0 flex items-center justify-between p-4 border-b border-zinc-200 dark:border-white/5">
         <div className="flex items-center gap-2">
-          <Mic2 size={18} className="text-violet-400" />
-          <span className="font-semibold text-white">Voice & Script</span>
+          <Mic2 size={18} className="text-emerald-400" />
+          <span className="font-semibold text-zinc-900 dark:text-white">Voice & Script</span>
         </div>
         <button
           onClick={onClose}
@@ -747,7 +747,7 @@ export function VoicePanel({ onClose }: VoicePanelProps) {
         <ScriptSection />
 
         {/* Divider */}
-        {project.script && <div className="h-px bg-white/5" />}
+        {project.script && <div className="h-px bg-zinc-200 dark:bg-white/5" />}
 
         {/* Voice Selector */}
         {project.script && <VoiceSelector />}
@@ -758,7 +758,7 @@ export function VoicePanel({ onClose }: VoicePanelProps) {
 
       {/* Footer - Synthesize Button */}
       {project.script && (
-        <div className="flex-shrink-0 p-4 border-t border-white/5 bg-zinc-900/50">
+        <div className="flex-shrink-0 p-4 border-t border-zinc-200 dark:border-white/5 bg-zinc-50 dark:bg-zinc-900/50">
           <SynthesizeButton />
         </div>
       )}

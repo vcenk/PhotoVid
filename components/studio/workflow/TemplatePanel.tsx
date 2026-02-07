@@ -42,8 +42,8 @@ export const TemplatePanel: React.FC<TemplatePanelProps> = ({
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-zinc-200 dark:border-zinc-800">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-indigo-100 dark:bg-indigo-950/50 flex items-center justify-center">
-              <Sparkles className="text-indigo-600 dark:text-indigo-400" size={20} />
+            <div className="w-10 h-10 rounded-xl bg-teal-100 dark:bg-teal-950/50 flex items-center justify-center">
+              <Sparkles className="text-teal-600 dark:text-teal-400" size={20} />
             </div>
             <div>
               <h2 className="text-2xl font-bold text-zinc-900 dark:text-white">
@@ -70,7 +70,7 @@ export const TemplatePanel: React.FC<TemplatePanelProps> = ({
               onClick={() => setSelectedCategory(category.id)}
               className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-all ${
                 selectedCategory === category.id
-                  ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/20'
+                  ? 'bg-teal-600 text-white shadow-lg shadow-teal-500/20'
                   : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700'
               }`}
             >
@@ -87,12 +87,12 @@ export const TemplatePanel: React.FC<TemplatePanelProps> = ({
               return (
                 <div
                   key={template.id}
-                  className="group relative bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 hover:border-indigo-400 dark:hover:border-indigo-600 transition-all cursor-pointer hover:shadow-lg hover:shadow-indigo-500/10"
+                  className="group relative bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 hover:border-teal-400 dark:hover:border-teal-600 transition-all cursor-pointer hover:shadow-lg hover:shadow-teal-500/10"
                   onClick={() => handleLoadTemplate(template)}
                 >
                   {/* Icon */}
                   <div className="w-12 h-12 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-                    <Icon className="text-indigo-600 dark:text-indigo-400" size={24} />
+                    <Icon className="text-teal-600 dark:text-teal-400" size={24} />
                   </div>
 
                   {/* Content */}
@@ -111,7 +111,7 @@ export const TemplatePanel: React.FC<TemplatePanelProps> = ({
                   </div>
 
                   {/* Hover Overlay */}
-                  <div className="absolute inset-0 bg-indigo-600/5 dark:bg-indigo-400/5 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+                  <div className="absolute inset-0 bg-teal-600/5 dark:bg-teal-400/5 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
                 </div>
               );
             })}

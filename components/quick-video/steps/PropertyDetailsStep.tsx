@@ -35,7 +35,7 @@ export function PropertyDetailsStep() {
   const inputClasses = (name: string) => `
     w-full px-4 py-3.5 bg-white/5 border rounded-xl text-white placeholder-zinc-500 transition-all duration-300
     ${activeField === name 
-      ? 'border-violet-500/50 ring-4 ring-violet-500/10 bg-white/10' 
+      ? 'border-emerald-500/50 ring-4 ring-emerald-500/10 bg-white/10' 
       : 'border-white/5 hover:border-white/10 hover:bg-white/10'
     }
     focus:outline-none
@@ -53,7 +53,7 @@ export function PropertyDetailsStep() {
       {/* Address - Required */}
       <div className="space-y-4">
         <label className="flex items-center gap-2 text-sm font-medium text-zinc-300">
-          <MapPin size={16} className="text-violet-400" />
+          <MapPin size={16} className="text-emerald-400" />
           Property Address <span className="text-red-400">*</span>
         </label>
         <div className="space-y-4">
@@ -189,7 +189,7 @@ export function PropertyDetailsStep() {
         </div>
         <div className="space-y-2">
           <label className="flex items-center gap-2 text-sm font-medium text-zinc-300">
-            <Calendar size={16} className="text-purple-400" />
+            <Calendar size={16} className="text-teal-400" />
             Year Built
           </label>
           <input
@@ -210,7 +210,7 @@ export function PropertyDetailsStep() {
       {/* Features */}
       <div className="space-y-4 pt-4 border-t border-white/5">
         <label className="flex items-center gap-2 text-sm font-medium text-zinc-300">
-          <Sparkles size={16} className="text-violet-400" />
+          <Sparkles size={16} className="text-emerald-400" />
           Property Features
         </label>
 
@@ -224,12 +224,12 @@ export function PropertyDetailsStep() {
                     initial={{ scale: 0.8, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     exit={{ scale: 0.8, opacity: 0 }}
-                    className="inline-flex items-center gap-2 px-3 py-1.5 bg-violet-600/20 border border-violet-500/20 text-violet-200 rounded-lg text-sm group"
+                    className="inline-flex items-center gap-2 px-3 py-1.5 bg-emerald-600/20 border border-emerald-500/20 text-emerald-200 rounded-lg text-sm group"
                 >
                     {feature}
                     <button
                     onClick={() => removeFeature(feature)}
-                    className="hover:text-white transition-colors p-0.5 rounded-full hover:bg-violet-600/50"
+                    className="hover:text-white transition-colors p-0.5 rounded-full hover:bg-emerald-600/50"
                     >
                     <X size={12} />
                     </button>
@@ -254,7 +254,7 @@ export function PropertyDetailsStep() {
             <button
                 onClick={handleAddCustomFeature}
                 disabled={!customFeature.trim()}
-                className="px-4 py-2 bg-violet-600 hover:bg-violet-500 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl transition-all duration-300 shadow-lg shadow-violet-900/20 hover:shadow-violet-600/30 text-white"
+                className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl transition-all duration-300 shadow-lg shadow-emerald-900/20 hover:shadow-emerald-600/30 text-white"
             >
                 <Plus size={20} />
             </button>

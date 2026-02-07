@@ -19,7 +19,7 @@ export const WorkflowPage: React.FC = () => {
   };
 
   return (
-    <div className="h-screen flex bg-white dark:bg-[#09090b]">
+    <div className="h-screen flex bg-white dark:bg-[#09090b] font-[Space_Grotesk]">
       {/* Navigation Rail */}
       <NavigationRail isMobileOpen={mobileMenuOpen} onMobileClose={() => setMobileMenuOpen(false)} />
 

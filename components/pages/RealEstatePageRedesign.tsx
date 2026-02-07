@@ -46,7 +46,7 @@ const TOOLS: Tool[] = [
     name: 'Virtual Staging',
     description: 'Transform empty rooms with AI-generated furniture and decor',
     icon: Building2,
-    gradient: 'from-blue-500 to-indigo-600',
+    gradient: 'from-blue-500 to-teal-600',
     route: '/studio/real-estate/virtual-staging',
     category: ['all', 'photo', 'ai'],
     isFeatured: true,
@@ -76,7 +76,7 @@ const TOOLS: Tool[] = [
     name: 'Day-to-Twilight',
     description: 'Convert daytime exteriors into stunning dusk photography',
     icon: Sparkles,
-    gradient: 'from-indigo-500 to-purple-600',
+    gradient: 'from-teal-500 to-teal-600',
     route: '/studio/real-estate/twilight',
     category: ['all', 'photo', 'ai'],
     isPremium: true,
@@ -105,7 +105,7 @@ const TOOLS: Tool[] = [
     name: 'Room Tour Video',
     description: 'Generate cinematic video clips from still photos',
     icon: Video,
-    gradient: 'from-violet-500 to-purple-600',
+    gradient: 'from-emerald-500 to-teal-600',
     route: '/studio/real-estate/room-tour',
     category: ['all', 'video', 'ai'],
     isPremium: true,
@@ -126,7 +126,7 @@ const TOOLS: Tool[] = [
     name: 'Text-to-Video',
     description: 'Generate entire property videos from listing descriptions',
     icon: Wand2,
-    gradient: 'from-violet-600 to-indigo-600',
+    gradient: 'from-emerald-600 to-teal-600',
     route: '/studio/real-estate/text-to-video',
     category: ['all', 'video', 'ai'],
     isPremium: true,
@@ -239,7 +239,7 @@ const FeaturedToolCard: React.FC<{ tool: Tool }> = ({ tool }) => {
       animate={{ opacity: 1, scale: 1 }}
       whileHover={{ scale: 1.02 }}
       onClick={() => navigate(tool.route)}
-      className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-violet-600 via-purple-600 to-indigo-700 p-8 cursor-pointer group"
+      className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-emerald-600 via-teal-600 to-teal-700 p-8 cursor-pointer group"
     >
       {/* Decorative elements */}
       <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
@@ -271,7 +271,7 @@ const FeaturedToolCard: React.FC<{ tool: Tool }> = ({ tool }) => {
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="px-6 py-3 bg-white text-violet-700 font-semibold rounded-xl flex items-center gap-2 shadow-xl shadow-black/20"
+              className="px-6 py-3 bg-white text-emerald-700 font-semibold rounded-xl flex items-center gap-2 shadow-xl shadow-black/20"
             >
               Get Started
               <ArrowRight size={18} />
@@ -327,8 +327,8 @@ export const RealEstatePageRedesign: React.FC = () => {
         {/* Hero Section */}
         <div className="relative overflow-hidden">
           {/* Background gradient */}
-          <div className="absolute inset-0 bg-gradient-to-b from-violet-950/50 via-transparent to-transparent" />
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[600px] bg-violet-600/20 rounded-full blur-[120px]" />
+          <div className="absolute inset-0 bg-gradient-to-b from-emerald-950/50 via-transparent to-transparent" />
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[600px] bg-emerald-600/20 rounded-full blur-[120px]" />
 
           <div className="relative max-w-7xl mx-auto px-6 pt-12 pb-8">
             {/* Breadcrumb */}
@@ -351,17 +351,17 @@ export const RealEstatePageRedesign: React.FC = () => {
               className="max-w-3xl mb-10"
             >
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center">
                   <Building2 size={24} className="text-white" />
                 </div>
-                <div className="px-3 py-1 bg-violet-500/20 text-violet-300 text-xs font-medium rounded-full">
+                <div className="px-3 py-1 bg-emerald-500/20 text-emerald-300 text-xs font-medium rounded-full">
                   9 Professional Tools
                 </div>
               </div>
 
               <h1 className="text-4xl lg:text-5xl font-bold text-white mb-4 leading-tight">
                 Real Estate
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-indigo-400"> AI Studio</span>
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-400"> AI Studio</span>
               </h1>
 
               <p className="text-xl text-zinc-400 leading-relaxed">
@@ -388,7 +388,7 @@ export const RealEstatePageRedesign: React.FC = () => {
                     onClick={() => tool && navigate(tool.route)}
                     className="px-5 py-3 bg-white/10 hover:bg-white/15 backdrop-blur-sm border border-white/10 rounded-xl text-white font-medium flex items-center gap-2 transition-colors"
                   >
-                    <Icon size={18} className="text-violet-400" />
+                    <Icon size={18} className="text-emerald-400" />
                     {action.label}
                     <ArrowRight size={16} className="text-zinc-500" />
                   </motion.button>
@@ -428,7 +428,7 @@ export const RealEstatePageRedesign: React.FC = () => {
                   onClick={() => setActiveCategory(cat.id)}
                   className={`px-4 py-2.5 rounded-xl font-medium text-sm flex items-center gap-2 transition-all whitespace-nowrap ${
                     isActive
-                      ? 'bg-violet-600 text-white shadow-lg shadow-violet-600/25'
+                      ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-600/25'
                       : 'bg-white/5 text-zinc-400 hover:bg-white/10 hover:text-white'
                   }`}
                 >
@@ -473,7 +473,7 @@ export const RealEstatePageRedesign: React.FC = () => {
                   key={index}
                   className="p-5 rounded-2xl bg-white/5 border border-white/10"
                 >
-                  <Icon size={20} className="text-violet-400 mb-3" />
+                  <Icon size={20} className="text-emerald-400 mb-3" />
                   <p className="text-2xl font-bold text-white mb-1">{stat.value}</p>
                   <p className="text-sm text-zinc-500">{stat.label}</p>
                 </div>
@@ -488,8 +488,8 @@ export const RealEstatePageRedesign: React.FC = () => {
             transition={{ delay: 0.5 }}
             className="mt-16 text-center"
           >
-            <div className="inline-flex flex-col items-center p-8 rounded-3xl bg-gradient-to-br from-violet-600/20 to-indigo-600/20 border border-violet-500/20">
-              <Zap size={32} className="text-violet-400 mb-4" />
+            <div className="inline-flex flex-col items-center p-8 rounded-3xl bg-gradient-to-br from-emerald-600/20 to-teal-600/20 border border-emerald-500/20">
+              <Zap size={32} className="text-emerald-400 mb-4" />
               <h3 className="text-xl font-bold text-white mb-2">Ready to transform your listings?</h3>
               <p className="text-zinc-400 mb-6 max-w-md">
                 Start with 100 free credits. No credit card required.
@@ -498,7 +498,7 @@ export const RealEstatePageRedesign: React.FC = () => {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => navigate('/studio/real-estate/virtual-staging')}
-                className="px-8 py-4 bg-violet-600 hover:bg-violet-500 text-white font-semibold rounded-xl flex items-center gap-2 transition-colors"
+                className="px-8 py-4 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded-xl flex items-center gap-2 transition-colors"
               >
                 Start Creating
                 <ArrowRight size={18} />

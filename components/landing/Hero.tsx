@@ -109,7 +109,7 @@ export const Hero = () => {
 
           {/* Secondary CTA — outlined */}
           <Link
-            to="/studio"
+            to="/auth"
             className="inline-flex items-center gap-3 px-10 py-4 text-white font-semibold rounded-full border border-white/30 hover:border-white/60 hover:bg-white/5 backdrop-blur-sm transition-all duration-300 text-base"
           >
             Start Free

@@ -50,7 +50,7 @@ const FeatureCard: React.FC<FeatureCardProps> = ({
       animate={isInView ? { opacity: 1, y: 0 } : {}}
       transition={{ delay, duration: 0.5 }}
       whileHover={{ y: -5, scale: 1.01 }}
-      className={`${sizeClasses[size]} group relative overflow-hidden rounded-3xl bg-zinc-900/50 border border-white/10 p-6 md:p-8 transition-all duration-500 hover:border-white/20 hover:shadow-2xl hover:shadow-indigo-500/5`}
+      className={`${sizeClasses[size]} group relative overflow-hidden rounded-3xl bg-zinc-900/50 border border-white/10 p-6 md:p-8 transition-all duration-500 hover:border-white/20 hover:shadow-2xl hover:shadow-teal-500/5`}
     >
       {/* Background gradient on hover */}
       <div className={`absolute inset-0 bg-gradient-to-br ${gradient} opacity-0 group-hover:opacity-5 transition-opacity duration-500`} />
@@ -70,7 +70,7 @@ const FeatureCard: React.FC<FeatureCardProps> = ({
         </motion.div>
 
         {/* Title */}
-        <h3 className="text-xl font-bold text-white mb-2 group-hover:text-indigo-400 transition-colors">
+        <h3 className="text-xl font-bold text-white mb-2 group-hover:text-teal-400 transition-colors">
           {title}
         </h3>
 
@@ -95,7 +95,7 @@ const FeatureCard: React.FC<FeatureCardProps> = ({
         <motion.div
           initial={{ opacity: 0, x: -10 }}
           whileHover={{ x: 5 }}
-          className="mt-4 flex items-center gap-2 text-sm font-semibold text-indigo-400 opacity-0 group-hover:opacity-100 transition-opacity"
+          className="mt-4 flex items-center gap-2 text-sm font-semibold text-teal-400 opacity-0 group-hover:opacity-100 transition-opacity"
         >
           Try it free <ArrowRight size={14} />
         </motion.div>
@@ -112,7 +112,7 @@ const FEATURES: FeatureCardProps[] = [
     title: "Virtual Staging",
     description: "Stage any empty room with designer furniture in seconds. Choose from modern, traditional, Scandinavian, and more — no photographer required.",
     icon: Sofa,
-    gradient: "from-violet-500 to-purple-600",
+    gradient: "from-emerald-500 to-teal-600",
     size: "large",
     image: "/showcase/real-estate/after/virtual-staging.jpg",
   },
@@ -155,7 +155,7 @@ const FEATURES: FeatureCardProps[] = [
     title: "AI Renovation & Wall Colors",
     description: "Preview kitchen remodels, bathroom upgrades, or fresh wall paint colors — help buyers see the potential before any construction begins.",
     icon: PaintBucket,
-    gradient: "from-indigo-500 to-violet-500",
+    gradient: "from-teal-500 to-emerald-500",
     size: "medium",
   },
 ];
@@ -194,7 +194,7 @@ export const FeatureGrid: React.FC = () => {
 
           <h2 className="text-3xl md:text-5xl font-bold text-white tracking-tight mb-4">
             Every tool a listing{' '}
-            <span className="bg-gradient-to-r from-indigo-400 to-violet-400 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-teal-400 to-emerald-400 bg-clip-text text-transparent">
               needs
             </span>
           </h2>
@@ -225,7 +225,7 @@ export const FeatureGrid: React.FC = () => {
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="inline-flex items-center gap-3 px-8 py-4 rounded-full bg-gradient-to-r from-indigo-500 to-violet-500 text-white font-bold shadow-lg shadow-indigo-500/30 hover:shadow-xl hover:shadow-indigo-500/40 transition-shadow"
+            className="inline-flex items-center gap-3 px-8 py-4 rounded-full bg-gradient-to-r from-teal-500 to-emerald-500 text-white font-bold shadow-lg shadow-teal-500/30 hover:shadow-xl hover:shadow-teal-500/40 transition-shadow"
           >
             <Sparkles size={18} />
             Explore All Tools

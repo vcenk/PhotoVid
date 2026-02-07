@@ -19,14 +19,14 @@ export const TextToImageNode = memo(({ id, data, selected }: NodeProps) => {
         status === 'running' && 'border-blue-500 ring-2 ring-blue-500/20',
         status === 'completed' && 'border-emerald-500 ring-2 ring-emerald-500/20',
         status === 'error' && 'border-red-500 ring-2 ring-red-500/20',
-        status === 'idle' && 'border-indigo-300 dark:border-indigo-700',
-        selected && 'ring-4 ring-indigo-500/30'
+        status === 'idle' && 'border-teal-300 dark:border-teal-700',
+        selected && 'ring-4 ring-teal-500/30'
       )}
     >
       {/* Header */}
-      <div className="flex items-center justify-between p-3 border-b border-zinc-200 dark:border-zinc-800 bg-indigo-50 dark:bg-indigo-950/30">
+      <div className="flex items-center justify-between p-3 border-b border-zinc-200 dark:border-zinc-800 bg-teal-50 dark:bg-teal-950/30">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400">
+          <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-teal-100 dark:bg-teal-900/50 text-teal-600 dark:text-teal-400">
             <Wand2 size={18} />
           </div>
           <div>
@@ -65,7 +65,7 @@ export const TextToImageNode = memo(({ id, data, selected }: NodeProps) => {
           <select
             value={data.parameters?.model || 'flux-dev'}
             onChange={(e) => handleParameterChange('model', e.target.value)}
-            className="w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg text-sm text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+            className="w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg text-sm text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-teal-500/20"
           >
             <option value="flux-dev">Flux Dev</option>
             <option value="flux-pro">Flux Pro</option>
@@ -82,7 +82,7 @@ export const TextToImageNode = memo(({ id, data, selected }: NodeProps) => {
             <select
               value={data.parameters?.width || '1024'}
               onChange={(e) => handleParameterChange('width', e.target.value)}
-              className="w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg text-sm text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+              className="w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg text-sm text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-teal-500/20"
             >
               <option value="512">512px</option>
               <option value="768">768px</option>
@@ -97,7 +97,7 @@ export const TextToImageNode = memo(({ id, data, selected }: NodeProps) => {
             <select
               value={data.parameters?.height || '1024'}
               onChange={(e) => handleParameterChange('height', e.target.value)}
-              className="w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg text-sm text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+              className="w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg text-sm text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-teal-500/20"
             >
               <option value="512">512px</option>
               <option value="768">768px</option>
@@ -119,7 +119,7 @@ export const TextToImageNode = memo(({ id, data, selected }: NodeProps) => {
             step="1"
             value={data.parameters?.steps || 28}
             onChange={(e) => handleParameterChange('steps', parseInt(e.target.value))}
-            className="w-full h-2 bg-zinc-200 dark:bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-indigo-600"
+            className="w-full h-2 bg-zinc-200 dark:bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-teal-600"
           />
         </div>
 
@@ -132,7 +132,7 @@ export const TextToImageNode = memo(({ id, data, selected }: NodeProps) => {
             value={data.parameters?.negative_prompt || ''}
             onChange={(e) => handleParameterChange('negative_prompt', e.target.value)}
             placeholder="What to avoid..."
-            className="w-full h-16 px-3 py-2 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg text-sm text-zinc-900 dark:text-white placeholder:text-zinc-400 resize-none focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+            className="w-full h-16 px-3 py-2 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg text-sm text-zinc-900 dark:text-white placeholder:text-zinc-400 resize-none focus:outline-none focus:ring-2 focus:ring-teal-500/20"
           />
         </div>
 

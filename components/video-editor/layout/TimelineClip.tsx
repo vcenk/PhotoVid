@@ -27,7 +27,7 @@ const clipColor = (type: TrackType) => {
   switch (type) {
     case 'visual': return 'bg-blue-500/80 hover:bg-blue-500/90';
     case 'audio': return 'bg-green-500/80 hover:bg-green-500/90';
-    case 'text': return 'bg-purple-500/80 hover:bg-purple-500/90';
+    case 'text': return 'bg-teal-500/80 hover:bg-teal-500/90';
   }
 };
 
@@ -103,7 +103,7 @@ export const TimelineClipComponent: React.FC<TimelineClipProps> = ({
       }}
       className={`absolute top-1 bottom-1 rounded cursor-grab active:cursor-grabbing transition-colors ${clipColor(trackType)} ${
         isSelected
-          ? 'ring-2 ring-yellow-400 ring-offset-1 ring-offset-[#0d0d0f]'
+          ? 'ring-2 ring-yellow-400 ring-offset-1 ring-offset-zinc-100 dark:ring-offset-[#0d0d0f]'
           : ''
       } ${isDragging ? 'opacity-80 z-10' : ''} ${resizing ? 'z-10' : ''}`}
       style={{

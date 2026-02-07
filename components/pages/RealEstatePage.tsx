@@ -24,7 +24,7 @@ const REAL_ESTATE_TOOLS = [
         name: 'Virtual Staging',
         description: 'Transform empty rooms with AI-generated furniture and decor',
         icon: Sofa,
-        gradient: 'from-blue-500 to-indigo-600',
+        gradient: 'from-emerald-500 to-teal-600',
         isPremium: true,
     },
     {
@@ -39,14 +39,14 @@ const REAL_ESTATE_TOOLS = [
         name: 'Sky Replacement',
         description: 'Replace overcast skies with beautiful blue skies',
         icon: ImageIcon,
-        gradient: 'from-cyan-500 to-blue-600',
+        gradient: 'from-cyan-500 to-teal-600',
     },
     {
         id: 'room-tour',
         name: 'Room Tour Video',
         description: 'Create smooth walkthrough videos from photos',
         icon: Video,
-        gradient: 'from-violet-500 to-purple-600',
+        gradient: 'from-emerald-500 to-teal-600',
         isPremium: true,
     },
     {
@@ -116,7 +116,7 @@ export const RealEstatePage: React.FC = () => {
     };
 
     return (
-        <div className="h-screen flex bg-white dark:bg-[#09090b]">
+        <div className="h-screen flex bg-white dark:bg-[#09090b] font-[Space_Grotesk]">
             {/* Navigation Rail */}
             <NavigationRail isMobileOpen={mobileMenuOpen} onMobileClose={() => setMobileMenuOpen(false)} />
 
@@ -124,7 +124,7 @@ export const RealEstatePage: React.FC = () => {
 {/* Main Content */}
             <div className="flex-1 overflow-y-auto ml-0 lg:ml-16">
                 {/* Hero Section */}
-                <div className="relative bg-gradient-to-br from-blue-600 via-indigo-600 to-violet-700 overflow-hidden">
+                <div className="relative bg-gradient-to-br from-emerald-600 via-teal-600 to-cyan-600 overflow-hidden">
                     {/* Background Pattern */}
                     <div className="absolute inset-0 opacity-10">
                         <div className="absolute top-0 left-0 w-96 h-96 bg-white rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2" />
@@ -154,7 +154,7 @@ export const RealEstatePage: React.FC = () => {
                                 <div className="flex gap-4">
                                     <button
                                         onClick={() => navigate('/studio/image')}
-                                        className="px-6 py-3 bg-white text-indigo-600 font-semibold rounded-xl hover:bg-white/90 transition-colors flex items-center gap-2"
+                                        className="px-6 py-3 bg-white text-teal-600 font-semibold rounded-xl hover:bg-white/90 transition-colors flex items-center gap-2"
                                     >
                                         <Sparkles size={18} />
                                         Start Creating
@@ -208,7 +208,7 @@ export const RealEstatePage: React.FC = () => {
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ delay: index * 0.05 }}
                                     onClick={() => handleToolClick(tool.id)}
-                                    className="group relative bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 p-6 cursor-pointer hover:shadow-xl hover:border-indigo-200 dark:hover:border-indigo-900/50 transition-all"
+                                    className="group relative bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 p-6 cursor-pointer hover:shadow-xl hover:border-teal-200 dark:hover:border-teal-900/50 transition-all"
                                 >
                                     {/* Premium Badge */}
                                     {tool.isPremium && (
@@ -225,7 +225,7 @@ export const RealEstatePage: React.FC = () => {
                                     </div>
 
                                     {/* Content */}
-                                    <h3 className="text-lg font-semibold text-zinc-900 dark:text-white mb-2 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                                    <h3 className="text-lg font-semibold text-zinc-900 dark:text-white mb-2 group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">
                                         {tool.name}
                                     </h3>
                                     <p className="text-zinc-500 dark:text-zinc-400 text-sm">
@@ -234,7 +234,7 @@ export const RealEstatePage: React.FC = () => {
 
                                     {/* Arrow */}
                                     <div className="absolute bottom-6 right-6 opacity-0 group-hover:opacity-100 transition-opacity">
-                                        <ArrowRight size={20} className="text-indigo-600 dark:text-indigo-400" />
+                                        <ArrowRight size={20} className="text-teal-600 dark:text-teal-400" />
                                     </div>
                                 </motion.div>
                             );
@@ -255,7 +255,7 @@ export const RealEstatePage: React.FC = () => {
                         </div>
                         <button
                             onClick={() => navigate('/studio/workflow')}
-                            className="text-sm text-indigo-600 dark:text-indigo-400 font-medium hover:underline flex items-center gap-1"
+                            className="text-sm text-teal-600 dark:text-teal-400 font-medium hover:underline flex items-center gap-1"
                         >
                             View All Workflows <ArrowRight size={16} />
                         </button>
@@ -273,13 +273,13 @@ export const RealEstatePage: React.FC = () => {
                             >
                                 <div className="flex items-start justify-between mb-4">
                                     <div className="p-3 rounded-xl bg-white dark:bg-zinc-800 shadow-sm">
-                                        <Home size={20} className="text-indigo-600 dark:text-indigo-400" />
+                                        <Home size={20} className="text-teal-600 dark:text-teal-400" />
                                     </div>
                                     <div className="flex gap-2">
                                         <span className="px-2 py-1 bg-white dark:bg-zinc-800 rounded-full text-xs text-zinc-600 dark:text-zinc-400">
                                             {workflow.steps} steps
                                         </span>
-                                        <span className="px-2 py-1 bg-indigo-100 dark:bg-indigo-950 rounded-full text-xs text-indigo-600 dark:text-indigo-400 font-medium">
+                                        <span className="px-2 py-1 bg-teal-100 dark:bg-teal-950 rounded-full text-xs text-teal-600 dark:text-teal-400 font-medium">
                                             {workflow.credits} credits
                                         </span>
                                     </div>

@@ -30,7 +30,7 @@ export const CreditDisplay: React.FC<CreditDisplayProps> = ({ compact = false })
   const statusColors = {
     critical: 'text-red-400 bg-red-500/10 border-red-500/30',
     low: 'text-amber-400 bg-amber-500/10 border-amber-500/30',
-    normal: 'text-violet-400 bg-violet-500/10 border-violet-500/30',
+    normal: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/30',
   };
 
   if (compact) {
@@ -63,7 +63,7 @@ export const CreditDisplay: React.FC<CreditDisplayProps> = ({ compact = false })
         <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
           status === 'critical' ? 'bg-red-500/20' :
           status === 'low' ? 'bg-amber-500/20' :
-          'bg-violet-500/20'
+          'bg-emerald-500/20'
         }`}>
           <Zap size={16} className="fill-current" />
         </div>
@@ -121,7 +121,7 @@ export const CreditDisplay: React.FC<CreditDisplayProps> = ({ compact = false })
                       <span className={`text-3xl font-bold ${
                         status === 'critical' ? 'text-red-400' :
                         status === 'low' ? 'text-amber-400' :
-                        'text-violet-400'
+                        'text-emerald-400'
                       }`}>
                         {formatCredits(balance)}
                       </span>
@@ -137,7 +137,7 @@ export const CreditDisplay: React.FC<CreditDisplayProps> = ({ compact = false })
                       className={`h-full transition-all ${
                         status === 'critical' ? 'bg-red-500' :
                         status === 'low' ? 'bg-amber-500' :
-                        'bg-violet-500'
+                        'bg-emerald-500'
                       }`}
                       style={{ width: `${Math.min(100, (balance / 100) * 100)}%` }}
                     />
@@ -168,7 +168,7 @@ export const CreditDisplay: React.FC<CreditDisplayProps> = ({ compact = false })
                       >
                         <div className="flex items-center gap-2">
                           {tx.type === 'generation' ? (
-                            <Sparkles size={12} className="text-violet-400" />
+                            <Sparkles size={12} className="text-emerald-400" />
                           ) : tx.type === 'purchase' ? (
                             <CreditCard size={12} className="text-green-400" />
                           ) : (
@@ -201,7 +201,7 @@ export const CreditDisplay: React.FC<CreditDisplayProps> = ({ compact = false })
                         className={`
                           w-full flex items-center justify-between p-3 rounded-xl transition-all
                           ${pkg.popular
-                            ? 'bg-violet-600/20 border border-violet-500/30 hover:bg-violet-600/30'
+                            ? 'bg-emerald-600/20 border border-emerald-500/30 hover:bg-emerald-600/30'
                             : 'bg-white/5 hover:bg-white/10'
                           }
                         `}
@@ -210,7 +210,7 @@ export const CreditDisplay: React.FC<CreditDisplayProps> = ({ compact = false })
                           <div className="flex items-center gap-2">
                             <span className="text-sm font-medium text-white">{pkg.name}</span>
                             {pkg.popular && (
-                              <span className="px-1.5 py-0.5 text-[10px] font-medium bg-violet-500 text-white rounded">
+                              <span className="px-1.5 py-0.5 text-[10px] font-medium bg-emerald-500 text-white rounded">
                                 Popular
                               </span>
                             )}

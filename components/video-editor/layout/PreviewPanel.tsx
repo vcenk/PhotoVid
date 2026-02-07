@@ -168,11 +168,11 @@ export const PreviewPanel: React.FC = () => {
   const hasClips = Object.keys(project.clips).length > 0;
 
   return (
-    <div className="flex-1 flex flex-col bg-[#050505] overflow-hidden min-w-0 relative z-10">
+    <div className="flex-1 flex flex-col bg-zinc-100 dark:bg-[#050505] overflow-hidden min-w-0 relative z-10">
       {/* ============ PREVIEW CANVAS ============ */}
       <div className="flex-1 flex items-center justify-center p-6 min-h-0 relative">
         <div
-          className="relative rounded-[2rem] overflow-hidden shadow-[0_0_50px_rgba(0,0,0,0.8)] ring-1 ring-white/10 bg-black flex items-center justify-center"
+          className="relative rounded-[2rem] overflow-hidden shadow-[0_0_50px_rgba(0,0,0,0.3)] dark:shadow-[0_0_50px_rgba(0,0,0,0.8)] ring-1 ring-zinc-300 dark:ring-white/10 bg-black flex items-center justify-center"
           style={{
             aspectRatio: `${config.width} / ${config.height}`,
             maxHeight: '100%',
@@ -197,7 +197,7 @@ export const PreviewPanel: React.FC = () => {
                 renderLoading={() => (
                   <div className="w-full h-full flex items-center justify-center bg-black">
                     <div className="flex flex-col items-center gap-3">
-                        <RefreshCw size={24} className="text-purple-500 animate-spin" />
+                        <RefreshCw size={24} className="text-teal-500 animate-spin" />
                         <p className="text-zinc-500 text-xs font-bold uppercase tracking-widest">Warming Up</p>
                     </div>
                   </div>
@@ -220,10 +220,10 @@ export const PreviewPanel: React.FC = () => {
             </>
           ) : (
             <div className="absolute inset-0 flex flex-col items-center justify-center p-12 text-center">
-              <div className="w-24 h-24 rounded-full bg-white/5 border border-white/5 flex items-center justify-center mb-6">
-                <Film size={40} className="text-zinc-700" />
+              <div className="w-24 h-24 rounded-full bg-zinc-200 dark:bg-white/5 border border-zinc-300 dark:border-white/5 flex items-center justify-center mb-6">
+                <Film size={40} className="text-zinc-400 dark:text-zinc-700" />
               </div>
-              <h3 className="text-xl font-bold text-white mb-2">Create Your Masterpiece</h3>
+              <h3 className="text-xl font-bold text-zinc-800 dark:text-white mb-2">Create Your Masterpiece</h3>
               <p className="text-zinc-500 text-sm max-w-xs leading-relaxed">Drag images or videos from the sidebar to the timeline to begin editing.</p>
             </div>
           )}
@@ -231,9 +231,9 @@ export const PreviewPanel: React.FC = () => {
       </div>
 
       {/* ============ TRANSPORT BAR ============ */}
-      <div className="flex-shrink-0 h-14 px-4 bg-zinc-900/40 backdrop-blur-xl border-t border-white/5 flex items-center gap-4 shadow-[0_-10px_30px_rgba(0,0,0,0.3)] relative z-30">
+      <div className="flex-shrink-0 h-14 px-4 bg-white/80 dark:bg-zinc-900/40 backdrop-blur-xl border-t border-zinc-200 dark:border-white/5 flex items-center gap-4 shadow-[0_-10px_30px_rgba(0,0,0,0.05)] dark:shadow-[0_-10px_30px_rgba(0,0,0,0.3)] relative z-30">
         {/* Edit Tools */}
-        <div className="flex items-center gap-1.5 p-1.5 bg-black/40 rounded-2xl border border-white/5 shadow-inner">
+        <div className="flex items-center gap-1.5 p-1.5 bg-zinc-100 dark:bg-black/40 rounded-2xl border border-zinc-200 dark:border-white/5 shadow-inner">
           <button
             onClick={() => {
               console.log('[PreviewPanel] Delete clicked, selectedClipId:', project.selectedClipId);
@@ -250,45 +250,45 @@ export const PreviewPanel: React.FC = () => {
           <button
             onClick={() => project.selectedClipId && splitClip(project.selectedClipId, project.currentFrame)}
             disabled={!project.selectedClipId}
-            className="p-2 hover:bg-white/10 rounded-xl transition-all disabled:opacity-20 disabled:cursor-not-allowed group"
+            className="p-2 hover:bg-zinc-200 dark:hover:bg-white/10 rounded-xl transition-all disabled:opacity-20 disabled:cursor-not-allowed group"
             title="Split clip"
           >
-            <Scissors size={16} className="text-zinc-400 group-hover:text-white transition-colors" />
+            <Scissors size={16} className="text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-white transition-colors" />
           </button>
           <button
             onClick={() => project.selectedClipId && duplicateClip(project.selectedClipId)}
             disabled={!project.selectedClipId}
-            className="p-2 hover:bg-white/10 rounded-xl transition-all disabled:opacity-20 disabled:cursor-not-allowed group"
+            className="p-2 hover:bg-zinc-200 dark:hover:bg-white/10 rounded-xl transition-all disabled:opacity-20 disabled:cursor-not-allowed group"
             title="Duplicate"
           >
-            <Copy size={16} className="text-zinc-400 group-hover:text-white transition-colors" />
+            <Copy size={16} className="text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-white transition-colors" />
           </button>
         </div>
 
         {/* Playback Controls */}
         <div className="flex items-center gap-1">
-            <button onClick={seekToStart} className="p-2 hover:bg-white/10 rounded-xl transition-all group" title="Start">
-            <SkipBack size={18} className="text-zinc-400 group-hover:text-white transition-colors" />
+            <button onClick={seekToStart} className="p-2 hover:bg-zinc-200 dark:hover:bg-white/10 rounded-xl transition-all group" title="Start">
+            <SkipBack size={18} className="text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-white transition-colors" />
             </button>
             <button
             onClick={togglePlayPause}
-            className="w-10 h-10 bg-gradient-to-br from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 rounded-2xl transition-all shadow-lg shadow-purple-900/40 hover:shadow-purple-600/50 flex items-center justify-center mx-1 group hover:-translate-y-0.5 active:translate-y-0"
+            className="w-10 h-10 bg-gradient-to-br from-teal-600 to-teal-600 hover:from-teal-500 hover:to-teal-500 rounded-2xl transition-all shadow-lg shadow-teal-900/40 hover:shadow-teal-600/50 flex items-center justify-center mx-1 group hover:-translate-y-0.5 active:translate-y-0"
             title="Play/Pause (Space)"
             >
             {project.isPlaying ? <Pause size={20} className="text-white fill-white" /> : <Play size={20} className="text-white fill-white ml-1" />}
             </button>
-            <button onClick={seekToEnd} className="p-2 hover:bg-white/10 rounded-xl transition-all group" title="End">
-            <SkipForward size={18} className="text-zinc-400 group-hover:text-white transition-colors" />
+            <button onClick={seekToEnd} className="p-2 hover:bg-zinc-200 dark:hover:bg-white/10 rounded-xl transition-all group" title="End">
+            <SkipForward size={18} className="text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-white transition-colors" />
             </button>
         </div>
         
-        <button onClick={() => setIsMuted(!isMuted)} className="p-2 hover:bg-white/10 rounded-xl transition-all group" title="Mute">
-          {isMuted ? <VolumeX size={18} className="text-red-400" /> : <Volume2 size={18} className="text-zinc-400 group-hover:text-white transition-colors" />}
+        <button onClick={() => setIsMuted(!isMuted)} className="p-2 hover:bg-zinc-200 dark:hover:bg-white/10 rounded-xl transition-all group" title="Mute">
+          {isMuted ? <VolumeX size={18} className="text-red-400" /> : <Volume2 size={18} className="text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-white transition-colors" />}
         </button>
 
         {/* Time Display */}
-        <div className="flex items-center gap-2 px-3 py-1.5 bg-black/40 rounded-xl border border-white/5 font-mono shadow-inner">
-          <span className="text-xs font-bold text-white tracking-widest">{formatTimeSimple(project.currentFrame, project.fps)}</span>
+        <div className="flex items-center gap-2 px-3 py-1.5 bg-zinc-100 dark:bg-black/40 rounded-xl border border-zinc-200 dark:border-white/5 font-mono shadow-inner">
+          <span className="text-xs font-bold text-zinc-900 dark:text-white tracking-widest">{formatTimeSimple(project.currentFrame, project.fps)}</span>
           <span className="text-[10px] text-zinc-600 font-black">/</span>
           <span className="text-xs font-bold text-zinc-500 tracking-widest">{formatTimeSimple(project.totalDurationFrames, project.fps)}</span>
         </div>
@@ -297,12 +297,12 @@ export const PreviewPanel: React.FC = () => {
         <div className="flex-1" />
 
         {/* Zoom Controls */}
-        <div className="flex items-center gap-1 bg-black/20 p-1 rounded-xl border border-white/5">
-            <button onClick={zoomOut} className="p-1.5 hover:bg-white/10 rounded-lg transition-all group" title="Zoom out (-)">
+        <div className="flex items-center gap-1 bg-zinc-100 dark:bg-black/20 p-1 rounded-xl border border-zinc-200 dark:border-white/5">
+            <button onClick={zoomOut} className="p-1.5 hover:bg-zinc-200 dark:hover:bg-white/10 rounded-lg transition-all group" title="Zoom out (-)">
             <ZoomOut size={16} className="text-zinc-500 group-hover:text-zinc-300" />
             </button>
             <span className="text-[10px] font-black text-zinc-500 w-12 text-center tracking-tighter">{Math.round(project.zoom * 50)}%</span>
-            <button onClick={zoomIn} className="p-1.5 hover:bg-white/10 rounded-lg transition-all group" title="Zoom in (+)">
+            <button onClick={zoomIn} className="p-1.5 hover:bg-zinc-200 dark:hover:bg-white/10 rounded-lg transition-all group" title="Zoom in (+)">
             <ZoomIn size={16} className="text-zinc-500 group-hover:text-zinc-300" />
             </button>
         </div>

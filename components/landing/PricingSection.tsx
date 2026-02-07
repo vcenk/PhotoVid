@@ -9,12 +9,12 @@ const PLANS = [
   {
     name: "Free",
     price: "0",
-    description: "Try every tool with watermarked previews.",
+    description: "Try before you buy.",
     features: [
-      "5 free edits per month",
-      "All 25+ AI tools",
-      "Watermarked exports",
-      "Standard processing"
+      "5 credits per month",
+      "Basic image editing tools",
+      "SD video export",
+      "Community support"
     ],
     cta: "Start Free",
     highlight: false,
@@ -22,44 +22,57 @@ const PLANS = [
     gradient: "from-zinc-400 to-zinc-600",
   },
   {
-    name: "Agent",
-    price: "29",
-    description: "Everything you need to win more listings.",
+    name: "Starter",
+    price: "19",
+    description: "Perfect for individuals.",
     features: [
-      "100 edits per month",
-      "Full-resolution exports",
-      "Priority processing",
-      "Batch upload (up to 25)",
-      "Commercial use license"
+      "100 credits per month",
+      "All image editing tools",
+      "HD video export",
+      "Email support",
+      "Remove watermarks"
     ],
-    cta: "Go Agent",
-    highlight: true,
-    icon: Crown,
-    gradient: "from-indigo-500 to-violet-500",
+    cta: "Go Starter",
+    highlight: false,
+    icon: Package,
+    gradient: "from-blue-500 to-cyan-500",
   },
   {
-    name: "Brokerage",
-    price: "99",
-    description: "For teams and high-volume brokerages.",
+    name: "Pro",
+    price: "49",
+    description: "For professionals and teams.",
     features: [
-      "Unlimited edits",
-      "Up to 10 team seats",
-      "Brand presets & watermarks",
+      "250 credits per month",
+      "All image & video tools",
+      "4K video export",
+      "Priority support",
       "API access",
-      "Dedicated support"
+      "Custom branding"
     ],
-    cta: "Go Brokerage",
+    cta: "Go Pro",
+    highlight: true,
+    icon: Crown,
+    gradient: "from-teal-500 to-emerald-500",
+  },
+  {
+    name: "Enterprise",
+    price: "149",
+    description: "For large organizations.",
+    features: [
+      "800 credits per month",
+      "Unlimited team members",
+      "4K+ video export",
+      "Dedicated support",
+      "Custom integrations",
+      "SLA guarantee"
+    ],
+    cta: "Go Enterprise",
     highlight: false,
     icon: Rocket,
-    gradient: "from-violet-500 to-purple-500",
+    gradient: "from-emerald-500 to-teal-500",
   }
 ];
 
-const CREDIT_PACKS = [
-  { credits: 10, price: 12 },
-  { credits: 25, price: 25 },
-  { credits: 60, price: 49 },
-];
 
 interface TiltCardProps {
   children: React.ReactNode;
@@ -130,7 +143,6 @@ const AnimatedCounter: React.FC<AnimatedCounterProps> = ({ value, isInView }) =>
 export const PricingSection = () => {
   const sectionRef = useRef<HTMLElement>(null);
   const isInView = useInView(sectionRef, { once: true, margin: "-100px" });
-  const [hoveredPack, setHoveredPack] = useState<number | null>(null);
 
   return (
     <section ref={sectionRef} className="relative py-24 md:py-32 overflow-hidden">
@@ -141,7 +153,7 @@ export const PricingSection = () => {
       <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:40px_40px]" />
 
       {/* Ambient glow */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-indigo-500/10 rounded-full blur-[150px]" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-teal-500/10 rounded-full blur-[150px]" />
 
       <div className="relative max-w-7xl mx-auto px-6">
 
@@ -168,7 +180,7 @@ export const PricingSection = () => {
         </motion.div>
 
         {/* Subscription Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-start mb-20 perspective-1000">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-start mb-20 perspective-1000">
           {PLANS.map((plan, idx) => {
             const Icon = plan.icon;
 
@@ -192,7 +204,7 @@ export const PricingSection = () => {
                   {/* Animated border for highlighted plan */}
                   {plan.highlight && (
                     <>
-                      <div className="absolute -inset-px rounded-[2rem] bg-gradient-to-r from-indigo-500 via-violet-500 to-indigo-500 opacity-100" />
+                      <div className="absolute -inset-px rounded-[2rem] bg-gradient-to-r from-teal-500 via-emerald-500 to-teal-500 opacity-100" />
                       <div className="absolute inset-0 rounded-[2rem] bg-zinc-900" />
 
                       <motion.div
@@ -211,7 +223,7 @@ export const PricingSection = () => {
                         }}
                       />
 
-                      <div className="absolute -inset-4 bg-gradient-to-r from-indigo-500/20 via-violet-500/20 to-indigo-500/20 rounded-[3rem] blur-2xl -z-10" />
+                      <div className="absolute -inset-4 bg-gradient-to-r from-teal-500/20 via-emerald-500/20 to-teal-500/20 rounded-[3rem] blur-2xl -z-10" />
                     </>
                   )}
 
@@ -222,7 +234,7 @@ export const PricingSection = () => {
                         initial={{ y: -20, opacity: 0 }}
                         animate={isInView ? { y: 0, opacity: 1 } : {}}
                         transition={{ delay: 0.4 }}
-                        className="absolute -top-12 left-1/2 -translate-x-1/2 px-4 py-1.5 bg-gradient-to-r from-indigo-500 to-violet-500 text-white text-[10px] font-bold uppercase tracking-widest rounded-full shadow-lg shadow-indigo-500/30 flex items-center gap-2"
+                        className="absolute -top-12 left-1/2 -translate-x-1/2 px-4 py-1.5 bg-gradient-to-r from-teal-500 to-emerald-500 text-white text-[10px] font-bold uppercase tracking-widest rounded-full shadow-lg shadow-teal-500/30 flex items-center gap-2"
                       >
                         <Sparkles size={10} fill="currentColor" /> Most Popular
                       </motion.div>
@@ -258,7 +270,7 @@ export const PricingSection = () => {
                           transition={{ delay: idx * 0.1 + featureIdx * 0.05 + 0.4 }}
                           className="flex items-start gap-3 text-sm text-zinc-300"
                         >
-                          <Check size={16} className={`flex-shrink-0 mt-0.5 ${plan.highlight ? 'text-indigo-500' : 'text-zinc-500'}`} />
+                          <Check size={16} className={`flex-shrink-0 mt-0.5 ${plan.highlight ? 'text-teal-500' : 'text-zinc-500'}`} />
                           <span className="leading-tight">{feature}</span>
                         </motion.li>
                       ))}
@@ -267,11 +279,11 @@ export const PricingSection = () => {
                     {/* CTA Button */}
                     <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                       <Link
-                        to="/login"
+                        to="/auth"
                         className={`
                           w-full py-4 rounded-xl text-xs font-bold uppercase tracking-widest transition-all text-center block
                           ${plan.highlight
-                            ? "bg-gradient-to-r from-indigo-500 to-violet-500 text-white shadow-lg shadow-indigo-500/30 hover:shadow-xl hover:shadow-indigo-500/40"
+                            ? "bg-gradient-to-r from-teal-500 to-emerald-500 text-white shadow-lg shadow-teal-500/30 hover:shadow-xl hover:shadow-teal-500/40"
                             : "bg-white/5 border border-white/10 text-white hover:bg-white/10"
                           }
                         `}
@@ -285,74 +297,6 @@ export const PricingSection = () => {
             );
           })}
         </div>
-
-        {/* Credit System Add-on */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ delay: 0.6 }}
-          className="max-w-4xl mx-auto"
-        >
-          <div className="relative p-2 bg-zinc-900/50 rounded-[2.5rem] border border-white/10 shadow-xl overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/5 via-violet-500/5 to-indigo-500/5" />
-
-            <div className="relative flex flex-col md:flex-row items-center p-6 md:p-10 gap-8">
-
-              {/* Left: Info */}
-              <div className="flex items-center gap-6 flex-1">
-                <motion.div
-                  whileHover={{ rotate: 10 }}
-                  className="w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500/10 to-violet-500/10 flex items-center justify-center text-indigo-500 border border-indigo-500/20"
-                >
-                  <Package size={32} strokeWidth={1.5} />
-                </motion.div>
-                <div>
-                  <h4 className="text-lg font-bold text-white flex items-center gap-2">
-                    Need extra edits?
-                  </h4>
-                  <p className="text-sm text-zinc-400 mt-1">
-                    Top up with credit packs for on-demand processing without upgrading.
-                  </p>
-                </div>
-              </div>
-
-              {/* Right: Credit Packs */}
-              <div className="flex gap-4">
-                {CREDIT_PACKS.map((pack) => (
-                  <motion.button
-                    key={pack.credits}
-                    whileHover={{ scale: 1.05, y: -2 }}
-                    whileTap={{ scale: 0.95 }}
-                    onMouseEnter={() => setHoveredPack(pack.credits)}
-                    onMouseLeave={() => setHoveredPack(null)}
-                    className={`
-                      relative flex flex-col items-center justify-center w-28 h-28 rounded-2xl border transition-all duration-300 cursor-pointer overflow-hidden
-                      ${hoveredPack === pack.credits
-                        ? 'border-indigo-500 bg-gradient-to-br from-indigo-500/10 to-violet-500/10 shadow-lg shadow-indigo-500/20'
-                        : 'border-white/10 bg-black hover:border-white/20'
-                      }
-                    `}
-                  >
-                    {hoveredPack === pack.credits && (
-                      <motion.div
-                        className="absolute inset-0 bg-gradient-to-r from-indigo-500/10 to-violet-500/10"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                      />
-                    )}
-                    <span className={`relative text-[10px] font-bold uppercase tracking-widest mb-1 transition-colors ${hoveredPack === pack.credits ? 'text-indigo-500' : 'text-zinc-400'}`}>
-                      {pack.credits} Credits
-                    </span>
-                    <span className="relative text-2xl font-bold text-white">
-                      ${pack.price}
-                    </span>
-                  </motion.button>
-                ))}
-              </div>
-
-            </div>
-          </div>
-        </motion.div>
 
       </div>
     </section>

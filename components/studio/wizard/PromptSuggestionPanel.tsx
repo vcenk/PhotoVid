@@ -39,35 +39,35 @@ export const PromptSuggestionPanel: React.FC<PromptSuggestionPanelProps> = ({
     }, {} as Record<string, PromptSuggestion[]>);
 
     return (
-        <div className="bg-white rounded-2xl border border-zinc-200 overflow-hidden">
+        <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-700 overflow-hidden">
             {/* Header */}
-            <div className="p-4 border-b border-zinc-100 bg-gradient-to-r from-indigo-50 to-violet-50">
+            <div className="p-4 border-b border-zinc-100 dark:border-zinc-800 bg-gradient-to-r from-teal-50 to-emerald-50 dark:from-teal-950/50 dark:to-emerald-950/50">
                 <div className="flex items-center gap-2">
-                    <div className="p-1.5 rounded-lg bg-indigo-100">
-                        <Sparkles size={14} className="text-indigo-600" />
+                    <div className="p-1.5 rounded-lg bg-teal-100 dark:bg-teal-900/50">
+                        <Sparkles size={14} className="text-teal-600 dark:text-teal-400" />
                     </div>
                     <div>
-                        <h3 className="text-sm font-bold text-zinc-900">Smart Prompts</h3>
-                        <p className="text-xs text-zinc-500">AI-powered suggestions for {selectedIndustry?.name || 'your industry'}</p>
+                        <h3 className="text-sm font-bold text-zinc-900 dark:text-zinc-100">Smart Prompts</h3>
+                        <p className="text-xs text-zinc-500 dark:text-zinc-400">AI-powered suggestions for {selectedIndustry?.name || 'your industry'}</p>
                     </div>
                 </div>
             </div>
 
             {/* Categories */}
-            <div className="divide-y divide-zinc-100">
+            <div className="divide-y divide-zinc-100 dark:divide-zinc-800">
                 {categories.map(category => (
                     <div key={category}>
                         {/* Category Header */}
                         <button
                             onClick={() => setExpandedCategory(expandedCategory === category ? null : category)}
-                            className="w-full flex items-center justify-between p-3 hover:bg-zinc-50 transition-colors"
+                            className="w-full flex items-center justify-between p-3 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors"
                         >
-                            <span className="text-sm font-medium text-zinc-700">{category}</span>
+                            <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">{category}</span>
                             <div className="flex items-center gap-2">
-                                <span className="text-xs text-zinc-400">{groupedPrompts[category].length}</span>
+                                <span className="text-xs text-zinc-400 dark:text-zinc-500">{groupedPrompts[category].length}</span>
                                 <ChevronDown
                                     size={14}
-                                    className={`text-zinc-400 transition-transform ${expandedCategory === category ? 'rotate-180' : ''}`}
+                                    className={`text-zinc-400 dark:text-zinc-500 transition-transform ${expandedCategory === category ? 'rotate-180' : ''}`}
                                 />
                             </div>
                         </button>
@@ -85,18 +85,18 @@ export const PromptSuggestionPanel: React.FC<PromptSuggestionPanelProps> = ({
                                         {groupedPrompts[category].map(suggestion => (
                                             <div
                                                 key={suggestion.id}
-                                                className="p-3 rounded-xl bg-zinc-50 hover:bg-zinc-100 transition-colors group"
+                                                className="p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-750 transition-colors group"
                                             >
                                                 <div className="flex items-start gap-3">
                                                     <span className="text-lg">{suggestion.icon}</span>
                                                     <div className="flex-1 min-w-0">
-                                                        <h4 className="text-xs font-semibold text-zinc-900 mb-1">
+                                                        <h4 className="text-xs font-semibold text-zinc-900 dark:text-zinc-100 mb-1">
                                                             {suggestion.title}
                                                         </h4>
-                                                        <p className="text-[11px] text-zinc-500 mb-2">
+                                                        <p className="text-[11px] text-zinc-500 dark:text-zinc-400 mb-2">
                                                             {suggestion.description}
                                                         </p>
-                                                        <p className="text-xs text-zinc-600 bg-white rounded-lg p-2 border border-zinc-200 font-mono">
+                                                        <p className="text-xs text-zinc-600 dark:text-zinc-300 bg-white dark:bg-zinc-900 rounded-lg p-2 border border-zinc-200 dark:border-zinc-700 font-mono">
                                                             {suggestion.prompt.substring(0, 80)}...
                                                         </p>
                                                     </div>
@@ -106,7 +106,7 @@ export const PromptSuggestionPanel: React.FC<PromptSuggestionPanelProps> = ({
                                                 <div className="flex items-center gap-2 mt-3 opacity-0 group-hover:opacity-100 transition-opacity">
                                                     <button
                                                         onClick={() => handleCopy(suggestion)}
-                                                        className="flex items-center gap-1 px-2 py-1 rounded-md bg-white border border-zinc-200 text-xs text-zinc-600 hover:bg-zinc-50 transition-colors"
+                                                        className="flex items-center gap-1 px-2 py-1 rounded-md bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 text-xs text-zinc-600 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors"
                                                     >
                                                         {copiedId === suggestion.id ? (
                                                             <><Check size={10} className="text-emerald-500" /> Copied</>
@@ -116,7 +116,7 @@ export const PromptSuggestionPanel: React.FC<PromptSuggestionPanelProps> = ({
                                                     </button>
                                                     <button
                                                         onClick={() => handleUse(suggestion)}
-                                                        className="flex items-center gap-1 px-2 py-1 rounded-md bg-indigo-600 text-white text-xs font-medium hover:bg-indigo-700 transition-colors"
+                                                        className="flex items-center gap-1 px-2 py-1 rounded-md bg-teal-600 text-white text-xs font-medium hover:bg-teal-700 transition-colors"
                                                     >
                                                         Use This
                                                     </button>
@@ -132,8 +132,8 @@ export const PromptSuggestionPanel: React.FC<PromptSuggestionPanelProps> = ({
             </div>
 
             {/* Quick Apply */}
-            <div className="p-3 bg-zinc-50 border-t border-zinc-100">
-                <p className="text-[10px] text-zinc-400 text-center">
+            <div className="p-3 bg-zinc-50 dark:bg-zinc-800/50 border-t border-zinc-100 dark:border-zinc-800">
+                <p className="text-[10px] text-zinc-400 dark:text-zinc-500 text-center">
                     Click "Use This" to apply a prompt to your generation
                 </p>
             </div>

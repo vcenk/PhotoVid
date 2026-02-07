@@ -205,7 +205,7 @@ export const TextToVideoWizard: React.FC<TextToVideoWizardProps> = ({
             <div
               className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
                 index <= currentIndex
-                  ? 'bg-violet-500/20 text-violet-400'
+                  ? 'bg-emerald-500/20 text-emerald-400'
                   : 'bg-white/5 text-zinc-500'
               }`}
             >
@@ -217,7 +217,7 @@ export const TextToVideoWizard: React.FC<TextToVideoWizardProps> = ({
               <span className="text-xs font-medium hidden sm:inline">{s.label}</span>
             </div>
             {index < steps.length - 1 && (
-              <div className={`w-8 h-0.5 ${index < currentIndex ? 'bg-violet-500' : 'bg-white/10'}`} />
+              <div className={`w-8 h-0.5 ${index < currentIndex ? 'bg-emerald-500' : 'bg-white/10'}`} />
             )}
           </React.Fragment>
         ))}
@@ -263,8 +263,8 @@ export const TextToVideoWizard: React.FC<TextToVideoWizardProps> = ({
               className="max-w-2xl mx-auto"
             >
               <div className="text-center mb-6">
-                <div className="w-14 h-14 rounded-2xl bg-violet-500/20 flex items-center justify-center mx-auto mb-4">
-                  <FileText size={28} className="text-violet-400" />
+                <div className="w-14 h-14 rounded-2xl bg-emerald-500/20 flex items-center justify-center mx-auto mb-4">
+                  <FileText size={28} className="text-emerald-400" />
                 </div>
                 <h3 className="text-xl font-semibold text-white mb-2">Enter Property Description</h3>
                 <p className="text-sm text-zinc-400">
@@ -278,7 +278,7 @@ export const TextToVideoWizard: React.FC<TextToVideoWizardProps> = ({
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder="Example: Beautiful 4 bedroom, 3 bathroom modern farmhouse with an open concept living area, gourmet kitchen with quartz countertops, luxurious master suite, private backyard with pool, and 3-car garage. Features include hardwood floors throughout, smart home technology, and energy-efficient appliances..."
                   rows={8}
-                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-violet-500 resize-none"
+                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 resize-none"
                 />
 
                 <div className="grid grid-cols-2 gap-4">
@@ -289,7 +289,7 @@ export const TextToVideoWizard: React.FC<TextToVideoWizardProps> = ({
                     <select
                       value={propertyData.propertyType}
                       onChange={(e) => setPropertyData(prev => ({ ...prev, propertyType: e.target.value as any }))}
-                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-violet-500"
+                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
                     >
                       <option value="house">Single Family Home</option>
                       <option value="condo">Condominium</option>
@@ -305,7 +305,7 @@ export const TextToVideoWizard: React.FC<TextToVideoWizardProps> = ({
                     <select
                       value={propertyData.style}
                       onChange={(e) => setPropertyData(prev => ({ ...prev, style: e.target.value }))}
-                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-violet-500"
+                      className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
                     >
                       <option value="modern">Modern</option>
                       <option value="traditional">Traditional</option>
@@ -329,7 +329,7 @@ export const TextToVideoWizard: React.FC<TextToVideoWizardProps> = ({
                   disabled={!description.trim() || isProcessing}
                   className={`w-full py-4 rounded-xl font-semibold text-sm transition-all flex items-center justify-center gap-2 ${
                     description.trim() && !isProcessing
-                      ? 'bg-violet-600 hover:bg-violet-500 text-white'
+                      ? 'bg-emerald-600 hover:bg-emerald-500 text-white'
                       : 'bg-white/5 text-zinc-600 cursor-not-allowed'
                   }`}
                 >
@@ -373,7 +373,7 @@ export const TextToVideoWizard: React.FC<TextToVideoWizardProps> = ({
                     className="p-4 rounded-xl bg-white/5 border border-white/10"
                   >
                     <div className="flex items-center gap-2 mb-2">
-                      <span className="w-6 h-6 rounded-full bg-violet-500/20 text-violet-400 flex items-center justify-center text-xs font-semibold">
+                      <span className="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xs font-semibold">
                         {index + 1}
                       </span>
                       <span className="text-sm font-medium text-white capitalize">
@@ -389,7 +389,7 @@ export const TextToVideoWizard: React.FC<TextToVideoWizardProps> = ({
                 ))}
               </div>
 
-              <div className="p-4 rounded-xl bg-violet-500/10 border border-violet-500/30 mb-6">
+              <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 mb-6">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-sm font-medium text-white">Estimated Credits</span>
                   <span className="text-sm text-zinc-400">Your balance: {balance}</span>
@@ -421,7 +421,7 @@ export const TextToVideoWizard: React.FC<TextToVideoWizardProps> = ({
                 <button
                   onClick={handleGenerateImages}
                   disabled={isProcessing || !hasEnoughCredits('virtual-staging')}
-                  className="flex-1 py-3 rounded-xl font-semibold text-sm bg-violet-600 hover:bg-violet-500 text-white flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex-1 py-3 rounded-xl font-semibold text-sm bg-emerald-600 hover:bg-emerald-500 text-white flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isProcessing ? (
                     <>
@@ -446,7 +446,7 @@ export const TextToVideoWizard: React.FC<TextToVideoWizardProps> = ({
                   </div>
                   <div className="h-2 bg-white/10 rounded-full overflow-hidden">
                     <div
-                      className="h-full bg-violet-500 transition-all"
+                      className="h-full bg-emerald-500 transition-all"
                       style={{ width: `${(progress.current / progress.total) * 100}%` }}
                     />
                   </div>
@@ -513,7 +513,7 @@ export const TextToVideoWizard: React.FC<TextToVideoWizardProps> = ({
                 <button
                   onClick={handleGenerateVideos}
                   disabled={isProcessing}
-                  className="flex-1 py-3 rounded-xl font-semibold text-sm bg-violet-600 hover:bg-violet-500 text-white flex items-center justify-center gap-2 disabled:opacity-50"
+                  className="flex-1 py-3 rounded-xl font-semibold text-sm bg-emerald-600 hover:bg-emerald-500 text-white flex items-center justify-center gap-2 disabled:opacity-50"
                 >
                   {isProcessing ? (
                     <>
@@ -538,7 +538,7 @@ export const TextToVideoWizard: React.FC<TextToVideoWizardProps> = ({
                   </div>
                   <div className="h-2 bg-white/10 rounded-full overflow-hidden">
                     <div
-                      className="h-full bg-violet-500 transition-all"
+                      className="h-full bg-emerald-500 transition-all"
                       style={{ width: `${(progress.current / progress.total) * 100}%` }}
                     />
                   </div>
@@ -605,7 +605,7 @@ export const TextToVideoWizard: React.FC<TextToVideoWizardProps> = ({
                 </button>
                 <button
                   onClick={handleCreateStoryboard}
-                  className="flex-1 py-3 rounded-xl font-semibold text-sm bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white flex items-center justify-center gap-2"
+                  className="flex-1 py-3 rounded-xl font-semibold text-sm bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white flex items-center justify-center gap-2"
                 >
                   <Wand2 size={18} />
                   Create Storyboard
@@ -634,7 +634,7 @@ export const TextToVideoWizard: React.FC<TextToVideoWizardProps> = ({
               <div className="space-y-3">
                 <button
                   onClick={() => onComplete && storyboard && onComplete(storyboard.id)}
-                  className="w-full py-3 rounded-xl font-semibold text-sm bg-violet-600 hover:bg-violet-500 text-white flex items-center justify-center gap-2"
+                  className="w-full py-3 rounded-xl font-semibold text-sm bg-emerald-600 hover:bg-emerald-500 text-white flex items-center justify-center gap-2"
                 >
                   <Eye size={18} />
                   View Storyboard

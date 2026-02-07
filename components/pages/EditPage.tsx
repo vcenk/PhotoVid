@@ -9,7 +9,7 @@ export const EditPage: React.FC = () => {
 
     return (
         <AssetProvider>
-            <div className="flex h-screen bg-white dark:bg-[#09090b] text-zinc-900 dark:text-white overflow-hidden">
+            <div className="flex h-screen bg-white dark:bg-[#09090b] text-zinc-900 dark:text-white font-[Space_Grotesk] overflow-hidden">
                 <NavigationRail isMobileOpen={mobileMenuOpen} onMobileClose={() => setMobileMenuOpen(false)} />
 
                 <div className="flex-1 flex flex-col min-w-0 overflow-hidden ml-0 lg:ml-16">

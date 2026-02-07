@@ -16,16 +16,16 @@ export const WorkflowCard: React.FC<WorkflowCardProps> = ({ workflow, accentColo
 
     const accentClasses = {
         indigo: {
-            badge: 'bg-indigo-100 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400',
-            icon: 'text-indigo-600 dark:text-indigo-400',
+            badge: 'bg-teal-100 dark:bg-teal-950 text-teal-600 dark:text-teal-400',
+            icon: 'text-teal-600 dark:text-teal-400',
         },
         red: {
             badge: 'bg-red-100 dark:bg-red-950 text-red-600 dark:text-red-400',
             icon: 'text-red-600 dark:text-red-400',
         },
     }[accentColor] || {
-        badge: 'bg-violet-100 dark:bg-violet-950 text-violet-600 dark:text-violet-400',
-        icon: 'text-violet-600 dark:text-violet-400',
+        badge: 'bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400',
+        icon: 'text-emerald-600 dark:text-emerald-400',
     };
 
     return (
@@ -77,9 +77,9 @@ export const WorkflowsSection: React.FC<WorkflowsSectionProps> = ({
     const navigate = useNavigate();
 
     const accentClasses = {
-        indigo: 'text-indigo-600 dark:text-indigo-400',
+        indigo: 'text-teal-600 dark:text-teal-400',
         red: 'text-red-600 dark:text-red-400',
-    }[accentColor] || 'text-violet-600 dark:text-violet-400';
+    }[accentColor] || 'text-emerald-600 dark:text-emerald-400';
 
     return (
         <div className="py-8">

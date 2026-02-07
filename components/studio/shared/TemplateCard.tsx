@@ -19,7 +19,7 @@ export const TemplateCard: React.FC<TemplateCardProps> = ({ template, onSelect }
             onMouseEnter={() => setIsHovering(true)}
             onMouseLeave={() => setIsHovering(false)}
             onClick={() => onSelect(template)}
-            className="group cursor-pointer bg-white dark:bg-zinc-950 rounded-2xl border border-zinc-200 dark:border-zinc-800 overflow-hidden hover:shadow-2xl hover:border-indigo-200 dark:hover:border-indigo-600 transition-all duration-300"
+            className="group cursor-pointer bg-white dark:bg-zinc-950 rounded-2xl border border-zinc-200 dark:border-zinc-800 overflow-hidden hover:shadow-2xl hover:border-teal-200 dark:hover:border-teal-600 transition-all duration-300"
         >
             {/* Image/Video Preview */}
             <div className="relative aspect-[4/3] overflow-hidden bg-zinc-100 dark:bg-zinc-900">
@@ -54,7 +54,7 @@ export const TemplateCard: React.FC<TemplateCardProps> = ({ template, onSelect }
 
                 {/* Before/After Label */}
                 <div className="absolute top-3 left-3 flex items-center gap-1">
-                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide ${isHovering ? 'bg-indigo-500 text-white' : 'bg-white/90 dark:bg-zinc-800/90 text-zinc-600 dark:text-zinc-300'}`}>
+                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide ${isHovering ? 'bg-teal-500 text-white' : 'bg-white/90 dark:bg-zinc-800/90 text-zinc-600 dark:text-zinc-300'}`}>
                         {isHovering ? 'After' : 'Before'}
                     </span>
                 </div>
@@ -90,7 +90,7 @@ export const TemplateCard: React.FC<TemplateCardProps> = ({ template, onSelect }
             {/* Content */}
             <div className="p-4">
                 <div className="flex items-start justify-between mb-2">
-                    <h3 className="text-sm font-bold text-zinc-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors line-clamp-1">
+                    <h3 className="text-sm font-bold text-zinc-900 dark:text-white group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors line-clamp-1">
                         {template.name}
                     </h3>
                     <div className="flex items-center gap-1 text-amber-500">
@@ -108,7 +108,7 @@ export const TemplateCard: React.FC<TemplateCardProps> = ({ template, onSelect }
                     <span className="px-2 py-0.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 text-[10px] font-medium">
                         {template.category}
                     </span>
-                    <span className="px-2 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 text-[10px] font-medium">
+                    <span className="px-2 py-0.5 rounded-full bg-teal-50 dark:bg-teal-950/50 text-teal-600 dark:text-teal-400 text-[10px] font-medium">
                         {template.stylePreset}
                     </span>
                 </div>

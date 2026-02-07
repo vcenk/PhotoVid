@@ -40,9 +40,9 @@ export function FlyoutPanels({ activeFlyout, onClose }: FlyoutPanelsProps) {
         {/* Header */}
         <div className="sticky top-0 bg-white dark:bg-zinc-950 border-b border-zinc-200 dark:border-zinc-800 px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            {activeFlyout === 'image' && <ImageIcon size={20} className="text-indigo-600" />}
-            {activeFlyout === 'video' && <Video size={20} className="text-indigo-600" />}
-            {activeFlyout === 'edit' && <Wand2 size={20} className="text-indigo-600" />}
+            {activeFlyout === 'image' && <ImageIcon size={20} className="text-teal-600" />}
+            {activeFlyout === 'video' && <Video size={20} className="text-teal-600" />}
+            {activeFlyout === 'edit' && <Wand2 size={20} className="text-teal-600" />}
             <h2 className="text-lg font-bold text-zinc-900 dark:text-white capitalize">
               {activeFlyout} Tools
             </h2>
@@ -92,16 +92,16 @@ function ImageFlyoutContent({ onAction, onClose }: { onAction: (action: string, 
               <button
                 key={action.id}
                 onClick={() => onAction(action.id, 'image')}
-                className="flex items-center gap-3 p-3 rounded-xl bg-zinc-50 dark:bg-zinc-900 hover:bg-indigo-50 dark:hover:bg-indigo-950/30 border border-zinc-200 dark:border-zinc-800 hover:border-indigo-300 dark:hover:border-indigo-700 transition-all group"
+                className="flex items-center gap-3 p-3 rounded-xl bg-zinc-50 dark:bg-zinc-900 hover:bg-teal-50 dark:hover:bg-teal-950/30 border border-zinc-200 dark:border-zinc-800 hover:border-teal-300 dark:hover:border-teal-700 transition-all group"
               >
-                <div className="w-10 h-10 rounded-lg bg-white dark:bg-zinc-800 flex items-center justify-center group-hover:bg-indigo-100 dark:group-hover:bg-indigo-900/50 transition-colors">
-                  <Icon size={18} className="text-zinc-600 dark:text-zinc-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400" />
+                <div className="w-10 h-10 rounded-lg bg-white dark:bg-zinc-800 flex items-center justify-center group-hover:bg-teal-100 dark:group-hover:bg-teal-900/50 transition-colors">
+                  <Icon size={18} className="text-zinc-600 dark:text-zinc-400 group-hover:text-teal-600 dark:group-hover:text-teal-400" />
                 </div>
                 <div className="flex-1 text-left">
                   <div className="text-sm font-medium text-zinc-900 dark:text-white">{action.label}</div>
                   <div className="text-xs text-zinc-500 dark:text-zinc-400">{action.description}</div>
                 </div>
-                <ArrowRight size={16} className="text-zinc-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors" />
+                <ArrowRight size={16} className="text-zinc-400 group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors" />
               </button>
             );
           })}
@@ -118,10 +118,10 @@ function ImageFlyoutContent({ onAction, onClose }: { onAction: (action: string, 
               <button
                 key={preset.id}
                 onClick={() => onAction(preset.id, 'image')}
-                className="flex flex-col items-center gap-2 p-3 rounded-xl bg-zinc-50 dark:bg-zinc-900 hover:bg-indigo-50 dark:hover:bg-indigo-950/30 border border-zinc-200 dark:border-zinc-800 hover:border-indigo-300 dark:hover:border-indigo-700 transition-all group"
+                className="flex flex-col items-center gap-2 p-3 rounded-xl bg-zinc-50 dark:bg-zinc-900 hover:bg-teal-50 dark:hover:bg-teal-950/30 border border-zinc-200 dark:border-zinc-800 hover:border-teal-300 dark:hover:border-teal-700 transition-all group"
               >
-                <div className="w-12 h-12 rounded-lg bg-white dark:bg-zinc-800 flex items-center justify-center group-hover:bg-indigo-100 dark:group-hover:bg-indigo-900/50 transition-colors">
-                  <Icon size={20} className="text-zinc-600 dark:text-zinc-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400" />
+                <div className="w-12 h-12 rounded-lg bg-white dark:bg-zinc-800 flex items-center justify-center group-hover:bg-teal-100 dark:group-hover:bg-teal-900/50 transition-colors">
+                  <Icon size={20} className="text-zinc-600 dark:text-zinc-400 group-hover:text-teal-600 dark:group-hover:text-teal-400" />
                 </div>
                 <div className="text-xs font-medium text-zinc-900 dark:text-white text-center">{preset.name}</div>
               </button>
@@ -161,16 +161,16 @@ function VideoFlyoutContent({ onAction, onClose }: { onAction: (action: string, 
               <button
                 key={action.id}
                 onClick={() => onAction(action.id, 'video')}
-                className="flex items-center gap-3 p-3 rounded-xl bg-zinc-50 dark:bg-zinc-900 hover:bg-indigo-50 dark:hover:bg-indigo-950/30 border border-zinc-200 dark:border-zinc-800 hover:border-indigo-300 dark:hover:border-indigo-700 transition-all group"
+                className="flex items-center gap-3 p-3 rounded-xl bg-zinc-50 dark:bg-zinc-900 hover:bg-teal-50 dark:hover:bg-teal-950/30 border border-zinc-200 dark:border-zinc-800 hover:border-teal-300 dark:hover:border-teal-700 transition-all group"
               >
-                <div className="w-10 h-10 rounded-lg bg-white dark:bg-zinc-800 flex items-center justify-center group-hover:bg-indigo-100 dark:group-hover:bg-indigo-900/50 transition-colors">
-                  <Icon size={18} className="text-zinc-600 dark:text-zinc-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400" />
+                <div className="w-10 h-10 rounded-lg bg-white dark:bg-zinc-800 flex items-center justify-center group-hover:bg-teal-100 dark:group-hover:bg-teal-900/50 transition-colors">
+                  <Icon size={18} className="text-zinc-600 dark:text-zinc-400 group-hover:text-teal-600 dark:group-hover:text-teal-400" />
                 </div>
                 <div className="flex-1 text-left">
                   <div className="text-sm font-medium text-zinc-900 dark:text-white">{action.label}</div>
                   <div className="text-xs text-zinc-500 dark:text-zinc-400">{action.description}</div>
                 </div>
-                <ArrowRight size={16} className="text-zinc-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors" />
+                <ArrowRight size={16} className="text-zinc-400 group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors" />
               </button>
             );
           })}
@@ -185,10 +185,10 @@ function VideoFlyoutContent({ onAction, onClose }: { onAction: (action: string, 
             <button
               key={preset.id}
               onClick={() => onAction(preset.id, 'video')}
-              className="flex flex-col items-center gap-2 p-3 rounded-xl bg-zinc-50 dark:bg-zinc-900 hover:bg-indigo-50 dark:hover:bg-indigo-950/30 border border-zinc-200 dark:border-zinc-800 hover:border-indigo-300 dark:hover:border-indigo-700 transition-all group"
+              className="flex flex-col items-center gap-2 p-3 rounded-xl bg-zinc-50 dark:bg-zinc-900 hover:bg-teal-50 dark:hover:bg-teal-950/30 border border-zinc-200 dark:border-zinc-800 hover:border-teal-300 dark:hover:border-teal-700 transition-all group"
             >
-              <div className="w-12 h-12 rounded-lg bg-white dark:bg-zinc-800 flex items-center justify-center group-hover:bg-indigo-100 dark:group-hover:bg-indigo-900/50 transition-colors">
-                <Video size={20} className="text-zinc-600 dark:text-zinc-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400" />
+              <div className="w-12 h-12 rounded-lg bg-white dark:bg-zinc-800 flex items-center justify-center group-hover:bg-teal-100 dark:group-hover:bg-teal-900/50 transition-colors">
+                <Video size={20} className="text-zinc-600 dark:text-zinc-400 group-hover:text-teal-600 dark:group-hover:text-teal-400" />
               </div>
               <div className="text-xs font-medium text-zinc-900 dark:text-white text-center">{preset.name}</div>
             </button>
@@ -222,16 +222,16 @@ function EditFlyoutContent({ onAction, onClose }: { onAction: (action: string, m
               <button
                 key={tool.id}
                 onClick={() => onAction(tool.id, 'edit')}
-                className="flex items-center gap-3 p-3 rounded-xl bg-zinc-50 dark:bg-zinc-900 hover:bg-indigo-50 dark:hover:bg-indigo-950/30 border border-zinc-200 dark:border-zinc-800 hover:border-indigo-300 dark:hover:border-indigo-700 transition-all group"
+                className="flex items-center gap-3 p-3 rounded-xl bg-zinc-50 dark:bg-zinc-900 hover:bg-teal-50 dark:hover:bg-teal-950/30 border border-zinc-200 dark:border-zinc-800 hover:border-teal-300 dark:hover:border-teal-700 transition-all group"
               >
-                <div className="w-10 h-10 rounded-lg bg-white dark:bg-zinc-800 flex items-center justify-center group-hover:bg-indigo-100 dark:group-hover:bg-indigo-900/50 transition-colors">
-                  <Icon size={18} className="text-zinc-600 dark:text-zinc-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400" />
+                <div className="w-10 h-10 rounded-lg bg-white dark:bg-zinc-800 flex items-center justify-center group-hover:bg-teal-100 dark:group-hover:bg-teal-900/50 transition-colors">
+                  <Icon size={18} className="text-zinc-600 dark:text-zinc-400 group-hover:text-teal-600 dark:group-hover:text-teal-400" />
                 </div>
                 <div className="flex-1 text-left">
                   <div className="text-sm font-medium text-zinc-900 dark:text-white">{tool.label}</div>
                   <div className="text-xs text-zinc-500 dark:text-zinc-400">{tool.description}</div>
                 </div>
-                <ArrowRight size={16} className="text-zinc-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors" />
+                <ArrowRight size={16} className="text-zinc-400 group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors" />
               </button>
             );
           })}

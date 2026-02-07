@@ -127,7 +127,7 @@ export const StoryboardPreview: React.FC<StoryboardPreviewProps> = ({ onClose })
           </span>
           <div className="flex-1 h-1 bg-white/10 rounded-full overflow-hidden">
             <div
-              className="h-full bg-violet-500 transition-all"
+              className="h-full bg-emerald-500 transition-all"
               style={{ width: `${(elapsedDuration / totalDuration) * 100}%` }}
             />
           </div>
@@ -189,7 +189,7 @@ export const StoryboardPreview: React.FC<StoryboardPreviewProps> = ({ onClose })
               onClick={() => setCurrentSceneIndex(index)}
               className={`relative w-20 h-12 rounded-lg overflow-hidden flex-shrink-0 transition-all ${
                 index === currentSceneIndex
-                  ? 'ring-2 ring-violet-500 ring-offset-2 ring-offset-black'
+                  ? 'ring-2 ring-emerald-500 ring-offset-2 ring-offset-black'
                   : 'opacity-60 hover:opacity-100'
               }`}
             >

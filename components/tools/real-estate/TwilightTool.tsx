@@ -177,7 +177,7 @@ const TwilightToolInner: React.FC = () => {
                                 <ArrowLeft size={18} className="text-zinc-400" />
                             </button>
                             <h1 className="text-base font-semibold text-white flex items-center gap-2">
-                                <Moon size={18} className="text-indigo-400" />
+                                <Moon size={18} className="text-teal-400" />
                                 Day to Twilight
                             </h1>
                         </div>
@@ -190,7 +190,7 @@ const TwilightToolInner: React.FC = () => {
                             {!imagePreview ? (
                                 <div
                                     onDragEnter={handleDrag} onDragLeave={handleDrag} onDragOver={handleDrag} onDrop={handleDrop}
-                                    className={`relative border border-dashed rounded-xl p-6 text-center transition-all cursor-pointer ${isDragging ? 'border-indigo-500 bg-indigo-500/10' : 'border-white/10 hover:border-white/20 bg-white/[0.02]'}`}
+                                    className={`relative border border-dashed rounded-xl p-6 text-center transition-all cursor-pointer ${isDragging ? 'border-teal-500 bg-teal-500/10' : 'border-white/10 hover:border-white/20 bg-white/[0.02]'}`}
                                 >
                                     <input type="file" className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" onChange={handleFileChange} accept="image/*" />
                                     <Sun size={28} className="mx-auto mb-2 text-zinc-500" />
@@ -214,14 +214,14 @@ const TwilightToolInner: React.FC = () => {
                                     <button
                                         key={style.id}
                                         onClick={() => setSelectedStyle(style.id)}
-                                        className={`w-full p-3 rounded-xl text-left transition-all flex items-center gap-3 ${selectedStyle === style.id ? 'bg-indigo-600/20 border border-indigo-500/50' : 'bg-white/[0.02] border border-transparent hover:bg-white/[0.05]'}`}
+                                        className={`w-full p-3 rounded-xl text-left transition-all flex items-center gap-3 ${selectedStyle === style.id ? 'bg-teal-600/20 border border-teal-500/50' : 'bg-white/[0.02] border border-transparent hover:bg-white/[0.05]'}`}
                                     >
                                         <img src={style.image} alt={style.name} className="w-10 h-10 rounded-lg object-cover" />
                                         <div className="flex-1">
-                                            <p className={`text-sm font-medium ${selectedStyle === style.id ? 'text-indigo-300' : 'text-zinc-300'}`}>{style.name}</p>
+                                            <p className={`text-sm font-medium ${selectedStyle === style.id ? 'text-teal-300' : 'text-zinc-300'}`}>{style.name}</p>
                                             <p className="text-xs text-zinc-500">{style.description}</p>
                                         </div>
-                                        {selectedStyle === style.id && <Check size={16} className="text-indigo-400" />}
+                                        {selectedStyle === style.id && <Check size={16} className="text-teal-400" />}
                                     </button>
                                 ))}
                             </div>
@@ -238,7 +238,7 @@ const TwilightToolInner: React.FC = () => {
                                     <button
                                         key={option.id}
                                         onClick={() => setWindowBrightness(option.id)}
-                                        className={`flex-1 py-2 px-3 rounded-lg text-xs font-medium transition-all ${windowBrightness === option.id ? 'bg-indigo-600 text-white' : 'bg-white/5 text-zinc-400 hover:bg-white/10'}`}
+                                        className={`flex-1 py-2 px-3 rounded-lg text-xs font-medium transition-all ${windowBrightness === option.id ? 'bg-teal-600 text-white' : 'bg-white/5 text-zinc-400 hover:bg-white/10'}`}
                                     >
                                         {option.name}
                                     </button>
@@ -257,7 +257,7 @@ const TwilightToolInner: React.FC = () => {
                                     <button
                                         key={option.id}
                                         onClick={() => setSkyIntensity(option.id)}
-                                        className={`flex-1 py-2 px-3 rounded-lg text-xs font-medium transition-all ${skyIntensity === option.id ? 'bg-indigo-600 text-white' : 'bg-white/5 text-zinc-400 hover:bg-white/10'}`}
+                                        className={`flex-1 py-2 px-3 rounded-lg text-xs font-medium transition-all ${skyIntensity === option.id ? 'bg-teal-600 text-white' : 'bg-white/5 text-zinc-400 hover:bg-white/10'}`}
                                     >
                                         {option.name}
                                     </button>
@@ -270,7 +270,7 @@ const TwilightToolInner: React.FC = () => {
                         <button
                             onClick={handleGenerate}
                             disabled={!uploadedImage || isGenerating}
-                            className={`w-full py-3 rounded-xl font-semibold text-sm transition-all flex items-center justify-center gap-2 ${uploadedImage && !isGenerating ? 'bg-indigo-600 hover:bg-indigo-500 text-white' : 'bg-white/5 text-zinc-600 cursor-not-allowed'}`}
+                            className={`w-full py-3 rounded-xl font-semibold text-sm transition-all flex items-center justify-center gap-2 ${uploadedImage && !isGenerating ? 'bg-teal-600 hover:bg-teal-500 text-white' : 'bg-white/5 text-zinc-600 cursor-not-allowed'}`}
                         >
                             {isGenerating ? <><Loader2 size={18} className="animate-spin" />Converting {generationProgress}%</> : <><Moon size={18} />Convert to Twilight</>}
                         </button>
@@ -289,7 +289,7 @@ const TwilightToolInner: React.FC = () => {
                                 ) : (
                                     <button onClick={async () => { if (resultImage) { try { await addAsset(resultImage, 'image', 'Twilight Result'); setSavedToLibrary(true); } catch {} } }} className="px-3 py-1.5 text-xs font-medium text-zinc-400 hover:text-white bg-white/5 hover:bg-white/10 rounded-lg transition-colors flex items-center gap-1.5"><BookmarkPlus size={14} />Save to Library</button>
                                 )}
-                                <button onClick={() => resultImage && downloadFile(resultImage, `twilight-${Date.now()}.jpg`)} className="px-3 py-1.5 text-xs font-medium text-white bg-indigo-600 hover:bg-indigo-500 rounded-lg transition-colors flex items-center gap-1.5"><Download size={14} />Download</button>
+                                <button onClick={() => resultImage && downloadFile(resultImage, `twilight-${Date.now()}.jpg`)} className="px-3 py-1.5 text-xs font-medium text-white bg-teal-600 hover:bg-teal-500 rounded-lg transition-colors flex items-center gap-1.5"><Download size={14} />Download</button>
                             </div>
                         )}
                     </div>
@@ -304,7 +304,7 @@ const TwilightToolInner: React.FC = () => {
                                 <p className="text-zinc-500 text-xs max-w-xs">{error}</p>
                                 <button
                                     onClick={() => setError(null)}
-                                    className="mt-4 px-4 py-2 text-xs font-medium text-white bg-indigo-600 hover:bg-indigo-500 rounded-lg transition-colors"
+                                    className="mt-4 px-4 py-2 text-xs font-medium text-white bg-teal-600 hover:bg-teal-500 rounded-lg transition-colors"
                                 >
                                     Try Again
                                 </button>
@@ -317,7 +317,7 @@ const TwilightToolInner: React.FC = () => {
                         ) : isGenerating ? (
                             <div className="text-center">
                                 <div className="relative w-24 h-24 mx-auto mb-6">
-                                    <svg className="w-full h-full -rotate-90"><circle cx="48" cy="48" r="44" stroke="currentColor" strokeWidth="4" fill="none" className="text-white/10" /><circle cx="48" cy="48" r="44" stroke="currentColor" strokeWidth="4" fill="none" strokeDasharray={276.46} strokeDashoffset={276.46 - (276.46 * generationProgress) / 100} className="text-indigo-500 transition-all duration-300" strokeLinecap="round" /></svg>
+                                    <svg className="w-full h-full -rotate-90"><circle cx="48" cy="48" r="44" stroke="currentColor" strokeWidth="4" fill="none" className="text-white/10" /><circle cx="48" cy="48" r="44" stroke="currentColor" strokeWidth="4" fill="none" strokeDasharray={276.46} strokeDashoffset={276.46 - (276.46 * generationProgress) / 100} className="text-teal-500 transition-all duration-300" strokeLinecap="round" /></svg>
                                     <span className="absolute inset-0 flex items-center justify-center text-xl font-semibold text-white">{generationProgress}%</span>
                                 </div>
                                 <p className="text-zinc-400 font-medium">Converting to twilight...</p>

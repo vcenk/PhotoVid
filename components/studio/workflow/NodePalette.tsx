@@ -42,7 +42,7 @@ export const NodePalette: React.FC<NodePaletteProps> = ({ onAddNode }) => {
             placeholder="Search nodes..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-9 pr-3 py-2 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 text-zinc-900 dark:text-white placeholder:text-zinc-400"
+            className="w-full pl-9 pr-3 py-2 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/20 text-zinc-900 dark:text-white placeholder:text-zinc-400"
           />
         </div>
       </div>
@@ -97,7 +97,7 @@ export const NodePalette: React.FC<NodePaletteProps> = ({ onAddNode }) => {
                             className={cn(
                               'w-full p-3 rounded-lg text-left transition-all group',
                               'bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800',
-                              'hover:border-indigo-300 dark:hover:border-indigo-700 hover:shadow-md'
+                              'hover:border-teal-300 dark:hover:border-teal-700 hover:shadow-md'
                             )}
                           >
                             <div className="flex items-start gap-3">

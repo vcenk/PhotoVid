@@ -17,12 +17,12 @@ const INDUSTRY_VIDEOS: Record<string, string> = {
 
 // Industry gradients
 const INDUSTRY_GRADIENTS: Record<string, string> = {
-    'real-estate': 'from-blue-600 to-indigo-700',
+    'real-estate': 'from-emerald-600 to-teal-600',
     'ecommerce': 'from-amber-500 to-orange-600',
     'restaurant': 'from-rose-500 to-red-600',
     'agency': 'from-slate-600 to-zinc-800',
     'architecture': 'from-teal-500 to-cyan-600',
-    'creator': 'from-violet-500 to-purple-600',
+    'creator': 'from-emerald-500 to-teal-600',
 };
 
 export const IndustryPortalCards: React.FC = () => {
@@ -57,7 +57,7 @@ export const IndustryPortalCards: React.FC = () => {
                 relative group cursor-pointer rounded-2xl overflow-hidden
                 transition-all duration-300
                 ${isSelected
-                                    ? 'ring-2 ring-indigo-500 ring-offset-2 shadow-xl scale-[1.02]'
+                                    ? 'ring-2 ring-teal-500 ring-offset-2 shadow-xl scale-[1.02]'
                                     : 'hover:shadow-xl hover:scale-[1.01]'
                                 }
               `}
@@ -115,7 +115,7 @@ export const IndustryPortalCards: React.FC = () => {
                             {/* Selected Indicator */}
                             {isSelected && (
                                 <div className="absolute top-3 right-3">
-                                    <span className="px-2 py-0.5 rounded-full bg-white text-indigo-600 text-[10px] font-bold">
+                                    <span className="px-2 py-0.5 rounded-full bg-white text-teal-600 text-[10px] font-bold">
                                         Selected
                                     </span>
                                 </div>

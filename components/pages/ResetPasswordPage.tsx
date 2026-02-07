@@ -60,7 +60,7 @@ export const ResetPasswordPage: React.FC = () => {
   if (authLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#0a0a0b]">
-        <Loader2 size={32} className="text-violet-500 animate-spin" />
+        <Loader2 size={32} className="text-emerald-500 animate-spin" />
       </div>
     );
   }
@@ -82,7 +82,7 @@ export const ResetPasswordPage: React.FC = () => {
 
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-4">
-            <img src="/photovid.svg" alt="Photovid" className="h-10 w-auto" />
+            <img src="/logo.png" alt="Photovid" className="h-12 w-auto" />
           </div>
           <h2 className="text-2xl font-bold text-white mb-2">Set new password</h2>
           <p className="text-zinc-400 text-sm">
@@ -104,7 +104,7 @@ export const ResetPasswordPage: React.FC = () => {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
                 disabled={!isAuthenticated}
-                className="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-12 pr-12 text-white placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all disabled:opacity-50"
+                className="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-12 pr-12 text-white placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all disabled:opacity-50"
               />
               <button
                 type="button"
@@ -129,7 +129,7 @@ export const ResetPasswordPage: React.FC = () => {
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 placeholder="••••••••"
                 disabled={!isAuthenticated}
-                className="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-12 pr-4 text-white placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all disabled:opacity-50"
+                className="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-12 pr-4 text-white placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all disabled:opacity-50"
               />
             </div>
           </div>
@@ -155,7 +155,7 @@ export const ResetPasswordPage: React.FC = () => {
           <button
             type="submit"
             disabled={isLoading || !isAuthenticated}
-            className="w-full py-3 rounded-xl bg-violet-600 hover:bg-violet-500 text-white font-semibold text-sm transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-sm transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isLoading ? (
               <Loader2 size={18} className="animate-spin" />
@@ -169,7 +169,7 @@ export const ResetPasswordPage: React.FC = () => {
           <div className="mt-6 text-center">
             <Link
               to="/auth?mode=forgot-password"
-              className="text-sm text-violet-400 hover:text-violet-300 transition-colors"
+              className="text-sm text-emerald-400 hover:text-emerald-300 transition-colors"
             >
               Request a new reset link
             </Link>

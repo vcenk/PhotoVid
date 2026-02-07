@@ -29,14 +29,14 @@ export const WorkflowGrid: React.FC = () => {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95 }}
             onClick={() => selectWorkflow(workflow)}
-            className="group cursor-pointer bg-white dark:bg-zinc-950 rounded-2xl border border-zinc-200 dark:border-zinc-800 overflow-hidden hover:shadow-xl hover:border-indigo-500/30 dark:hover:border-indigo-500/50 transition-all duration-300"
+            className="group cursor-pointer bg-white dark:bg-zinc-950 rounded-2xl border border-zinc-200 dark:border-zinc-800 overflow-hidden hover:shadow-xl hover:border-teal-500/30 dark:hover:border-teal-500/50 transition-all duration-300"
           >
             {/* Preview Image Area */}
             <div className="h-40 bg-zinc-100 dark:bg-zinc-900 flex items-center justify-center relative overflow-hidden">
                {workflow.previewImage ? (
                  <img src={workflow.previewImage} alt={workflow.name} className="w-full h-full object-cover" />
                ) : (
-                 <div className="p-4 bg-indigo-50 dark:bg-indigo-950/50 rounded-full text-indigo-500 dark:text-indigo-400 group-hover:scale-110 transition-transform duration-500">
+                 <div className="p-4 bg-teal-50 dark:bg-teal-950/50 rounded-full text-teal-500 dark:text-teal-400 group-hover:scale-110 transition-transform duration-500">
                     <workflow.icon size={32} />
                  </div>
                )}
@@ -46,7 +46,7 @@ export const WorkflowGrid: React.FC = () => {
             </div>
 
             <div className="p-6">
-              <h3 className="text-lg font-bold text-zinc-900 dark:text-white mb-2 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+              <h3 className="text-lg font-bold text-zinc-900 dark:text-white mb-2 group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">
                 {workflow.name}
               </h3>
               <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-4 line-clamp-2">
@@ -57,7 +57,7 @@ export const WorkflowGrid: React.FC = () => {
                 <span className="text-xs text-zinc-400 dark:text-zinc-500 flex items-center gap-1">
                   <Layers size={14} /> {workflow.steps.length} Steps
                 </span>
-                <span className="text-sm font-medium text-indigo-600 dark:text-indigo-400 flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+                <span className="text-sm font-medium text-teal-600 dark:text-teal-400 flex items-center gap-1 group-hover:translate-x-1 transition-transform">
                   Start <ArrowRight size={14} />
                 </span>
               </div>

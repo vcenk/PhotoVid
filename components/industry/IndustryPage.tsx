@@ -34,7 +34,7 @@ export const IndustryPage: React.FC<IndustryPageProps> = ({ industryId: propIndu
                     </p>
                     <button
                         onClick={() => navigate('/studio/apps')}
-                        className="px-6 py-3 bg-indigo-600 text-white font-semibold rounded-xl hover:bg-indigo-700 transition-colors"
+                        className="px-6 py-3 bg-teal-600 text-white font-semibold rounded-xl hover:bg-teal-700 transition-colors"
                     >
                         Back to Apps
                     </button>

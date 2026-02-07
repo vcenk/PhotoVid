@@ -91,7 +91,7 @@ export function EditHub() {
   return (
     <div className="min-h-full">
       {/* Hero Banner */}
-      <div className="relative overflow-hidden bg-gradient-to-r from-indigo-600 via-violet-600 to-purple-700 px-6 py-10 sm:px-10">
+      <div className="relative overflow-hidden bg-gradient-to-r from-teal-600 via-emerald-600 to-teal-700 px-6 py-10 sm:px-10">
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PGNpcmNsZSBjeD0iMzAiIGN5PSIzMCIgcj0iMiIvPjwvZz48L2c+PC9zdmc+')] opacity-40" />
         <div className="relative max-w-4xl">
           <div className="flex items-center gap-3 mb-2">
@@ -118,7 +118,7 @@ export function EditHub() {
               placeholder="Search tools..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 rounded-xl bg-white dark:bg-white/[0.04] border border-zinc-200 dark:border-white/10 text-sm text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-violet-500/40 transition-colors"
+              className="w-full pl-9 pr-4 py-2 rounded-xl bg-white dark:bg-white/[0.04] border border-zinc-200 dark:border-white/10 text-sm text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 transition-colors"
             />
           </div>
 
@@ -131,7 +131,7 @@ export function EditHub() {
                 className={cn(
                   'px-3.5 py-1.5 rounded-full text-xs font-medium transition-all duration-200',
                   activeCategory === cat
-                    ? 'bg-violet-600 text-white shadow-lg shadow-violet-600/20'
+                    ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-600/20'
                     : 'bg-white dark:bg-white/[0.04] text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-white/10 hover:bg-zinc-50 dark:hover:bg-white/[0.07] hover:text-zinc-900 dark:hover:text-white'
                 )}
               >
@@ -152,7 +152,7 @@ export function EditHub() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.25, delay: i * 0.02 }}
                 onClick={() => navigate(tool.route)}
-                className="group relative flex flex-col rounded-2xl bg-white dark:bg-white/[0.03] border border-zinc-200 dark:border-white/[0.06] hover:border-violet-500/30 dark:hover:border-violet-500/20 hover:bg-zinc-50 dark:hover:bg-white/[0.05] transition-all duration-200 text-left overflow-hidden"
+                className="group relative flex flex-col rounded-2xl bg-white dark:bg-white/[0.03] border border-zinc-200 dark:border-white/[0.06] hover:border-emerald-500/30 dark:hover:border-emerald-500/20 hover:bg-zinc-50 dark:hover:bg-white/[0.05] transition-all duration-200 text-left overflow-hidden"
               >
                 {/* Image */}
                 <div className="relative w-full h-36 overflow-hidden">
@@ -171,11 +171,11 @@ export function EditHub() {
 
                 {/* Content */}
                 <div className="flex items-start gap-3 p-4">
-                  <div className="w-9 h-9 rounded-lg bg-violet-500/10 flex items-center justify-center shrink-0 group-hover:bg-violet-500/15 transition-colors">
-                    <Icon size={18} className="text-violet-500" />
+                  <div className="w-9 h-9 rounded-lg bg-emerald-500/10 flex items-center justify-center shrink-0 group-hover:bg-emerald-500/15 transition-colors">
+                    <Icon size={18} className="text-emerald-500" />
                   </div>
                   <div className="min-w-0">
-                    <h3 className="text-sm font-semibold text-zinc-900 dark:text-white mb-0.5 group-hover:text-violet-600 dark:group-hover:text-violet-400 transition-colors truncate">
+                    <h3 className="text-sm font-semibold text-zinc-900 dark:text-white mb-0.5 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors truncate">
                       {tool.name}
                     </h3>
                     <p className="text-xs text-zinc-500 dark:text-zinc-500 leading-relaxed line-clamp-2">

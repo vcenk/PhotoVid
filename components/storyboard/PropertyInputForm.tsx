@@ -89,7 +89,7 @@ export const PropertyInputForm: React.FC<PropertyInputFormProps> = ({
         {/* Basic Info Section */}
         <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
           <h3 className="text-sm font-semibold text-white mb-4 flex items-center gap-2">
-            <Building2 size={16} className="text-violet-400" />
+            <Building2 size={16} className="text-emerald-400" />
             Property Information
           </h3>
 
@@ -106,7 +106,7 @@ export const PropertyInputForm: React.FC<PropertyInputFormProps> = ({
                   value={formData.address}
                   onChange={(e) => handleChange('address', e.target.value)}
                   placeholder="123 Main Street, City, State 12345"
-                  className="w-full pl-10 pr-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-violet-500"
+                  className="w-full pl-10 pr-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-emerald-500"
                 />
               </div>
             </div>
@@ -120,7 +120,7 @@ export const PropertyInputForm: React.FC<PropertyInputFormProps> = ({
                 <select
                   value={formData.propertyType}
                   onChange={(e) => handleChange('propertyType', e.target.value)}
-                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-violet-500"
+                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
                 >
                   {PROPERTY_TYPE_CONFIGS.map((type) => (
                     <option key={type.id} value={type.id}>
@@ -137,7 +137,7 @@ export const PropertyInputForm: React.FC<PropertyInputFormProps> = ({
                 <select
                   value={formData.style}
                   onChange={(e) => handleChange('style', e.target.value)}
-                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-violet-500"
+                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
                 >
                   {Object.entries(PROPERTY_STYLES).map(([id, label]) => (
                     <option key={id} value={id}>
@@ -161,7 +161,7 @@ export const PropertyInputForm: React.FC<PropertyInputFormProps> = ({
                   max="20"
                   value={formData.bedrooms}
                   onChange={(e) => handleChange('bedrooms', parseInt(e.target.value) || 0)}
-                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-violet-500"
+                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
                 />
               </div>
 
@@ -177,7 +177,7 @@ export const PropertyInputForm: React.FC<PropertyInputFormProps> = ({
                   step="0.5"
                   value={formData.bathrooms}
                   onChange={(e) => handleChange('bathrooms', parseFloat(e.target.value) || 0)}
-                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-violet-500"
+                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
                 />
               </div>
 
@@ -191,7 +191,7 @@ export const PropertyInputForm: React.FC<PropertyInputFormProps> = ({
                   min="0"
                   value={formData.squareFeet}
                   onChange={(e) => handleChange('squareFeet', parseInt(e.target.value) || 0)}
-                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-violet-500"
+                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
                 />
               </div>
             </div>
@@ -201,7 +201,7 @@ export const PropertyInputForm: React.FC<PropertyInputFormProps> = ({
         {/* Features Section */}
         <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
           <h3 className="text-sm font-semibold text-white mb-4 flex items-center gap-2">
-            <Sparkles size={16} className="text-violet-400" />
+            <Sparkles size={16} className="text-emerald-400" />
             Property Features
           </h3>
 
@@ -212,7 +212,7 @@ export const PropertyInputForm: React.FC<PropertyInputFormProps> = ({
                 onClick={() => toggleFeature(feature)}
                 className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                   formData.features?.includes(feature)
-                    ? 'bg-violet-600 text-white'
+                    ? 'bg-emerald-600 text-white'
                     : 'bg-white/5 text-zinc-400 hover:bg-white/10'
                 }`}
               >
@@ -224,7 +224,7 @@ export const PropertyInputForm: React.FC<PropertyInputFormProps> = ({
           {!showAdvanced && (
             <button
               onClick={() => setShowAdvanced(true)}
-              className="text-xs text-violet-400 hover:text-violet-300 flex items-center gap-1"
+              className="text-xs text-emerald-400 hover:text-emerald-300 flex items-center gap-1"
             >
               Show more features
               <ChevronDown size={12} />
@@ -238,7 +238,7 @@ export const PropertyInputForm: React.FC<PropertyInputFormProps> = ({
               value={customFeature}
               onChange={(e) => setCustomFeature(e.target.value)}
               placeholder="Add custom feature..."
-              className="flex-1 px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-sm text-white placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-violet-500"
+              className="flex-1 px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-sm text-white placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-emerald-500"
               onKeyPress={(e) => e.key === 'Enter' && addCustomFeature()}
             />
             <button
@@ -258,7 +258,7 @@ export const PropertyInputForm: React.FC<PropertyInputFormProps> = ({
                 {formData.features.map((feature) => (
                   <span
                     key={feature}
-                    className="px-2 py-1 bg-violet-600/20 text-violet-300 rounded-md text-xs flex items-center gap-1"
+                    className="px-2 py-1 bg-emerald-600/20 text-emerald-300 rounded-md text-xs flex items-center gap-1"
                   >
                     {feature}
                     <button
@@ -284,7 +284,7 @@ export const PropertyInputForm: React.FC<PropertyInputFormProps> = ({
             onChange={(e) => handleChange('description', e.target.value)}
             placeholder="Paste your MLS description or add custom details about the property. The AI will use this to create better scene prompts..."
             rows={4}
-            className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-violet-500 resize-none"
+            className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 resize-none"
           />
         </div>
 
@@ -309,7 +309,7 @@ export const PropertyInputForm: React.FC<PropertyInputFormProps> = ({
                   value={formData.price || ''}
                   onChange={(e) => handleChange('price', parseInt(e.target.value) || undefined)}
                   placeholder="$0"
-                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-violet-500"
+                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-emerald-500"
                 />
               </div>
 
@@ -322,7 +322,7 @@ export const PropertyInputForm: React.FC<PropertyInputFormProps> = ({
                   value={formData.mlsNumber || ''}
                   onChange={(e) => handleChange('mlsNumber', e.target.value || undefined)}
                   placeholder="MLS#12345678"
-                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-violet-500"
+                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-emerald-500"
                 />
               </div>
 
@@ -335,7 +335,7 @@ export const PropertyInputForm: React.FC<PropertyInputFormProps> = ({
                   value={formData.yearBuilt || ''}
                   onChange={(e) => handleChange('yearBuilt', parseInt(e.target.value) || undefined)}
                   placeholder="2020"
-                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-violet-500"
+                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-emerald-500"
                 />
               </div>
 
@@ -349,7 +349,7 @@ export const PropertyInputForm: React.FC<PropertyInputFormProps> = ({
                   value={formData.lotSize || ''}
                   onChange={(e) => handleChange('lotSize', parseFloat(e.target.value) || undefined)}
                   placeholder="0.25"
-                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-violet-500"
+                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-emerald-500"
                 />
               </div>
             </div>
@@ -363,7 +363,7 @@ export const PropertyInputForm: React.FC<PropertyInputFormProps> = ({
             whileTap={{ scale: 0.98 }}
             onClick={handleAutoGenerate}
             disabled={isGenerating}
-            className="flex-1 py-4 rounded-xl font-semibold text-sm bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex-1 py-4 rounded-xl font-semibold text-sm bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isGenerating ? (
               <>

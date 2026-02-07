@@ -19,7 +19,7 @@ export const UpscaleNode = memo(({ id, data, selected }: NodeProps) => {
         status === 'completed' && 'border-emerald-500 ring-2 ring-emerald-500/20',
         status === 'error' && 'border-red-500 ring-2 ring-red-500/20',
         status === 'idle' && 'border-cyan-300 dark:border-cyan-700',
-        selected && 'ring-4 ring-indigo-500/30'
+        selected && 'ring-4 ring-teal-500/30'
       )}
     >
       {/* Header */}

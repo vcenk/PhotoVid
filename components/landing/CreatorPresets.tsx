@@ -73,12 +73,12 @@ const Typewriter = ({ text }: { text: string }) => {
   }, [text]);
 
   return (
-    <span className="font-mono text-zinc-500 italic">
+    <span className="font-mono text-zinc-500 dark:text-zinc-400 italic">
       {displayed}
       <motion.span
         animate={{ opacity: [1, 0] }}
         transition={{ duration: 0.8, repeat: Infinity }}
-        className="inline-block w-1.5 h-4 ml-1 bg-indigo-600 align-middle"
+        className="inline-block w-1.5 h-4 ml-1 bg-teal-600 dark:bg-teal-400 align-middle"
       />
     </span>
   );
@@ -95,7 +95,7 @@ export const CreatorPresets = () => {
   };
 
   return (
-    <section id="presets" className="relative py-24 md:py-40 bg-white overflow-hidden scroll-mt-20">
+    <section id="presets" className="relative py-24 md:py-40 bg-white dark:bg-zinc-950 overflow-hidden scroll-mt-20">
       <div className="max-w-7xl mx-auto px-6">
         {/* Header */}
         <div className="mb-16">
@@ -105,10 +105,10 @@ export const CreatorPresets = () => {
             viewport={{ once: true }}
             className="flex flex-col gap-4"
           >
-            <span className="text-xs font-bold uppercase tracking-[0.4em] text-indigo-600">Industry Packs</span>
-            <h2 className="text-4xl md:text-6xl font-bold text-zinc-900 tracking-tighter">
+            <span className="text-xs font-bold uppercase tracking-[0.4em] text-teal-600 dark:text-teal-400">Industry Packs</span>
+            <h2 className="text-4xl md:text-6xl font-bold text-zinc-900 dark:text-zinc-100 tracking-tighter">
               Presets for Every <br className="hidden md:block" />
-              <span className="text-zinc-400 italic">Narrative.</span>
+              <span className="text-zinc-400 dark:text-zinc-500 italic">Narrative.</span>
             </h2>
           </motion.div>
         </div>
@@ -120,17 +120,17 @@ export const CreatorPresets = () => {
               key={preset.id}
               onClick={() => setActiveTab(preset)}
               className={`relative px-6 py-3 rounded-full text-sm font-bold transition-all whitespace-nowrap ${
-                activeTab.id === preset.id ? "text-zinc-900" : "text-zinc-400 hover:text-zinc-600"
+                activeTab.id === preset.id ? "text-zinc-900 dark:text-zinc-100" : "text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300"
               }`}
             >
               <span className="relative z-10 flex items-center gap-2">
                 {preset.name}
-                {preset.isPro && <Lock size={12} className="text-indigo-600/50" />}
+                {preset.isPro && <Lock size={12} className="text-teal-600/50 dark:text-teal-400/50" />}
               </span>
               {activeTab.id === preset.id && (
                 <motion.div
                   layoutId="activeTab"
-                  className="absolute inset-0 bg-zinc-50 border border-zinc-200 rounded-full shadow-sm"
+                  className="absolute inset-0 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-full shadow-sm"
                   transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
                 />
               )}
@@ -149,18 +149,18 @@ export const CreatorPresets = () => {
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: 20 }}
                 transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-                className="relative aspect-video rounded-3xl overflow-hidden border border-zinc-200 bg-zinc-50 group shadow-xl"
+                className="relative aspect-video rounded-3xl overflow-hidden border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900 group shadow-xl"
               >
                 <img
                   src={activeTab.image}
                   alt={activeTab.name}
                   className="w-full h-full object-cover transition-transform duration-[3s] group-hover:scale-105"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-white/80 via-transparent to-transparent opacity-60" />
+                <div className="absolute inset-0 bg-gradient-to-t from-white/80 dark:from-black/80 via-transparent to-transparent opacity-60" />
                 
-                <div className="absolute top-6 left-6 px-4 py-2 rounded-xl bg-white/80 backdrop-blur-md border border-zinc-200 flex items-center gap-3 shadow-sm">
-                   <div className="w-2 h-2 rounded-full bg-indigo-600" />
-                   <span className="text-[10px] font-bold text-zinc-900 uppercase tracking-widest">Previewing Preset</span>
+                <div className="absolute top-6 left-6 px-4 py-2 rounded-xl bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md border border-zinc-200 dark:border-zinc-700 flex items-center gap-3 shadow-sm">
+                   <div className="w-2 h-2 rounded-full bg-teal-600 dark:bg-teal-400" />
+                   <span className="text-[10px] font-bold text-zinc-900 dark:text-zinc-100 uppercase tracking-widest">Previewing Preset</span>
                 </div>
               </motion.div>
             </AnimatePresence>
@@ -179,21 +179,21 @@ export const CreatorPresets = () => {
               >
                 <div className="space-y-4">
                   <div className="flex items-center gap-3">
-                    <h3 className="text-3xl font-bold text-zinc-900 tracking-tight">{activeTab.name}</h3>
+                    <h3 className="text-3xl font-bold text-zinc-900 dark:text-zinc-100 tracking-tight">{activeTab.name}</h3>
                     {activeTab.isPro && (
-                      <span className="px-2 py-0.5 rounded bg-indigo-50 border border-indigo-100 text-[10px] font-black text-indigo-600 uppercase">
+                      <span className="px-2 py-0.5 rounded bg-teal-50 dark:bg-teal-950 border border-teal-100 dark:border-teal-800 text-[10px] font-black text-teal-600 dark:text-teal-400 uppercase">
                         PRO Pack
                       </span>
                     )}
                   </div>
-                  <p className="text-xl text-zinc-600 leading-relaxed font-sans">{activeTab.benefit}</p>
+                  <p className="text-xl text-zinc-600 dark:text-zinc-400 leading-relaxed font-sans">{activeTab.benefit}</p>
                 </div>
 
                 {/* Prompt Box */}
-                <div className="p-6 rounded-2xl bg-zinc-50 border border-zinc-200 space-y-3 shadow-sm">
+                <div className="p-6 rounded-2xl bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700 space-y-3 shadow-sm">
                   <div className="flex items-center justify-between">
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">Sample Prompt</span>
-                    <Sparkles size={14} className="text-zinc-300" />
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 dark:text-zinc-500">Sample Prompt</span>
+                    <Sparkles size={14} className="text-zinc-300 dark:text-zinc-600" />
                   </div>
                   <div className="min-h-[80px] text-sm leading-relaxed">
                     <Typewriter text={activeTab.prompt} />
@@ -203,7 +203,7 @@ export const CreatorPresets = () => {
                 {/* Tags */}
                 <div className="flex flex-wrap gap-2">
                   {activeTab.tags.map(tag => (
-                    <span key={tag} className="px-3 py-1 rounded-full bg-white border border-zinc-200 text-[10px] font-bold text-zinc-500 uppercase tracking-wider shadow-sm">
+                    <span key={tag} className="px-3 py-1 rounded-full bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-[10px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider shadow-sm">
                       {tag}
                     </span>
                   ))}
@@ -211,11 +211,11 @@ export const CreatorPresets = () => {
 
                 {/* Includes */}
                 <div className="space-y-3">
-                  <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400">Included features</span>
+                  <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400 dark:text-zinc-500">Included features</span>
                   <div className="grid grid-cols-2 gap-y-2">
                     {activeTab.includes.map(inc => (
-                      <div key={inc} className="flex items-center gap-2 text-xs text-zinc-600">
-                        <CheckCircle2 size={14} className="text-indigo-600/50" />
+                      <div key={inc} className="flex items-center gap-2 text-xs text-zinc-600 dark:text-zinc-400">
+                        <CheckCircle2 size={14} className="text-teal-600/50 dark:text-teal-400/50" />
                         {inc}
                       </div>
                     ))}
@@ -227,7 +227,7 @@ export const CreatorPresets = () => {
                   onClick={scrollToPricing}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  className="mt-4 group flex items-center justify-center gap-2 w-full py-5 rounded-2xl bg-zinc-900 text-white text-sm font-bold transition-all hover:bg-black shadow-lg shadow-zinc-200"
+                  className="mt-4 group flex items-center justify-center gap-2 w-full py-5 rounded-2xl bg-zinc-900 dark:bg-white text-white dark:text-black text-sm font-bold transition-all hover:bg-black dark:hover:bg-zinc-200 shadow-lg shadow-zinc-200 dark:shadow-zinc-900"
                 >
                   Use this preset
                   <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />

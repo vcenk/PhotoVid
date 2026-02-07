@@ -17,7 +17,7 @@ export function HeroComposer() {
   return (
     <section className="px-6 pt-6 pb-2">
       <div className="max-w-7xl mx-auto">
-        <div className="relative rounded-2xl overflow-hidden bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-700 py-10 px-8">
+        <div className="relative rounded-2xl overflow-hidden bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 py-10 px-8">
           {/* Background decoration */}
           <div className="absolute inset-0 opacity-10">
             <div className="absolute top-0 right-0 w-96 h-96 bg-white rounded-full blur-[100px] -translate-y-1/2 translate-x-1/3" />
@@ -55,7 +55,7 @@ export function HeroComposer() {
               </div>
               <button
                 type="submit"
-                className="px-5 py-3 bg-white text-indigo-700 font-semibold rounded-xl hover:bg-white/90 transition-colors flex items-center gap-2 text-sm whitespace-nowrap"
+                className="px-5 py-3 bg-white text-teal-700 font-semibold rounded-xl hover:bg-white/90 transition-colors flex items-center gap-2 text-sm whitespace-nowrap"
               >
                 Go
                 <ArrowRight size={16} />

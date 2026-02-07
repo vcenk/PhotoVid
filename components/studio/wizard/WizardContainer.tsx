@@ -38,13 +38,13 @@ export const WizardContainer: React.FC = () => {
           <div key={idx} className="flex items-center">
             <div className={`
               w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm transition-colors duration-300
-              ${idx === currentStep ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-200' : 
-                idx < currentStep ? 'bg-indigo-100 text-indigo-600' : 'bg-zinc-100 text-zinc-400'}
+              ${idx === currentStep ? 'bg-teal-600 text-white shadow-lg shadow-teal-200' : 
+                idx < currentStep ? 'bg-teal-100 text-teal-600' : 'bg-zinc-100 text-zinc-400'}
             `}>
               {idx + 1}
             </div>
             {idx < steps.length - 1 && (
-              <div className={`w-20 h-1 mx-2 rounded-full transition-colors duration-300 ${idx < currentStep ? 'bg-indigo-100' : 'bg-zinc-100'}`} />
+              <div className={`w-20 h-1 mx-2 rounded-full transition-colors duration-300 ${idx < currentStep ? 'bg-teal-100' : 'bg-zinc-100'}`} />
             )}
           </div>
         ))}
@@ -70,9 +70,9 @@ export const WizardContainer: React.FC = () => {
             onClick={currentStep === 1 ? startGeneration : nextStep}
             disabled={!canProceed()}
             className={`
-              flex items-center gap-2 px-8 py-3 rounded-xl font-bold transition-all shadow-lg shadow-indigo-100
+              flex items-center gap-2 px-8 py-3 rounded-xl font-bold transition-all shadow-lg shadow-teal-100
               ${canProceed() 
-                ? 'bg-indigo-600 text-white hover:bg-indigo-700 hover:shadow-indigo-200 hover:-translate-y-0.5' 
+                ? 'bg-teal-600 text-white hover:bg-teal-700 hover:shadow-teal-200 hover:-translate-y-0.5' 
                 : 'bg-zinc-100 text-zinc-400 cursor-not-allowed'}
             `}
           >
