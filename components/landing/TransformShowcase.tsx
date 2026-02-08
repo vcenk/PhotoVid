@@ -416,6 +416,7 @@ export const TransformShowcase: React.FC = () => {
   return (
     <section
       ref={sectionRef}
+      id="showcase"
       className="relative py-24 md:py-32 overflow-hidden bg-zinc-950"
     >
       {/* Background Effects */}
