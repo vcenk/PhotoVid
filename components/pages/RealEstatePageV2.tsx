@@ -29,6 +29,7 @@ import {
   Layers,
   Wand2,
   Share2,
+  Armchair,
 } from 'lucide-react';
 import { NavigationRail } from '../dashboard/navigation/NavigationRail';
 import { DashboardTopbar } from '../dashboard/navigation/DashboardTopbar';
@@ -59,6 +60,19 @@ const TOOLS: Tool[] = [
     gradient: 'from-blue-500 to-teal-600',
     route: '/studio/real-estate/virtual-staging',
     credits: 2,
+    beforeImage: '/showcase/real-estate/before/virtual-staging.jpg',
+    afterImage: '/showcase/real-estate/after/virtual-staging.jpg',
+  },
+  {
+    id: 'custom-furniture-staging',
+    name: 'Custom Furniture Staging',
+    description: 'Stage rooms with your own furniture reference images',
+    icon: Armchair,
+    gradient: 'from-violet-500 to-purple-600',
+    route: '/studio/real-estate/custom-furniture-staging',
+    credits: 3,
+    isPremium: true,
+    isNew: true,
     beforeImage: '/showcase/real-estate/before/virtual-staging.jpg',
     afterImage: '/showcase/real-estate/after/virtual-staging.jpg',
   },

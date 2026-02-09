@@ -68,6 +68,8 @@ const TOOL_MODEL_MAP: Record<string, string> = {
   'image-to-video': 'fal-ai/kling-video/v1.5/pro/image-to-video',
   // Marketing tools
   'social-media-poster': 'fal-ai/recraft-v3',
+  // Custom staging - using FLUX Pro Fill (inpainting) for room preservation
+  'custom-furniture-staging': 'fal-ai/flux-pro/v1/fill',
   'social-media-poster-overlay': 'fal-ai/ideogram/v2/remix', // Ideogram remix for text on images (no mask needed)
   // Property Reveal Videos (Veo 3.1)
   'property-reveal': 'fal-ai/veo3/image-to-video',
@@ -429,6 +431,34 @@ serve(async (req) => {
       if (imageUrl || options.image_url) {
         falInput.image_url = imageUrl || options.image_url
         falInput.strength = options.strength ?? 0.55
+      }
+    }
+    else if (tool === 'custom-furniture-staging') {
+      // Custom Furniture Staging - using FLUX Pro Fill (inpainting)
+      // This preserves the room 100% and only adds furniture in masked areas
+      if (!imageUrl) {
+        return new Response(
+          JSON.stringify({ error: 'imageUrl is required for furniture staging' }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        )
+      }
+      if (!maskUrl && !options.mask_url) {
+        return new Response(
+          JSON.stringify({ error: 'mask_url is required for furniture staging (indicates where to place furniture)' }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        )
+      }
+
+      // Build staging prompt describing the furniture to add
+      const stagingPrompt = prompt || 'Elegant living room furniture: a comfortable modern sofa, stylish coffee table, decorative area rug, and tasteful decor items. Professional interior design photography, photorealistic.'
+
+      falInput = {
+        image_url: imageUrl,
+        mask_url: maskUrl || options.mask_url,
+        prompt: stagingPrompt,
+        num_images: options.num_images || 1,
+        output_format: options.output_format || 'jpeg',
+        safety_tolerance: options.safety_tolerance || '2',
       }
     }
 

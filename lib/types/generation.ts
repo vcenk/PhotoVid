@@ -46,7 +46,9 @@ export type RealEstateToolType =
   | 'floor-plan'
   | '360-staging'
   // Marketing
-  | 'social-media-poster';
+  | 'social-media-poster'
+  // Custom Staging
+  | 'custom-furniture-staging';
 
 // Auto dealership tool identifiers
 export type AutoToolType =
@@ -122,6 +124,9 @@ export const TOOL_MODEL_MAP: Record<ToolType, string> = {
   // Marketing Tools
   'social-media-poster': 'fal-ai/recraft-v3',
 
+  // Custom Staging Tools
+  'custom-furniture-staging': 'fal-ai/flux-general/image-to-image',
+
   // ============ AUTO DEALERSHIP TOOLS ============
   // Photo Enhancement
   'background-swap': 'fal-ai/flux-pro/v1/fill',
@@ -150,6 +155,7 @@ export const TOOL_MODEL_MAP: Record<ToolType, string> = {
 export const TOOL_CREDITS_MAP: Record<ToolType, number> = {
   // Photo Enhancement
   'virtual-staging': 2,
+  'custom-furniture-staging': 3, // Premium dual-image feature
   'photo-enhancement': 1,
   'photo-relight': 1, // ICLight step for bright/hdr presets
   'sky-segmentation': 1, // Auto sky mask generation
@@ -346,6 +352,12 @@ export interface VirtualStagingOptions {
   roomType: 'living-room' | 'bedroom' | 'kitchen' | 'dining' | 'bathroom' | 'office';
   style: 'modern' | 'scandinavian' | 'coastal' | 'luxury' | 'industrial' | 'farmhouse';
   removeExisting: boolean;
+}
+
+export interface CustomFurnitureStagingOptions {
+  prompt?: string;
+  maskUrl?: string; // URL of the mask image (white = where to add furniture)
+  furnitureArea?: 'floor' | 'center' | 'full'; // Preset mask areas
 }
 
 export interface PhotoEnhancementOptions {
@@ -726,6 +738,7 @@ export interface DamageDetectionOptions {
 export type ToolOptions =
   // Real Estate Tools
   | VirtualStagingOptions
+  | CustomFurnitureStagingOptions
   | PhotoEnhancementOptions
   | SkyReplacementOptions
   | TwilightOptions

@@ -54,6 +54,7 @@ import { ExteriorPaintTool } from './components/tools/real-estate/ExteriorPaintT
 import { LandscapeDesignTool } from './components/tools/real-estate/LandscapeDesignTool';
 import { AutoDeclutterTool } from './components/tools/real-estate/AutoDeclutterTool';
 import { PropertyRevealTool } from './components/tools/real-estate/PropertyRevealTool';
+import { CustomFurnitureStagingTool } from './components/tools/real-estate/CustomFurnitureStagingTool';
 import { RealEstatePageV2 } from './components/pages/RealEstatePageV2';
 import { QuickVideoV2Page } from './components/quick-video-v2/QuickVideoV2Page';
 import { AuthPage } from './components/pages/AuthPage';
@@ -125,6 +126,7 @@ const App: React.FC = () => {
             <Route path="/studio/properties" element={<PropertiesPage />} />
             <Route path="/studio/real-estate" element={<RealEstatePageV2 />} />
             <Route path="/studio/real-estate/virtual-staging" element={<VirtualStagingTool />} />
+            <Route path="/studio/real-estate/custom-furniture-staging" element={<CustomFurnitureStagingTool />} />
             <Route path="/studio/real-estate/item-removal" element={<ItemRemovalTool />} />
             <Route path="/studio/real-estate/photo-enhancement" element={<PhotoEnhancementTool />} />
             <Route path="/studio/real-estate/sky-replacement" element={<SkyReplacementTool />} />

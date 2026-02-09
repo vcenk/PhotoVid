@@ -1,6 +1,6 @@
 // Industry configuration types and data for reusable industry pages
 
-import { LucideIcon, Building2, Car, Utensils, Briefcase, Camera, Video, Wand2, Paintbrush, Square, Sun, Moon, Leaf, Waves, Ban, User, Layers, Hammer, Sparkles, CircleDot, BadgeCheck, Palette, Circle, Film, Share2, AlertTriangle } from 'lucide-react';
+import { LucideIcon, Building2, Car, Utensils, Briefcase, Camera, Video, Wand2, Paintbrush, Square, Sun, Moon, Leaf, Waves, Ban, User, Layers, Hammer, Sparkles, CircleDot, BadgeCheck, Palette, Circle, Film, Share2, AlertTriangle, Armchair } from 'lucide-react';
 
 // ============ TYPE DEFINITIONS ============
 
@@ -141,6 +141,18 @@ export const INDUSTRY_CONFIGS: Record<string, IndustryConfig> = {
             },
         ],
         tools: [
+            // Custom Staging
+            {
+                id: 'custom-furniture-staging',
+                name: 'Custom Furniture Staging',
+                description: 'Stage rooms with your own furniture reference images',
+                icon: Armchair,
+                gradient: 'from-violet-500 to-purple-600',
+                image: '/showcase/real-estate/after/virtual-staging.jpg',
+                isPremium: true,
+                tags: ['New', 'Premium'],
+                route: '/studio/real-estate/custom-furniture-staging',
+            },
             // Video Tools
             {
                 id: 'quick-video',

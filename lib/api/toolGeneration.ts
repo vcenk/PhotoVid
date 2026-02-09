@@ -18,6 +18,7 @@ import {
   LandscapeStyle,
   LandscapeElement,
   VirtualStagingOptions,
+  CustomFurnitureStagingOptions,
   PhotoEnhancementOptions,
   SkyReplacementOptions,
   TwilightOptions,
@@ -111,13 +112,18 @@ export async function fetchAsBlob(remoteUrl: string, retries = 3): Promise<strin
 }
 
 /**
- * Returns the image URL directly (FAL URLs are public and load fine)
- * Previously tried to convert to blob URL which caused loading issues
+ * Safely fetch and convert a remote image URL to a blob URL
+ * This avoids ERR_QUIC_PROTOCOL_ERROR issues with FAL media URLs
  */
 export async function safeImageUrl(remoteUrl: string): Promise<string> {
-  // FAL URLs are public and load fine - just return directly
-  // Blob conversion was causing black screen issues in BeforeAfterSlider
-  return remoteUrl;
+  try {
+    // Fetch as blob to avoid QUIC protocol errors
+    return await fetchAsBlob(remoteUrl, 3);
+  } catch (error) {
+    console.warn('Failed to fetch as blob, returning original URL:', error);
+    // Fallback to original URL if blob conversion fails
+    return remoteUrl;
+  }
 }
 
 // Call FAL generate Edge Function (secure - no API key exposure)
@@ -3650,4 +3656,201 @@ export async function generatePropertyReveal(
   }
 
   throw new Error('No video in generation result');
+}
+
+/**
+ * Generate a floor mask for furniture placement
+ * Creates a gradient mask where white = floor area (where furniture goes)
+ */
+async function generateFloorMask(
+  imageFile: File | null,
+  imageUrl: string | null,
+  maskType: 'floor' | 'center' | 'full' = 'floor'
+): Promise<File> {
+  // Load the image to get dimensions
+  let img: HTMLImageElement;
+
+  if (imageFile) {
+    img = await new Promise((resolve, reject) => {
+      const image = new Image();
+      image.onload = () => resolve(image);
+      image.onerror = reject;
+      image.src = URL.createObjectURL(imageFile);
+    });
+  } else if (imageUrl) {
+    img = await new Promise((resolve, reject) => {
+      const image = new Image();
+      image.crossOrigin = 'anonymous';
+      image.onload = () => resolve(image);
+      image.onerror = reject;
+      image.src = imageUrl;
+    });
+  } else {
+    throw new Error('No image provided for mask generation');
+  }
+
+  const width = img.width;
+  const height = img.height;
+
+  // Create canvas for mask
+  const canvas = document.createElement('canvas');
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext('2d')!;
+
+  // Fill with black (areas to preserve)
+  ctx.fillStyle = 'black';
+  ctx.fillRect(0, 0, width, height);
+
+  // Draw white areas (where furniture will be added)
+  ctx.fillStyle = 'white';
+
+  if (maskType === 'floor') {
+    // Floor area: bottom 55% with gradient fade at top
+    const floorStart = height * 0.45;
+    const gradient = ctx.createLinearGradient(0, floorStart, 0, floorStart + height * 0.15);
+    gradient.addColorStop(0, 'rgba(255,255,255,0)');
+    gradient.addColorStop(1, 'rgba(255,255,255,1)');
+
+    // Gradient transition
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, floorStart, width, height * 0.15);
+
+    // Solid floor area
+    ctx.fillStyle = 'white';
+    ctx.fillRect(0, floorStart + height * 0.15, width, height);
+  } else if (maskType === 'center') {
+    // Center area: oval in the middle of the room
+    ctx.beginPath();
+    ctx.ellipse(width / 2, height * 0.65, width * 0.4, height * 0.3, 0, 0, Math.PI * 2);
+    ctx.fill();
+  } else if (maskType === 'full') {
+    // Full room: everything except walls (top 30%)
+    const wallHeight = height * 0.3;
+    const gradient = ctx.createLinearGradient(0, wallHeight, 0, wallHeight + height * 0.1);
+    gradient.addColorStop(0, 'rgba(255,255,255,0)');
+    gradient.addColorStop(1, 'rgba(255,255,255,1)');
+
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, wallHeight, width, height * 0.1);
+
+    ctx.fillStyle = 'white';
+    ctx.fillRect(0, wallHeight + height * 0.1, width, height);
+  }
+
+  // Convert canvas to blob/file
+  return new Promise((resolve, reject) => {
+    canvas.toBlob((blob) => {
+      if (blob) {
+        resolve(new File([blob], 'mask.png', { type: 'image/png' }));
+      } else {
+        reject(new Error('Failed to create mask'));
+      }
+    }, 'image/png');
+  });
+}
+
+/**
+ * Custom Furniture Staging - Stage rooms with furniture using inpainting
+ * Uses FLUX Pro Fill to preserve room structure and add furniture only in masked areas
+ *
+ * @param emptyRoomFile - File for the empty room image (or null if using URL)
+ * @param emptyRoomUrl - URL for the empty room image (or null if using file)
+ * @param furnitureFile - File for the furniture reference image (for style description)
+ * @param furnitureUrl - URL for the furniture reference image (for style description)
+ * @param options - Staging options (prompt, maskUrl, furnitureArea)
+ * @param onProgress - Progress callback
+ * @returns URL of the staged image
+ */
+export async function generateCustomFurnitureStaging(
+  emptyRoomFile: File | null,
+  emptyRoomUrl: string | null,
+  furnitureFile: File | null,
+  furnitureUrl: string | null,
+  options: CustomFurnitureStagingOptions,
+  onProgress?: GenerationProgressCallback
+): Promise<string> {
+  // Validate inputs
+  if (!emptyRoomFile && !emptyRoomUrl) {
+    throw new Error('Empty room image is required (either file or URL)');
+  }
+
+  onProgress?.(5, 'Preparing images...');
+
+  // Upload room image
+  let roomImageUrl = emptyRoomUrl;
+  if (emptyRoomFile) {
+    onProgress?.(10, 'Uploading empty room image...');
+    roomImageUrl = await uploadFile(emptyRoomFile, 'custom-furniture-staging');
+  }
+
+  if (!roomImageUrl) {
+    throw new Error('Failed to prepare room image URL');
+  }
+
+  // Generate or use provided mask
+  let maskUrl = options.maskUrl;
+  if (!maskUrl) {
+    onProgress?.(20, 'Generating furniture placement mask...');
+    const maskFile = await generateFloorMask(
+      emptyRoomFile,
+      emptyRoomUrl,
+      options.furnitureArea || 'floor'
+    );
+    maskUrl = await uploadFile(maskFile, 'custom-furniture-staging-mask');
+  }
+
+  onProgress?.(30, 'Processing with AI...');
+
+  // Build a detailed prompt - the furniture reference helps describe what to add
+  const defaultPrompt = 'Beautiful living room furniture arrangement: a plush comfortable sofa with throw pillows, elegant coffee table, soft area rug, side tables with decorative lamps, and tasteful wall art. Cohesive interior design, photorealistic, professional real estate photography, natural lighting.';
+  const prompt = options.prompt || defaultPrompt;
+
+  const model = TOOL_MODEL_MAP['custom-furniture-staging'];
+
+  const { requestId, data, statusUrl, responseUrl } = await callFalGenerate({
+    tool: 'custom-furniture-staging',
+    imageUrl: roomImageUrl,
+    maskUrl: maskUrl,
+    prompt,
+    options: {
+      mask_url: maskUrl,
+      output_format: 'jpeg',
+    },
+  });
+
+  console.log('FAL Generate Response:', JSON.stringify(data, null, 2));
+
+  // Helper to extract image URL from various response formats
+  const extractImageUrl = (responseData: any): string | null => {
+    if (!responseData) return null;
+    if (responseData.images?.[0]?.url) return responseData.images[0].url;
+    if (Array.isArray(responseData.images) && typeof responseData.images[0] === 'string') return responseData.images[0];
+    if (responseData.output?.images?.[0]?.url) return responseData.output.images[0].url;
+    if (responseData.output?.images?.[0] && typeof responseData.output.images[0] === 'string') return responseData.output.images[0];
+    if (responseData.image?.url) return responseData.image.url;
+    if (responseData.image_url) return responseData.image_url;
+    if (responseData.url) return responseData.url;
+    return null;
+  };
+
+  // If we got immediate result
+  const immediateUrl = extractImageUrl(data);
+  if (immediateUrl) {
+    onProgress?.(100, 'Complete');
+    return immediateUrl;
+  }
+
+  // Otherwise poll for result
+  onProgress?.(50, 'Adding furniture to room...');
+  const result = await pollFalStatus(requestId, model, statusUrl, responseUrl);
+
+  console.log('FAL Poll Result:', JSON.stringify(result, null, 2));
+
+  onProgress?.(100, 'Complete');
+  const resultUrl = extractImageUrl(result);
+  if (resultUrl) {
+    return resultUrl;
+  }
+  throw new Error('No image returned from generation');
 }

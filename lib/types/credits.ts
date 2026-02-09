@@ -91,6 +91,7 @@ export const CREDIT_COSTS = {
   'pool-enhancement': 2,
 
   // Real Estate - Premium (3 credits)
+  'custom-furniture-staging': 3,  // Premium dual-image feature
   'virtual-renovation': 3,
   'hdr-merge': 3,
   'headshot-retouching': 3,
