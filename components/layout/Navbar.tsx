@@ -168,7 +168,7 @@ export const Navbar: React.FC = () => {
 
           {/* Primary CTA */}
           <button
-            onClick={() => navigate(user ? '/studio/real-estate' : '/studio')}
+            onClick={() => navigate(user ? '/studio' : '/login')}
             className="hidden sm:inline-flex items-center gap-2 px-7 py-2.5 bg-zinc-900 text-white dark:bg-white dark:text-black text-base font-semibold rounded-full hover:bg-zinc-800 dark:hover:bg-white/90 transition-all duration-300"
           >
             Start For Free
