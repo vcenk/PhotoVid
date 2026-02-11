@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Property } from '@/lib/store/contexts/PropertyContext';
 import { PropertySelector } from './PropertySelector';
 import { DescriptionTab } from './DescriptionTab';
@@ -12,10 +11,8 @@ import {
   Share2,
   LayoutTemplate,
   Mail,
-  Video,
   Home,
   Check,
-  ExternalLink,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -28,23 +25,8 @@ const TABS: { id: TabId; label: string; icon: React.ElementType }[] = [
   { id: 'email', label: 'Email', icon: Mail },
 ];
 
-const LINK_TABS = [
-  {
-    label: 'Video Walkthrough',
-    icon: Video,
-    path: '/studio/real-estate/room-tour',
-    desc: 'Create cinematic room tour video',
-  },
-  {
-    label: 'Virtual Staging',
-    icon: Home,
-    path: '/studio/real-estate/virtual-staging',
-    desc: 'Stage empty rooms with AI',
-  },
-];
 
 export function ListingCreator() {
-  const navigate = useNavigate();
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
   const [activeTab, setActiveTab] = useState<TabId>('description');
   const [generatedTabs, setGeneratedTabs] = useState<Set<TabId>>(new Set());
@@ -106,22 +88,6 @@ export function ListingCreator() {
               );
             })}
 
-            <div className="w-px h-6 bg-zinc-300 dark:bg-white/10 mx-1 shrink-0" />
-
-            {LINK_TABS.map((link) => {
-              const Icon = link.icon;
-              return (
-                <button
-                  key={link.path}
-                  onClick={() => navigate(link.path)}
-                  className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium text-zinc-500 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-white/5 transition-all whitespace-nowrap"
-                >
-                  <Icon size={16} />
-                  {link.label}
-                  <ExternalLink size={10} className="text-zinc-600" />
-                </button>
-              );
-            })}
           </div>
 
           {/* Tab Content */}

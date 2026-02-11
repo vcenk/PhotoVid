@@ -66,6 +66,19 @@ import { CreditsPage } from './components/pages/CreditsPage';
 import { MyLibraryPage } from './components/pages/MyLibraryPage';
 import { VideoPage } from './components/pages/VideoPage';
 import { EditPage } from './components/pages/EditPage';
+// Edit Tools (Real Estate Focused)
+import { AIUpscaleTool } from './components/tools/edit/AIUpscaleTool';
+import { ObjectRemovalTool as EditObjectRemovalTool } from './components/tools/edit/ObjectRemovalTool';
+import { UncropTool } from './components/tools/edit/UncropTool';
+import { AutoEnhanceTool as EditAutoEnhanceTool } from './components/tools/edit/AutoEnhanceTool';
+import { SmartSharpenTool } from './components/tools/edit/SmartSharpenTool';
+import { HDREffectTool } from './components/tools/edit/HDREffectTool';
+import { NoiseReductionTool } from './components/tools/edit/NoiseReductionTool';
+import { ColorCorrectionTool } from './components/tools/edit/ColorCorrectionTool';
+import { ExposureFixTool } from './components/tools/edit/ExposureFixTool';
+import { ShadowHighlightTool } from './components/tools/edit/ShadowHighlightTool';
+import { AIRelightTool } from './components/tools/edit/AIRelightTool';
+import { SmartCropTool } from './components/tools/edit/SmartCropTool';
 import { PropertiesPage } from './components/pages/PropertiesPage';
 import { ListingPage } from './components/pages/ListingPage';
 import { ProfilePage } from './components/pages/ProfilePage';
@@ -174,7 +187,19 @@ const App: React.FC = () => {
             <Route path="/studio/dubbing" element={<DubbingPage />} />
             <Route path="/studio/image" element={<ImagePage />} />
             <Route path="/studio/edit" element={<EditPage />} />
+            <Route path="/studio/edit/auto-enhance" element={<EditAutoEnhanceTool />} />
+            <Route path="/studio/edit/upscale" element={<AIUpscaleTool />} />
+            <Route path="/studio/edit/sharpen" element={<SmartSharpenTool />} />
+            <Route path="/studio/edit/hdr" element={<HDREffectTool />} />
+            <Route path="/studio/edit/object-removal" element={<EditObjectRemovalTool />} />
             <Route path="/studio/edit/watermark-removal" element={<WatermarkRemovalTool />} />
+            <Route path="/studio/edit/noise-reduction" element={<NoiseReductionTool />} />
+            <Route path="/studio/edit/color-correct" element={<ColorCorrectionTool />} />
+            <Route path="/studio/edit/exposure-fix" element={<ExposureFixTool />} />
+            <Route path="/studio/edit/shadow-highlight" element={<ShadowHighlightTool />} />
+            <Route path="/studio/edit/relight" element={<AIRelightTool />} />
+            <Route path="/studio/edit/smart-crop" element={<SmartCropTool />} />
+            <Route path="/studio/edit/uncrop" element={<UncropTool />} />
             <Route path="/studio/video" element={<VideoPage />} />
             <Route path="/studio/workflow" element={<WorkflowPage />} />
             <Route path="/studio/credits" element={<CreditsPage />} />

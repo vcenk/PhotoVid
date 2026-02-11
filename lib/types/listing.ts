@@ -6,7 +6,7 @@
 export type ContentTone = 'professional' | 'luxury' | 'friendly' | 'casual';
 export type DescriptionLength = 'short' | 'medium' | 'long';
 export type SocialPlatform = 'instagram' | 'facebook' | 'tiktok' | 'linkedin';
-export type FlyerTemplate = 'classic' | 'modern-grid' | 'luxury' | 'open-house';
+export type FlyerTemplate = 'classic' | 'modern-grid' | 'luxury' | 'open-house' | 'minimal' | 'bold' | 'photo-strip' | 'elegant';
 export type EmailType = 'just-listed' | 'open-house' | 'price-reduction' | 'just-sold';
 
 export interface DescriptionOptions {
@@ -86,4 +86,8 @@ export const FLYER_TEMPLATE_LABELS: Record<FlyerTemplate, string> = {
   'modern-grid': 'Modern Grid',
   'luxury': 'Luxury',
   'open-house': 'Open House',
+  'minimal': 'Minimal',
+  'bold': 'Bold',
+  'photo-strip': 'Photo Strip',
+  'elegant': 'Elegant',
 };

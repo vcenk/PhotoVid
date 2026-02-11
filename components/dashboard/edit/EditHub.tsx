@@ -2,11 +2,9 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
-  Sparkles, Wand2, Ban, Paintbrush, Sun, Moon, Search,
+  Sparkles, Wand2, Sun, Search,
   Image as ImageIcon, Eraser, CircleDot, Layers, Zap,
-  Scissors, Maximize, Contrast, Blend, Focus,
-  Droplets, Palette, User, Crop,
-  Replace, Eye, Stamp,
+  Maximize, Focus, Droplets, Palette, Crop, Ban,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { LucideIcon } from 'lucide-react';
@@ -28,51 +26,33 @@ const CATEGORIES = [
   'All',
   'Enhance',
   'Remove & Clean',
-  'Color & Tone',
-  'Lighting',
+  'Color & Lighting',
   'Transform',
-  'Retouch',
 ] as const;
 
 type Category = typeof CATEGORIES[number];
 
 const EDIT_TOOLS: EditTool[] = [
   // Enhance
-  { id: 'auto-enhance', name: 'Auto Enhance', description: 'One-click fix for lighting, colors, and sharpness', icon: Zap, category: 'Enhance', creditCost: 1, route: '/studio/edit/auto-enhance', image: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=400&h=240&fit=crop' },
-  { id: 'upscale', name: 'AI Upscale', description: 'Increase image resolution up to 4x with AI', icon: Maximize, category: 'Enhance', creditCost: 2, route: '/studio/edit/upscale', image: 'https://images.unsplash.com/photo-1518791841217-8f162f1e1131?w=400&h=240&fit=crop' },
-  { id: 'sharpen', name: 'Smart Sharpen', description: 'Sharpen blurry or soft images with AI detail recovery', icon: Focus, category: 'Enhance', creditCost: 1, route: '/studio/edit/sharpen', image: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=400&h=240&fit=crop' },
-  { id: 'hdr', name: 'HDR Effect', description: 'Add dynamic range and depth to flat photos', icon: Layers, category: 'Enhance', creditCost: 2, route: '/studio/edit/hdr', image: 'https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=400&h=240&fit=crop' },
+  { id: 'auto-enhance', name: 'Auto Enhance', description: 'One-click fix for lighting, colors, and sharpness', icon: Zap, category: 'Enhance', creditCost: 1, route: '/studio/edit/auto-enhance', image: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=400&h=240&fit=crop' },
+  { id: 'upscale', name: 'AI Upscale', description: 'Increase image resolution up to 4x with AI', icon: Maximize, category: 'Enhance', creditCost: 2, route: '/studio/edit/upscale', image: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=400&h=240&fit=crop' },
+  { id: 'sharpen', name: 'Smart Sharpen', description: 'Sharpen blurry or soft property images with AI', icon: Focus, category: 'Enhance', creditCost: 1, route: '/studio/edit/sharpen', image: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=400&h=240&fit=crop' },
+  { id: 'hdr', name: 'HDR Effect', description: 'Add dynamic range to interior and exterior shots', icon: Layers, category: 'Enhance', creditCost: 2, route: '/studio/edit/hdr', image: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=400&h=240&fit=crop' },
 
   // Remove & Clean
-  { id: 'background-remove', name: 'Background Remover', description: 'Remove or replace image backgrounds instantly', icon: Scissors, category: 'Remove & Clean', creditCost: 1, route: '/studio/edit/background-remove', image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=240&fit=crop' },
-  { id: 'object-removal', name: 'Object Removal', description: 'Erase unwanted objects and people from photos', icon: Eraser, category: 'Remove & Clean', creditCost: 2, route: '/studio/edit/object-removal', image: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=400&h=240&fit=crop' },
-  { id: 'watermark-removal', name: 'Watermark Removal', description: 'Remove watermarks and text overlays cleanly', icon: Ban, category: 'Remove & Clean', creditCost: 2, route: '/studio/edit/watermark-removal', image: 'https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=400&h=240&fit=crop' },
-  { id: 'noise-reduction', name: 'Noise Reduction', description: 'Remove grain and noise from low-light photos', icon: Droplets, category: 'Remove & Clean', creditCost: 1, route: '/studio/edit/noise-reduction', image: 'https://images.unsplash.com/photo-1519681393784-d120267933ba?w=400&h=240&fit=crop' },
+  { id: 'object-removal', name: 'Object Removal', description: 'Erase unwanted objects from property photos', icon: Eraser, category: 'Remove & Clean', creditCost: 2, route: '/studio/edit/object-removal', image: 'https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?w=400&h=240&fit=crop' },
+  { id: 'watermark-removal', name: 'Watermark Removal', description: 'Remove MLS watermarks and text overlays', icon: Ban, category: 'Remove & Clean', creditCost: 2, route: '/studio/edit/watermark-removal', image: 'https://images.unsplash.com/photo-1600573472550-8090b5e0745e?w=400&h=240&fit=crop' },
+  { id: 'noise-reduction', name: 'Noise Reduction', description: 'Remove grain from low-light interior shots', icon: Droplets, category: 'Remove & Clean', creditCost: 1, route: '/studio/edit/noise-reduction', image: 'https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?w=400&h=240&fit=crop' },
 
-  // Color & Tone
-  { id: 'color-correct', name: 'Color Correction', description: 'Fix white balance, saturation, and color casts', icon: Palette, category: 'Color & Tone', creditCost: 1, route: '/studio/edit/color-correct', image: 'https://images.unsplash.com/photo-1502691876148-a84978e59af8?w=400&h=240&fit=crop' },
-  { id: 'color-grading', name: 'Color Grading', description: 'Apply cinematic color grades and film looks', icon: Blend, category: 'Color & Tone', creditCost: 2, route: '/studio/edit/color-grading', image: 'https://images.unsplash.com/photo-1518156677180-95a2893f3e9f?w=400&h=240&fit=crop' },
-  { id: 'black-white', name: 'Black & White', description: 'Convert to stunning monochrome with fine control', icon: Contrast, category: 'Color & Tone', creditCost: 1, route: '/studio/edit/black-white', image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=240&fit=crop&sat=-100' },
-  { id: 'recolor', name: 'Recolor', description: 'Change the color of specific objects in your image', icon: Paintbrush, category: 'Color & Tone', creditCost: 2, route: '/studio/edit/recolor', image: 'https://images.unsplash.com/photo-1525909002-1b05e0c869d8?w=400&h=240&fit=crop' },
-
-  // Lighting
-  { id: 'exposure-fix', name: 'Exposure Fix', description: 'Recover details from over or underexposed photos', icon: Sun, category: 'Lighting', creditCost: 1, route: '/studio/edit/exposure-fix', image: 'https://images.unsplash.com/photo-1495616811223-4d98c6e9c869?w=400&h=240&fit=crop' },
-  { id: 'shadow-highlight', name: 'Shadow & Highlight', description: 'Lift shadows and tame highlights independently', icon: CircleDot, category: 'Lighting', creditCost: 1, route: '/studio/edit/shadow-highlight', image: 'https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=400&h=240&fit=crop' },
-  { id: 'relight', name: 'AI Relight', description: 'Change the lighting direction and mood of any photo', icon: Sparkles, category: 'Lighting', creditCost: 3, route: '/studio/edit/relight', image: 'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=400&h=240&fit=crop' },
-  { id: 'day-night', name: 'Day / Night', description: 'Convert between daytime and nighttime scenes', icon: Moon, category: 'Lighting', creditCost: 2, route: '/studio/edit/day-night', image: 'https://images.unsplash.com/photo-1507400492013-162706c8c05e?w=400&h=240&fit=crop' },
+  // Color & Lighting
+  { id: 'color-correct', name: 'Color Correction', description: 'Fix white balance and color casts in property photos', icon: Palette, category: 'Color & Lighting', creditCost: 1, route: '/studio/edit/color-correct', image: 'https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=400&h=240&fit=crop' },
+  { id: 'exposure-fix', name: 'Exposure Fix', description: 'Recover details from dark or bright areas', icon: Sun, category: 'Color & Lighting', creditCost: 1, route: '/studio/edit/exposure-fix', image: 'https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=400&h=240&fit=crop' },
+  { id: 'shadow-highlight', name: 'Shadow & Highlight', description: 'Lift shadows and balance highlights in interiors', icon: CircleDot, category: 'Color & Lighting', creditCost: 1, route: '/studio/edit/shadow-highlight', image: 'https://images.unsplash.com/photo-1600585154526-990dced4db0d?w=400&h=240&fit=crop' },
+  { id: 'relight', name: 'AI Relight', description: 'Improve lighting direction and mood in rooms', icon: Sparkles, category: 'Color & Lighting', creditCost: 3, route: '/studio/edit/relight', image: 'https://images.unsplash.com/photo-1600121848594-d8644e57abab?w=400&h=240&fit=crop' },
 
   // Transform
-  { id: 'smart-crop', name: 'Smart Crop', description: 'AI-powered cropping for perfect composition', icon: Crop, category: 'Transform', creditCost: 1, route: '/studio/edit/smart-crop', image: 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=400&h=240&fit=crop' },
-  { id: 'uncrop', name: 'Uncrop / Extend', description: 'Expand image borders with AI-generated content', icon: Maximize, category: 'Transform', creditCost: 2, route: '/studio/edit/uncrop', image: 'https://images.unsplash.com/photo-1433086966358-54859d0ed716?w=400&h=240&fit=crop' },
-  { id: 'style-transfer', name: 'Style Transfer', description: 'Apply artistic styles — painting, sketch, anime, and more', icon: Wand2, category: 'Transform', creditCost: 2, route: '/studio/edit/style-transfer', image: 'https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?w=400&h=240&fit=crop' },
-  { id: 'replace-object', name: 'Replace Object', description: 'Select any object and replace it with AI generation', icon: Replace, category: 'Transform', creditCost: 3, route: '/studio/edit/replace-object', image: 'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=400&h=240&fit=crop' },
-
-  // Retouch
-  { id: 'face-retouch', name: 'Face Retouch', description: 'Smooth skin, brighten eyes, and enhance portraits', icon: User, category: 'Retouch', creditCost: 2, route: '/studio/edit/face-retouch', image: 'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=400&h=240&fit=crop&crop=face' },
-  { id: 'headshot-retouching', name: 'Headshot Retouching', description: 'Professional headshot enhancement with background options', icon: User, category: 'Retouch', creditCost: 2, route: '/studio/edit/headshot-retouching', image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&h=400&fit=crop&crop=face' },
-  { id: 'blemish-removal', name: 'Blemish Removal', description: 'Remove spots, acne, and skin imperfections', icon: CircleDot, category: 'Retouch', creditCost: 1, route: '/studio/edit/blemish-removal', image: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&h=240&fit=crop&crop=face' },
-  { id: 'red-eye', name: 'Red Eye Fix', description: 'Automatically detect and fix red-eye in portraits', icon: Eye, category: 'Retouch', creditCost: 1, route: '/studio/edit/red-eye', image: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&h=240&fit=crop&crop=face' },
-  { id: 'clone-stamp', name: 'Clone & Heal', description: 'Clone areas and heal imperfections with precision', icon: Stamp, category: 'Retouch', creditCost: 1, route: '/studio/edit/clone-stamp', image: 'https://images.unsplash.com/photo-1503023345310-bd7c1de61c7d?w=400&h=240&fit=crop' },
+  { id: 'smart-crop', name: 'Smart Crop', description: 'AI-powered cropping for perfect composition', icon: Crop, category: 'Transform', creditCost: 1, route: '/studio/edit/smart-crop', image: 'https://images.unsplash.com/photo-1600607687644-aac4c3eac7f4?w=400&h=240&fit=crop' },
+  { id: 'uncrop', name: 'Uncrop / Extend', description: 'Expand narrow property photos with AI', icon: Maximize, category: 'Transform', creditCost: 2, route: '/studio/edit/uncrop', image: 'https://images.unsplash.com/photo-1600563438938-a9a27216b4f5?w=400&h=240&fit=crop' },
 ];
 
 // ============ COMPONENT ============

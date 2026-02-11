@@ -1,12 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { Property } from '@/lib/store/contexts/PropertyContext';
 import { useToolGeneration } from '@/lib/hooks/useToolGeneration';
 import { generateSocialPost } from '@/lib/api/listingContent';
 import type { ContentTone, SocialPlatform, SocialPostOptions } from '@/lib/types/listing';
 import { SOCIAL_PLATFORM_LABELS } from '@/lib/types/listing';
 import { motion } from 'framer-motion';
-import { Copy, RefreshCw, Check, Zap, Instagram, Facebook, Linkedin } from 'lucide-react';
+import { Copy, RefreshCw, Check, Zap, Instagram, Facebook, Linkedin, Download, Image as ImageIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import html2canvas from 'html2canvas';
+import { createClient } from '@/lib/database/client';
 
 interface SocialMediaTabProps {
   property: Property;
@@ -28,10 +30,129 @@ export function SocialMediaTab({ property, onGenerated }: SocialMediaTabProps) {
   const [ctaType, setCtaType] = useState<'dm' | 'call' | 'link-in-bio'>('dm');
   const [posts, setPosts] = useState<Partial<Record<SocialPlatform, string>>>({});
   const [copiedPlatform, setCopiedPlatform] = useState<string | null>(null);
+  const [isDownloading, setIsDownloading] = useState(false);
+  const previewRef = useRef<HTMLDivElement>(null);
+
+  // Get all available images from property
+  const availableImages = [
+    ...(property.thumbnailUrl ? [property.thumbnailUrl] : []),
+    ...(property.assets?.filter(a => a.type === 'image').map(a => a.url) || []),
+  ].filter((url, index, self) => self.indexOf(url) === index); // Remove duplicates
+
+  // Track selected image per platform
+  const [selectedImages, setSelectedImages] = useState<Partial<Record<SocialPlatform, string>>>({});
+
+  // Initialize/update selected images when property changes
+  useEffect(() => {
+    if (availableImages.length > 0) {
+      setSelectedImages(prev => {
+        const updated: Partial<Record<SocialPlatform, string>> = { ...prev };
+        PLATFORMS.forEach(p => {
+          // Only set if not already set or if current value is not in available images
+          if (!updated[p.value] || !availableImages.includes(updated[p.value]!)) {
+            updated[p.value] = availableImages[0];
+          }
+        });
+        return updated;
+      });
+    }
+  }, [property.id, property.thumbnailUrl, property.assets?.length]);
+
+  const selectedImageUrl = selectedImages[platform] || availableImages[0] || '';
+
+  const handleSelectImage = (url: string) => {
+    setSelectedImages(prev => ({ ...prev, [platform]: url }));
+  };
 
   const { isGenerating, hasCredits, creditCost, generate, error } = useToolGeneration({
     toolId: 'listing-social-post',
   });
+
+  // Convert image URL to base64 data URL for html2canvas (uses proxy to bypass CORS)
+  const imageToBase64 = useCallback(async (url: string): Promise<string | null> => {
+    // First try direct fetch (works for same-origin or CORS-enabled)
+    try {
+      const response = await fetch(url);
+      if (response.ok) {
+        const blob = await response.blob();
+        return new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result as string);
+          reader.onerror = () => resolve(null);
+          reader.readAsDataURL(blob);
+        });
+      }
+    } catch {
+      // Direct fetch failed, try proxy
+    }
+
+    // Use Supabase edge function proxy
+    try {
+      const supabase = createClient();
+      if (!supabase) return null;
+
+      const { data, error } = await supabase.functions.invoke('proxy-image', {
+        body: { url },
+      });
+
+      if (error) throw error;
+      return data?.dataUrl || null;
+    } catch (err) {
+      console.warn('Failed to fetch image via proxy:', err);
+      return null;
+    }
+  }, []);
+
+  const handleDownloadImage = useCallback(async () => {
+    if (!previewRef.current) return;
+    setIsDownloading(true);
+    try {
+      // Pre-fetch and convert image to base64 for html2canvas
+      let base64Image: string | null = null;
+      if (selectedImageUrl) {
+        base64Image = await imageToBase64(selectedImageUrl);
+      }
+
+      const canvas = await html2canvas(previewRef.current, {
+        backgroundColor: '#09090b',
+        scale: 2,
+        useCORS: false,
+        allowTaint: true,
+        logging: false,
+        imageTimeout: 15000,
+        onclone: (clonedDoc) => {
+          // Remove any problematic oklch colors from cloned document
+          const style = clonedDoc.createElement('style');
+          style.textContent = `
+            * {
+              --tw-ring-color: transparent !important;
+              --tw-shadow: none !important;
+            }
+          `;
+          clonedDoc.head.appendChild(style);
+
+          // Replace image with base64 version in cloned document
+          if (base64Image) {
+            const imgs = clonedDoc.querySelectorAll('img');
+            imgs.forEach((img) => {
+              if (img.src === selectedImageUrl || img.src.includes(selectedImageUrl.split('/').pop() || '')) {
+                img.src = base64Image!;
+              }
+            });
+          }
+        },
+      });
+      const link = document.createElement('a');
+      link.download = `${platform}-post-${Date.now()}.jpg`;
+      link.href = canvas.toDataURL('image/jpeg', 0.95);
+      link.click();
+    } catch (err) {
+      console.error('Failed to download image:', err);
+      alert('Download failed. Please try again.');
+    } finally {
+      setIsDownloading(false);
+    }
+  }, [platform, selectedImageUrl, imageToBase64]);
 
   const handleGenerate = async (targetPlatform: SocialPlatform) => {
     const options: SocialPostOptions = {
@@ -165,6 +286,43 @@ export function SocialMediaTab({ property, onGenerated }: SocialMediaTabProps) {
           </div>
         </div>
 
+        {/* Photo Selector */}
+        {availableImages.length > 0 && (
+          <div>
+            <label className="block text-sm font-medium text-zinc-600 dark:text-zinc-300 mb-2">
+              <span className="flex items-center gap-1.5">
+                <ImageIcon size={14} />
+                Post Image
+              </span>
+            </label>
+            <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-thin">
+              {availableImages.map((url, index) => (
+                <button
+                  key={url}
+                  onClick={() => handleSelectImage(url)}
+                  className={cn(
+                    'relative flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-all',
+                    selectedImageUrl === url
+                      ? 'border-emerald-500 ring-2 ring-emerald-500/30'
+                      : 'border-transparent hover:border-zinc-400 dark:hover:border-zinc-600'
+                  )}
+                >
+                  <img
+                    src={url}
+                    alt={`Photo ${index + 1}`}
+                    className="w-full h-full object-cover"
+                  />
+                  {selectedImageUrl === url && (
+                    <div className="absolute inset-0 bg-emerald-500/20 flex items-center justify-center">
+                      <Check size={16} className="text-white drop-shadow-lg" />
+                    </div>
+                  )}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Buttons */}
         <div className="flex gap-2">
           <button
@@ -215,6 +373,7 @@ export function SocialMediaTab({ property, onGenerated }: SocialMediaTabProps) {
                 <button
                   onClick={() => handleCopy(currentPost, platform)}
                   className="p-1.5 rounded-lg text-zinc-500 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-white/5 transition-colors"
+                  title="Copy text"
                 >
                   {copiedPlatform === platform ? (
                     <Check size={14} className="text-green-400" />
@@ -223,38 +382,61 @@ export function SocialMediaTab({ property, onGenerated }: SocialMediaTabProps) {
                   )}
                 </button>
                 <button
+                  onClick={handleDownloadImage}
+                  disabled={isDownloading}
+                  className="p-1.5 rounded-lg text-zinc-500 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-white/5 transition-colors disabled:opacity-40"
+                  title="Download as image"
+                >
+                  <Download size={14} className={isDownloading ? 'animate-pulse' : ''} />
+                </button>
+                <button
                   onClick={() => handleGenerate(platform)}
                   disabled={isGenerating}
                   className="p-1.5 rounded-lg text-zinc-500 hover:text-white hover:bg-white/5 transition-colors disabled:opacity-40"
+                  title="Regenerate"
                 >
                   <RefreshCw size={14} className={isGenerating ? 'animate-spin' : ''} />
                 </button>
               </div>
             </div>
 
-            {/* Mock platform card */}
-            <div className="flex-1 rounded-xl border border-zinc-200 dark:border-white/5 bg-zinc-50 dark:bg-zinc-950 p-4">
+            {/* Mock platform card - using inline styles for html2canvas compatibility (no oklch) */}
+            <div
+              ref={previewRef}
+              className="flex-1 rounded-xl overflow-hidden"
+              style={{
+                backgroundColor: '#09090b',
+                border: '1px solid rgba(255,255,255,0.05)',
+                padding: '16px',
+              }}
+            >
               <div className="flex items-center gap-2 mb-3">
-                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600" />
+                <div
+                  className="w-8 h-8 rounded-full"
+                  style={{ background: 'linear-gradient(135deg, #10b981 0%, #0d9488 100%)' }}
+                />
                 <div>
-                  <div className="text-xs font-semibold text-zinc-900 dark:text-white">Your Agency</div>
-                  <div className="text-[10px] text-zinc-500">{SOCIAL_PLATFORM_LABELS[platform]}</div>
+                  <div style={{ fontSize: '12px', fontWeight: 600, color: '#ffffff' }}>Your Agency</div>
+                  <div style={{ fontSize: '10px', color: '#10b981' }}>{SOCIAL_PLATFORM_LABELS[platform]}</div>
                 </div>
               </div>
-              {property.thumbnailUrl && (
+              {selectedImageUrl && (
                 <img
-                  src={property.thumbnailUrl}
+                  src={selectedImageUrl}
                   alt=""
                   className="w-full aspect-video rounded-lg object-cover mb-3"
                 />
               )}
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed whitespace-pre-wrap"
+              <div
+                style={{
+                  fontSize: '14px',
+                  color: '#d4d4d8',
+                  lineHeight: 1.6,
+                  whiteSpace: 'pre-wrap',
+                }}
               >
                 {currentPost}
-              </motion.div>
+              </div>
             </div>
           </>
         ) : (

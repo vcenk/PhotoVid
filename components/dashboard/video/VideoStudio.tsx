@@ -51,8 +51,14 @@ const ASPECT_OPTIONS: AspectOption[] = [
 
 type PreviewState = 'empty' | 'image-uploaded' | 'generating' | 'error' | 'result';
 
-const I2V_COST = CREDIT_COSTS['image-to-video'] || 5;
-const T2V_COST = CREDIT_COSTS['text-to-video'] || 10;
+// Helper to get duration-based credit key
+function getVideoCreditKey(mode: Mode, duration: Duration): CreditCostKey {
+  if (mode === 'image-to-video') {
+    return duration === '5' ? 'image-to-video-5s' : 'image-to-video-10s';
+  } else {
+    return duration === '5' ? 'text-to-video-5s' : 'text-to-video-10s';
+  }
+}
 
 // ==========================================
 // Component
@@ -88,9 +94,9 @@ export const VideoStudio: React.FC = () => {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Derived
-  const creditCost = mode === 'image-to-video' ? I2V_COST : T2V_COST;
-  const toolId: CreditCostKey = mode === 'image-to-video' ? 'image-to-video' : 'text-to-video';
+  // Derived - use duration-based credit keys (5 credits per second)
+  const toolId: CreditCostKey = getVideoCreditKey(mode, duration);
+  const creditCost = CREDIT_COSTS[toolId] || (mode === 'image-to-video' ? 25 : 27);
   const hasCredits = hasEnoughCredits(toolId);
 
   const canGenerate =

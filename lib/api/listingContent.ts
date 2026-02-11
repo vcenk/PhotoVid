@@ -3,7 +3,6 @@
  * Uses OpenAI to generate MLS descriptions, social posts, flyer copy, and email campaigns
  */
 
-import OpenAI from 'openai';
 import type { Property } from '@/lib/store/contexts/PropertyContext';
 import type {
   DescriptionOptions,
@@ -13,15 +12,23 @@ import type {
   FlyerCopy,
   EmailContent,
 } from '@/lib/types/listing';
+import { createClient } from '@/lib/database/client';
 
-let openai: OpenAI | null = null;
+// Check if we can use the edge function for AI generation
+async function callAIEdgeFunction(prompt: string, systemPrompt: string, jsonMode = false): Promise<string | null> {
+  const supabase = createClient();
+  if (!supabase) return null;
 
-function getClient(): OpenAI | null {
-  if (openai) return openai;
-  const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
-  if (!apiKey) return null;
-  openai = new OpenAI({ apiKey, dangerouslyAllowBrowser: true });
-  return openai;
+  try {
+    const { data, error } = await supabase.functions.invoke('generate-listing-content', {
+      body: { prompt, systemPrompt, jsonMode },
+    });
+    if (error) throw error;
+    return data?.content || null;
+  } catch (err) {
+    console.warn('AI edge function not available, using mock data:', err);
+    return null;
+  }
 }
 
 function propertySnippet(property: Property): string {
@@ -45,37 +52,24 @@ export async function generateMLSDescription(
   property: Property,
   options: DescriptionOptions
 ): Promise<string> {
-  const client = getClient();
-  if (!client) return mockMLSDescription(property, options);
-
   const wordCount =
     options.length === 'short' ? 100 : options.length === 'medium' ? 250 : 500;
 
-  try {
-    const response = await client.chat.completions.create({
-      model: 'gpt-4o-mini',
-      messages: [
-        {
-          role: 'system',
-          content: `You are a professional real estate copywriter. Write MLS property descriptions.
+  const systemPrompt = `You are a professional real estate copywriter. Write MLS property descriptions.
 Tone: ${options.tone}. Target length: ~${wordCount} words.
 ${options.includeNeighborhood ? 'Include a paragraph about the neighborhood/location.' : ''}
 Highlight these features: ${options.highlightFeatures.join(', ') || 'key property features'}.
 ${options.customKeywords ? `Incorporate these keywords naturally: ${options.customKeywords}` : ''}
 Include a Fair Housing compliant disclaimer is NOT needed — the agent will add it separately.
-Do NOT include the property address or price in the description body — those appear in separate MLS fields.`,
-        },
-        {
-          role: 'user',
-          content: `Write an MLS description for this property:\n${propertySnippet(property)}`,
-        },
-      ],
-    });
-    return response.choices[0].message.content || mockMLSDescription(property, options);
-  } catch (error) {
-    console.error('MLS description generation error:', error);
-    return mockMLSDescription(property, options);
-  }
+Do NOT include the property address or price in the description body — those appear in separate MLS fields.`;
+
+  const prompt = `Write an MLS description for this property:\n${propertySnippet(property)}`;
+
+  const aiResult = await callAIEdgeFunction(prompt, systemPrompt);
+  if (aiResult) return aiResult;
+
+  // Fallback to mock
+  return mockMLSDescription(property, options);
 }
 
 function mockMLSDescription(property: Property, options: DescriptionOptions): string {
@@ -98,9 +92,6 @@ export async function generateSocialPost(
   property: Property,
   options: SocialPostOptions
 ): Promise<string> {
-  const client = getClient();
-  if (!client) return mockSocialPost(property, options);
-
   const platformInstructions: Record<string, string> = {
     instagram:
       'Write an Instagram caption with emojis and 25-30 relevant hashtags at the end. Keep it engaging and visual.',
@@ -114,30 +105,20 @@ export async function generateSocialPost(
 
   const ctaMap = { dm: 'DM me for details', call: 'Call/text for a showing', 'link-in-bio': 'Link in bio for full listing' };
 
-  try {
-    const response = await client.chat.completions.create({
-      model: 'gpt-4o-mini',
-      messages: [
-        {
-          role: 'system',
-          content: `You are a social media content creator for real estate.
+  const systemPrompt = `You are a social media content creator for real estate.
 Platform: ${options.platform}. ${platformInstructions[options.platform]}
 Tone: ${options.tone}.
 ${options.includePrice && property.price ? `Include the price: $${property.price.toLocaleString()}` : 'Do NOT include the price.'}
 ${options.includeAddress ? `Include the address: ${property.address}, ${property.city}, ${property.state}` : 'Do NOT include the exact address — just mention the area/city.'}
-End with this CTA: "${ctaMap[options.ctaType]}"`,
-        },
-        {
-          role: 'user',
-          content: `Create a ${options.platform} post for:\n${propertySnippet(property)}`,
-        },
-      ],
-    });
-    return response.choices[0].message.content || mockSocialPost(property, options);
-  } catch (error) {
-    console.error('Social post generation error:', error);
-    return mockSocialPost(property, options);
-  }
+End with this CTA: "${ctaMap[options.ctaType]}"`;
+
+  const prompt = `Create a ${options.platform} post for:\n${propertySnippet(property)}`;
+
+  const aiResult = await callAIEdgeFunction(prompt, systemPrompt);
+  if (aiResult) return aiResult;
+
+  // Fallback to mock
+  return mockSocialPost(property, options);
 }
 
 function mockSocialPost(property: Property, options: SocialPostOptions): string {
@@ -166,9 +147,6 @@ export async function generateFlyerCopy(
   property: Property,
   options: FlyerOptions
 ): Promise<FlyerCopy> {
-  const client = getClient();
-  if (!client) return mockFlyerCopy(property, options);
-
   const templateContext: Record<string, string> = {
     classic: 'Traditional property flyer with headline, description, and agent info.',
     'modern-grid': 'Modern minimal flyer with punchy headline and key stats.',
@@ -176,33 +154,27 @@ export async function generateFlyerCopy(
     'open-house': `Open house flyer for ${options.openHouseDate || 'upcoming date'} at ${options.openHouseTime || 'TBD'}.`,
   };
 
-  try {
-    const response = await client.chat.completions.create({
-      model: 'gpt-4o-mini',
-      messages: [
-        {
-          role: 'system',
-          content: `You are a real estate marketing copywriter. Generate flyer copy.
+  const systemPrompt = `You are a real estate marketing copywriter. Generate flyer copy.
 Template style: ${options.template}. ${templateContext[options.template]}
 Return EXACTLY this JSON format: {"headline":"...","body":"...","tagline":"..."}
 headline: 5-8 words, compelling.
 body: 2-3 sentences about the property.
-tagline: Short call-to-action phrase.`,
-        },
-        {
-          role: 'user',
-          content: `Generate flyer copy for:\n${propertySnippet(property)}`,
-        },
-      ],
-      response_format: { type: 'json_object' },
-    });
-    const parsed = JSON.parse(response.choices[0].message.content || '{}');
-    if (parsed.headline && parsed.body && parsed.tagline) return parsed as FlyerCopy;
-    return mockFlyerCopy(property, options);
-  } catch (error) {
-    console.error('Flyer copy generation error:', error);
-    return mockFlyerCopy(property, options);
+tagline: Short call-to-action phrase.`;
+
+  const prompt = `Generate flyer copy for:\n${propertySnippet(property)}`;
+
+  const aiResult = await callAIEdgeFunction(prompt, systemPrompt, true);
+  if (aiResult) {
+    try {
+      const parsed = JSON.parse(aiResult);
+      if (parsed.headline && parsed.body && parsed.tagline) return parsed as FlyerCopy;
+    } catch {
+      // JSON parse failed, fall through to mock
+    }
   }
+
+  // Fallback to mock
+  return mockFlyerCopy(property, options);
 }
 
 function mockFlyerCopy(property: Property, options: FlyerOptions): FlyerCopy {
@@ -233,9 +205,6 @@ export async function generateEmailContent(
   property: Property,
   options: EmailOptions
 ): Promise<EmailContent> {
-  const client = getClient();
-  if (!client) return mockEmailContent(property, options);
-
   const emailTypeInstructions: Record<string, string> = {
     'just-listed': 'Announce a new listing. Build excitement and highlight key features.',
     'open-house': 'Invite recipients to an open house. Include a warm, welcoming tone.',
@@ -243,35 +212,29 @@ export async function generateEmailContent(
     'just-sold': 'Celebrate a successful sale. Use it as social proof for the agent.',
   };
 
-  try {
-    const response = await client.chat.completions.create({
-      model: 'gpt-4o-mini',
-      messages: [
-        {
-          role: 'system',
-          content: `You are a real estate email marketing expert.
+  const systemPrompt = `You are a real estate email marketing expert.
 Email type: ${options.emailType}. ${emailTypeInstructions[options.emailType]}
 Agent: ${options.agentName}.
 CTA button text: "${options.ctaText}".
 ${options.includeVirtualTourLink ? 'Mention that a virtual tour link is available.' : ''}
 Return EXACTLY this JSON: {"subject":"...","body":"..."}
 body: Write in HTML with inline styles. Keep it professional, mobile-friendly.
-Use simple HTML: h2, p, a tags with inline styles. Include a styled CTA button.`,
-        },
-        {
-          role: 'user',
-          content: `Generate email content for:\n${propertySnippet(property)}`,
-        },
-      ],
-      response_format: { type: 'json_object' },
-    });
-    const parsed = JSON.parse(response.choices[0].message.content || '{}');
-    if (parsed.subject && parsed.body) return parsed as EmailContent;
-    return mockEmailContent(property, options);
-  } catch (error) {
-    console.error('Email content generation error:', error);
-    return mockEmailContent(property, options);
+Use simple HTML: h2, p, a tags with inline styles. Include a styled CTA button.`;
+
+  const prompt = `Generate email content for:\n${propertySnippet(property)}`;
+
+  const aiResult = await callAIEdgeFunction(prompt, systemPrompt, true);
+  if (aiResult) {
+    try {
+      const parsed = JSON.parse(aiResult);
+      if (parsed.subject && parsed.body) return parsed as EmailContent;
+    } catch {
+      // JSON parse failed, fall through to mock
+    }
   }
+
+  // Fallback to mock
+  return mockEmailContent(property, options);
 }
 
 function mockEmailContent(property: Property, options: EmailOptions): EmailContent {

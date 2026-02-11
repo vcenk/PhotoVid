@@ -98,12 +98,12 @@ export const CREDIT_COSTS = {
   'floor-plan': 3,
   '360-staging': 3,
 
-  // Real Estate - Video (5-10 credits)
-  'room-tour': 5,
-  'storyboard-scene': 5,
-  'text-to-video': 10,
+  // Real Estate - Video (5 credits per second)
+  'room-tour-5s': 25,
+  'room-tour-10s': 50,
+  'storyboard-scene': 10,
 
-  // Property Reveal Videos (40-100 credits based on duration/audio)
+  // Property Reveal Videos - Veo 3.1 (5 credits/sec, audio doubles)
   'property-reveal-8s': 40,
   'property-reveal-8s-audio': 80,
   'property-reveal-10s': 50,
@@ -131,10 +131,13 @@ export const CREDIT_COSTS = {
   'wheel-customizer': 2,
   'damage-detection': 2,
 
-  // Auto Dealership - Video (5 credits)
-  'vehicle-360': 5,
-  'vehicle-walkthrough': 5,
-  'social-clips': 5,
+  // Auto Dealership - Video (5 credits per second)
+  'vehicle-360-5s': 25,
+  'vehicle-360-10s': 50,
+  'vehicle-walkthrough-5s': 25,
+  'vehicle-walkthrough-10s': 50,
+  'social-clips-5s': 25,
+  'social-clips-10s': 50,
 
   // Listing Content (1 credit each)
   'listing-description': 1,
@@ -145,9 +148,34 @@ export const CREDIT_COSTS = {
   // General Tools
   'text-to-image': 2,
   'image-to-image': 2,
-  'image-to-video': 5,
+
+  // Video Generation (5 credits per second)
+  'image-to-video-5s': 25,
+  'image-to-video-10s': 50,
+  'text-to-video-5s': 27,   // 2 (image) + 25 (video)
+  'text-to-video-10s': 52,  // 2 (image) + 50 (video)
+
+  // Audio/Other
   'dubbing': 15,
-  'storyboard-export': 5,
+  'storyboard-export': 10,
+
+  // Edit Tools - Basic (1 credit)
+  'edit-auto-enhance': 1,
+  'edit-sharpen': 1,
+  'edit-noise-reduction': 1,
+  'edit-color-correct': 1,
+  'edit-exposure-fix': 1,
+  'edit-shadow-highlight': 1,
+  'edit-smart-crop': 1,
+
+  // Edit Tools - Advanced (2 credits)
+  'edit-upscale': 2,
+  'edit-hdr': 2,
+  'edit-object-removal': 2,
+  'edit-uncrop': 2,
+
+  // Edit Tools - Premium (3 credits)
+  'edit-relight': 3,
 } as const;
 
 export type CreditCostKey = keyof typeof CREDIT_COSTS;

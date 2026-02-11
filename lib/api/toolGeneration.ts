@@ -3854,3 +3854,578 @@ export async function generateCustomFurnitureStaging(
   }
   throw new Error('No image returned from generation');
 }
+
+// ============ EDIT TOOLS GENERATION FUNCTIONS ============
+
+/**
+ * Background Removal using BiRefNet
+ */
+export async function generateBackgroundRemoval(
+  imageFile: File,
+  options: { backgroundType?: string },
+  onProgress?: GenerationProgressCallback
+): Promise<string> {
+  onProgress?.(10, 'Uploading image...');
+  const imageUrl = await uploadFile(imageFile, 'background-removal');
+
+  onProgress?.(30, 'Removing background...');
+
+  const result = await secureSubscribe('fal-ai/birefnet', {
+    input: {
+      image_url: imageUrl,
+      model: 'General',
+      operating_resolution: '1024x1024',
+      output_format: 'png',
+    },
+    logs: true,
+    onQueueUpdate: (update) => {
+      if (update.status === 'IN_PROGRESS') {
+        onProgress?.(Math.round(40 + Math.random() * 40), 'Processing...');
+      }
+    },
+  });
+
+  onProgress?.(100, 'Complete');
+
+  const data = result.data as { image?: { url: string } };
+  if (data?.image?.url) {
+    return data.image.url;
+  }
+  throw new Error('No image returned from background removal');
+}
+
+/**
+ * AI Upscale using Clarity Upscaler
+ */
+export async function generateUpscale(
+  imageFile: File,
+  options: { scale?: number; enhanceFaces?: boolean },
+  onProgress?: GenerationProgressCallback
+): Promise<string> {
+  onProgress?.(10, 'Uploading image...');
+  const imageUrl = await uploadFile(imageFile, 'upscale');
+
+  onProgress?.(30, 'Upscaling image...');
+
+  const result = await secureSubscribe('fal-ai/clarity-upscaler', {
+    input: {
+      image_url: imageUrl,
+      upscale_factor: options.scale || 2,
+      creativity: 0.25,
+      resemblance: 0.75,
+      guidance_scale: 4,
+      num_inference_steps: 20,
+      prompt: 'high quality, sharp details, professional photo',
+      negative_prompt: '(worst quality, low quality, blurry:2)',
+      enable_face_enhancement: options.enhanceFaces ?? false,
+    },
+    logs: true,
+    onQueueUpdate: (update) => {
+      if (update.status === 'IN_PROGRESS') {
+        onProgress?.(Math.round(40 + Math.random() * 40), 'Enhancing resolution...');
+      }
+    },
+  });
+
+  onProgress?.(100, 'Complete');
+
+  const data = result.data as { image?: { url: string } };
+  if (data?.image?.url) {
+    return data.image.url;
+  }
+  throw new Error('No image returned from upscaling');
+}
+
+/**
+ * Object Removal using Bria Eraser
+ */
+export async function generateObjectRemoval(
+  imageFile: File,
+  options: { maskDataUrl?: string },
+  onProgress?: GenerationProgressCallback
+): Promise<string> {
+  onProgress?.(10, 'Uploading image...');
+  const imageUrl = await uploadFile(imageFile, 'object-removal');
+
+  let maskUrl: string | undefined;
+  if (options.maskDataUrl) {
+    onProgress?.(20, 'Processing mask...');
+    // Convert data URL to blob and upload
+    const response = await fetch(options.maskDataUrl);
+    const blob = await response.blob();
+    const maskFile = new File([blob], 'mask.png', { type: 'image/png' });
+    maskUrl = await uploadFile(maskFile, 'object-removal-masks');
+  }
+
+  onProgress?.(40, 'Removing objects...');
+
+  const result = await secureSubscribe('fal-ai/bria/eraser', {
+    input: {
+      image_url: imageUrl,
+      mask_url: maskUrl,
+    },
+    logs: true,
+    onQueueUpdate: (update) => {
+      if (update.status === 'IN_PROGRESS') {
+        onProgress?.(Math.round(50 + Math.random() * 35), 'Processing...');
+      }
+    },
+  });
+
+  onProgress?.(100, 'Complete');
+
+  const data = result.data as { image?: { url: string } };
+  if (data?.image?.url) {
+    return data.image.url;
+  }
+  throw new Error('No image returned from object removal');
+}
+
+/**
+ * Style Transfer using Flux
+ */
+export async function generateStyleTransfer(
+  imageFile: File,
+  options: { style: string },
+  onProgress?: GenerationProgressCallback
+): Promise<string> {
+  onProgress?.(10, 'Uploading image...');
+  const imageUrl = await uploadFile(imageFile, 'style-transfer');
+
+  const stylePrompts: Record<string, string> = {
+    'anime': 'Transform into anime style, vibrant colors, clean lines, Japanese animation aesthetic',
+    'oil-painting': 'Transform into classic oil painting, visible brushstrokes, rich colors, museum quality art',
+    'watercolor': 'Transform into soft watercolor painting, gentle washes, flowing colors, artistic',
+    'sketch': 'Transform into detailed pencil sketch, hand-drawn lines, shading, artistic drawing',
+    'pop-art': 'Transform into bold pop art style, comic book aesthetic, bright colors, halftone dots',
+    'cyberpunk': 'Transform into cyberpunk style, neon colors, futuristic, dark atmosphere with glowing elements',
+    'vintage': 'Transform into vintage film style, warm tones, film grain, retro aesthetic, 1970s look',
+    'ghibli': 'Transform into Studio Ghibli animation style, soft colors, whimsical, detailed backgrounds',
+  };
+
+  onProgress?.(30, `Applying ${options.style} style...`);
+
+  const prompt = stylePrompts[options.style] || stylePrompts['anime'];
+
+  const result = await secureSubscribe('fal-ai/flux/dev/image-to-image', {
+    input: {
+      image_url: imageUrl,
+      prompt,
+      strength: 0.75,
+      num_inference_steps: 28,
+      guidance_scale: 7.5,
+    },
+    logs: true,
+    onQueueUpdate: (update) => {
+      if (update.status === 'IN_PROGRESS') {
+        onProgress?.(Math.round(40 + Math.random() * 45), 'Transforming style...');
+      }
+    },
+  });
+
+  onProgress?.(100, 'Complete');
+
+  const data = result.data as { images?: Array<{ url: string }> };
+  if (data?.images?.[0]?.url) {
+    return data.images[0].url;
+  }
+  throw new Error('No image returned from style transfer');
+}
+
+/**
+ * Face Retouch
+ */
+export async function generateFaceRetouch(
+  imageFile: File,
+  options: {
+    smoothSkin?: boolean;
+    brightenEyes?: boolean;
+    whitenTeeth?: boolean;
+    removeRedEye?: boolean;
+    enhanceFeatures?: boolean;
+  },
+  onProgress?: GenerationProgressCallback
+): Promise<string> {
+  onProgress?.(10, 'Uploading portrait...');
+  const imageUrl = await uploadFile(imageFile, 'face-retouch');
+
+  const enhancements: string[] = [];
+  if (options.smoothSkin) enhancements.push('smooth and even skin texture');
+  if (options.brightenEyes) enhancements.push('bright sparkling eyes with catchlight');
+  if (options.whitenTeeth) enhancements.push('naturally whitened teeth');
+  if (options.removeRedEye) enhancements.push('remove any red-eye');
+  if (options.enhanceFeatures) enhancements.push('enhanced facial features and details');
+
+  const prompt = `Professional portrait retouching: ${enhancements.join(', ')}. Maintain natural appearance, professional headshot quality, flattering lighting`;
+
+  onProgress?.(30, 'Retouching portrait...');
+
+  const result = await secureSubscribe('fal-ai/flux/dev/image-to-image', {
+    input: {
+      image_url: imageUrl,
+      prompt,
+      strength: 0.35,
+      num_inference_steps: 25,
+      guidance_scale: 6,
+    },
+    logs: true,
+    onQueueUpdate: (update) => {
+      if (update.status === 'IN_PROGRESS') {
+        onProgress?.(Math.round(40 + Math.random() * 45), 'Enhancing portrait...');
+      }
+    },
+  });
+
+  onProgress?.(100, 'Complete');
+
+  const data = result.data as { images?: Array<{ url: string }> };
+  if (data?.images?.[0]?.url) {
+    return data.images[0].url;
+  }
+  throw new Error('No image returned from face retouching');
+}
+
+/**
+ * Uncrop / Image Extension
+ */
+export async function generateUncrop(
+  imageFile: File,
+  options: { direction: string; aspectRatio: string },
+  onProgress?: GenerationProgressCallback
+): Promise<string> {
+  onProgress?.(10, 'Uploading image...');
+  const imageUrl = await uploadFile(imageFile, 'uncrop');
+
+  const directionPrompts: Record<string, string> = {
+    'all': 'Extend the image in all directions with seamless continuation',
+    'horizontal': 'Extend the image horizontally with seamless continuation',
+    'vertical': 'Extend the image vertically with seamless continuation',
+    'top': 'Extend the image upward with seamless continuation',
+    'bottom': 'Extend the image downward with seamless continuation',
+    'left': 'Extend the image to the left with seamless continuation',
+    'right': 'Extend the image to the right with seamless continuation',
+  };
+
+  onProgress?.(30, 'Extending image...');
+
+  const prompt = `${directionPrompts[options.direction]}. Maintain consistent style, lighting, and subject matter. High quality, seamless blend.`;
+
+  const result = await secureSubscribe('fal-ai/flux-pro/v1/fill', {
+    input: {
+      image_url: imageUrl,
+      prompt,
+      output_format: 'jpeg',
+    },
+    logs: true,
+    onQueueUpdate: (update) => {
+      if (update.status === 'IN_PROGRESS') {
+        onProgress?.(Math.round(40 + Math.random() * 45), 'Generating extension...');
+      }
+    },
+  });
+
+  onProgress?.(100, 'Complete');
+
+  const data = result.data as { images?: Array<{ url: string }>; image?: { url: string } };
+  if (data?.images?.[0]?.url) {
+    return data.images[0].url;
+  }
+  if (data?.image?.url) {
+    return data.image.url;
+  }
+  throw new Error('No image returned from uncrop');
+}
+
+// Note: generateAutoEnhance for edit tools uses the existing auto enhance function above
+
+// ==========================================
+// Real Estate Photo Edit Tools
+// ==========================================
+
+/**
+ * Smart Sharpen - AI detail recovery for property photos
+ */
+export async function generateSharpen(
+  imageFile: File,
+  onProgress?: GenerationProgressCallback
+): Promise<string> {
+  onProgress?.(10, 'Uploading image...');
+  const imageUrl = await uploadFile(imageFile, 'sharpen');
+
+  onProgress?.(30, 'Sharpening image...');
+
+  const result = await secureSubscribe('fal-ai/clarity-upscaler', {
+    input: {
+      image_url: imageUrl,
+      scale: 1, // No upscaling, just sharpen
+      creativity: 0.2,
+      resemblance: 0.9,
+      prompt: 'sharp, detailed, crisp real estate property photo',
+    },
+    logs: true,
+    onQueueUpdate: (update) => {
+      if (update.status === 'IN_PROGRESS') {
+        onProgress?.(Math.round(40 + Math.random() * 45), 'Recovering details...');
+      }
+    },
+  });
+
+  onProgress?.(100, 'Complete');
+
+  const data = result.data as { image?: { url: string } };
+  if (data?.image?.url) return data.image.url;
+  throw new Error('No image returned from sharpening');
+}
+
+/**
+ * HDR Effect - Add dynamic range to property photos
+ */
+export async function generateHDR(
+  imageFile: File,
+  onProgress?: GenerationProgressCallback
+): Promise<string> {
+  onProgress?.(10, 'Uploading image...');
+  const imageUrl = await uploadFile(imageFile, 'hdr');
+
+  onProgress?.(30, 'Applying HDR effect...');
+
+  const result = await secureSubscribe('fal-ai/flux/dev/image-to-image', {
+    input: {
+      image_url: imageUrl,
+      prompt: 'HDR photography, high dynamic range, enhanced shadows and highlights, vibrant colors, professional real estate photo with balanced exposure throughout, natural lighting',
+      strength: 0.35,
+      num_inference_steps: 28,
+      guidance_scale: 7.5,
+    },
+    logs: true,
+    onQueueUpdate: (update) => {
+      if (update.status === 'IN_PROGRESS') {
+        onProgress?.(Math.round(40 + Math.random() * 45), 'Enhancing dynamic range...');
+      }
+    },
+  });
+
+  onProgress?.(100, 'Complete');
+
+  const data = result.data as { images?: Array<{ url: string }> };
+  if (data?.images?.[0]?.url) return data.images[0].url;
+  throw new Error('No image returned from HDR processing');
+}
+
+/**
+ * Noise Reduction - Clean grainy low-light photos
+ */
+export async function generateNoiseReduction(
+  imageFile: File,
+  onProgress?: GenerationProgressCallback
+): Promise<string> {
+  onProgress?.(10, 'Uploading image...');
+  const imageUrl = await uploadFile(imageFile, 'noise-reduction');
+
+  onProgress?.(30, 'Reducing noise...');
+
+  const result = await secureSubscribe('fal-ai/clarity-upscaler', {
+    input: {
+      image_url: imageUrl,
+      scale: 1,
+      creativity: 0.1,
+      resemblance: 0.95,
+      prompt: 'clean, noise-free, smooth real estate interior photo, pristine image quality',
+    },
+    logs: true,
+    onQueueUpdate: (update) => {
+      if (update.status === 'IN_PROGRESS') {
+        onProgress?.(Math.round(40 + Math.random() * 45), 'Cleaning up grain...');
+      }
+    },
+  });
+
+  onProgress?.(100, 'Complete');
+
+  const data = result.data as { image?: { url: string } };
+  if (data?.image?.url) return data.image.url;
+  throw new Error('No image returned from noise reduction');
+}
+
+/**
+ * Color Correction - Fix white balance and color casts
+ */
+export async function generateColorCorrection(
+  imageFile: File,
+  onProgress?: GenerationProgressCallback
+): Promise<string> {
+  onProgress?.(10, 'Uploading image...');
+  const imageUrl = await uploadFile(imageFile, 'color-correct');
+
+  onProgress?.(30, 'Correcting colors...');
+
+  const result = await secureSubscribe('fal-ai/flux/dev/image-to-image', {
+    input: {
+      image_url: imageUrl,
+      prompt: 'professionally color corrected real estate photo, perfect white balance, accurate natural colors, no color cast, neutral tones, proper exposure',
+      strength: 0.3,
+      num_inference_steps: 28,
+      guidance_scale: 7.5,
+    },
+    logs: true,
+    onQueueUpdate: (update) => {
+      if (update.status === 'IN_PROGRESS') {
+        onProgress?.(Math.round(40 + Math.random() * 45), 'Fixing white balance...');
+      }
+    },
+  });
+
+  onProgress?.(100, 'Complete');
+
+  const data = result.data as { images?: Array<{ url: string }> };
+  if (data?.images?.[0]?.url) return data.images[0].url;
+  throw new Error('No image returned from color correction');
+}
+
+/**
+ * Exposure Fix - Recover over/underexposed areas
+ */
+export async function generateExposureFix(
+  imageFile: File,
+  onProgress?: GenerationProgressCallback
+): Promise<string> {
+  onProgress?.(10, 'Uploading image...');
+  const imageUrl = await uploadFile(imageFile, 'exposure-fix');
+
+  onProgress?.(30, 'Fixing exposure...');
+
+  const result = await secureSubscribe('fal-ai/flux/dev/image-to-image', {
+    input: {
+      image_url: imageUrl,
+      prompt: 'perfectly exposed real estate photo, recovered details in shadows and highlights, balanced lighting, visible window views, no blown highlights, no crushed blacks',
+      strength: 0.4,
+      num_inference_steps: 28,
+      guidance_scale: 7.5,
+    },
+    logs: true,
+    onQueueUpdate: (update) => {
+      if (update.status === 'IN_PROGRESS') {
+        onProgress?.(Math.round(40 + Math.random() * 45), 'Recovering details...');
+      }
+    },
+  });
+
+  onProgress?.(100, 'Complete');
+
+  const data = result.data as { images?: Array<{ url: string }> };
+  if (data?.images?.[0]?.url) return data.images[0].url;
+  throw new Error('No image returned from exposure fix');
+}
+
+/**
+ * Shadow & Highlight - Balance interior lighting
+ */
+export async function generateShadowHighlight(
+  imageFile: File,
+  onProgress?: GenerationProgressCallback
+): Promise<string> {
+  onProgress?.(10, 'Uploading image...');
+  const imageUrl = await uploadFile(imageFile, 'shadow-highlight');
+
+  onProgress?.(30, 'Balancing lighting...');
+
+  const result = await secureSubscribe('fal-ai/flux/dev/image-to-image', {
+    input: {
+      image_url: imageUrl,
+      prompt: 'real estate interior with lifted shadows and controlled highlights, even lighting throughout the room, visible details in dark corners, balanced window exposure, professional interior photography',
+      strength: 0.35,
+      num_inference_steps: 28,
+      guidance_scale: 7.5,
+    },
+    logs: true,
+    onQueueUpdate: (update) => {
+      if (update.status === 'IN_PROGRESS') {
+        onProgress?.(Math.round(40 + Math.random() * 45), 'Adjusting shadows & highlights...');
+      }
+    },
+  });
+
+  onProgress?.(100, 'Complete');
+
+  const data = result.data as { images?: Array<{ url: string }> };
+  if (data?.images?.[0]?.url) return data.images[0].url;
+  throw new Error('No image returned from shadow/highlight adjustment');
+}
+
+/**
+ * AI Relight - Improve room lighting and mood
+ */
+export async function generateRelight(
+  imageFile: File,
+  onProgress?: GenerationProgressCallback
+): Promise<string> {
+  onProgress?.(10, 'Uploading image...');
+  const imageUrl = await uploadFile(imageFile, 'relight');
+
+  onProgress?.(30, 'Relighting image...');
+
+  const result = await secureSubscribe('fal-ai/flux/dev/image-to-image', {
+    input: {
+      image_url: imageUrl,
+      prompt: 'beautifully lit interior space, warm inviting lighting, natural daylight streaming through windows, soft shadows, professional real estate photography with perfect lighting mood',
+      strength: 0.45,
+      num_inference_steps: 28,
+      guidance_scale: 7.5,
+    },
+    logs: true,
+    onQueueUpdate: (update) => {
+      if (update.status === 'IN_PROGRESS') {
+        onProgress?.(Math.round(40 + Math.random() * 45), 'Improving lighting mood...');
+      }
+    },
+  });
+
+  onProgress?.(100, 'Complete');
+
+  const data = result.data as { images?: Array<{ url: string }> };
+  if (data?.images?.[0]?.url) return data.images[0].url;
+  throw new Error('No image returned from relighting');
+}
+
+/**
+ * Smart Crop - AI-powered composition
+ */
+export async function generateSmartCrop(
+  imageFile: File,
+  options: { aspectRatio: string },
+  onProgress?: GenerationProgressCallback
+): Promise<string> {
+  onProgress?.(10, 'Uploading image...');
+  const imageUrl = await uploadFile(imageFile, 'smart-crop');
+
+  const aspectMap: Record<string, string> = {
+    '16:9': 'landscape 16:9 aspect ratio',
+    '4:3': 'standard 4:3 aspect ratio',
+    '1:1': 'square 1:1 aspect ratio',
+    '9:16': 'portrait 9:16 vertical aspect ratio',
+  };
+
+  onProgress?.(30, 'Finding best crop...');
+
+  const result = await secureSubscribe('fal-ai/flux/dev/image-to-image', {
+    input: {
+      image_url: imageUrl,
+      prompt: `professionally composed real estate photo, ${aspectMap[options.aspectRatio]}, rule of thirds, balanced composition, centered subject, MLS-ready property photo`,
+      strength: 0.25,
+      num_inference_steps: 28,
+      guidance_scale: 7.5,
+    },
+    logs: true,
+    onQueueUpdate: (update) => {
+      if (update.status === 'IN_PROGRESS') {
+        onProgress?.(Math.round(40 + Math.random() * 45), 'Optimizing composition...');
+      }
+    },
+  });
+
+  onProgress?.(100, 'Complete');
+
+  const data = result.data as { images?: Array<{ url: string }> };
+  if (data?.images?.[0]?.url) return data.images[0].url;
+  throw new Error('No image returned from smart crop');
+}
