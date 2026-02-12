@@ -313,33 +313,29 @@ function buildVirtualStagingPrompt(options: VirtualStagingOptions): string {
 }
 
 /**
- * Build the prompt for Sky Replacement
+ * Build the prompt for Sky Replacement (FLUX Kontext Pro)
  *
- * Real-estate-safe prompts with proper constraints:
- * - Always include "photorealistic real estate photography"
- * - Match original lighting direction and exposure
- * - Seamless blend at roofline and tree edges
- * - Avoid halos, over-saturation, dramatic color grading
- * - Do not change buildings, trees, or any non-sky pixels
- *
- * Note: flux-pro/v1/fill does not support negative_prompt,
- * so constraints are embedded in the main prompt.
+ * Kontext-style prompts that describe the full transformation:
+ * - Explicitly state to replace ONLY the sky
+ * - Describe the desired sky in detail
+ * - Emphasize keeping everything else exactly the same
+ * - Similar pattern to Twilight prompts which work well
  */
 function buildSkyPrompt(options: SkyReplacementOptions): string {
   const skyPrompts: Record<string, string> = {
     // MLS-Safe options
-    'blue-clear': 'Photorealistic clear daytime blue sky, natural gradient, no clouds. Real estate photography. Match original lighting direction and exposure. Seamless blend at roofline and tree edges. Avoid halos, oversaturation, HDR look. Do not alter any non-sky elements.',
+    'blue-clear': 'Replace only the sky in this real estate photo with a beautiful clear blue sky. The sky should have a natural gradient from deeper blue at the top to lighter blue near the horizon, with no clouds. Keep the house, roof, trees, landscaping, lawn, driveway, and all other elements exactly the same. Do not change the building colors, architecture, or any ground-level features. Only replace the sky area.',
 
-    'blue-clouds': 'Photorealistic blue sky with a few soft white cumulus clouds, natural and subtle. Real estate photography. Match original lighting direction and exposure. Seamless blend at edges. Avoid dramatic clouds, oversaturation, HDR, halos. Do not alter non-sky elements.',
+    'blue-clouds': 'Replace only the sky in this real estate photo with a pleasant blue sky featuring a few soft white fluffy cumulus clouds. Natural daytime lighting. Keep the house, roof, trees, landscaping, lawn, driveway, and all other elements exactly the same. Do not change the building colors, architecture, or any ground-level features. Only replace the sky area.',
 
-    'overcast': 'Photorealistic light gray overcast sky, soft and even, realistic cloud texture, not flat. Real estate photography. Match original exposure. Seamless blend at edges. Avoid banding, halos, heavy HDR. Do not alter non-sky elements.',
+    'overcast': 'Replace only the sky in this real estate photo with a soft overcast sky. Light gray clouds with subtle texture, even lighting, professional real estate photography look. Keep the house, roof, trees, landscaping, lawn, driveway, and all other elements exactly the same. Do not change the building colors, architecture, or any ground-level features. Only replace the sky area.',
 
     // Marketing-only options (not MLS-safe)
-    'golden-hour': 'Photorealistic warm late-afternoon sky with subtle golden tones, realistic and not exaggerated. Match original lighting direction. Seamless blend. Avoid pink/purple fantasy colors, dramatic grading, HDR halos. Do not alter non-sky elements.',
+    'golden-hour': 'Replace only the sky in this real estate photo with a warm golden hour sky. Soft golden and peach tones, gentle warm light suggesting late afternoon sun. Keep the house, roof, trees, landscaping, lawn, driveway, and all other elements exactly the same. Do not change the building colors, architecture, or any ground-level features. Only replace the sky area with the golden hour sky.',
 
-    'sunset': 'Photorealistic mild sunset sky with soft warm tones, realistic and subtle, not dramatic. Match original lighting direction. Seamless blend at roofline and trees. Avoid purple/magenta gradients, oversaturation, HDR halos. Do not alter non-sky elements.',
+    'sunset': 'Replace only the sky in this real estate photo with a beautiful sunset sky. Warm orange and pink tones, soft clouds catching the sunset light, romantic evening atmosphere. Keep the house, roof, trees, landscaping, lawn, driveway, and all other elements exactly the same. Do not change the building colors, architecture, or any ground-level features. Only replace the sky area.',
 
-    'dramatic': 'Photorealistic moody sky with heavier clouds, realistic for local weather, not cinematic. Match original exposure. Seamless blend. Avoid storm lightning, extreme contrast, surreal colors, HDR halos. Do not alter non-sky elements.',
+    'dramatic': 'Replace only the sky in this real estate photo with a dramatic sky. Impressive cloud formations with depth and texture, moody but not stormy, professional real estate marketing photography. Keep the house, roof, trees, landscaping, lawn, driveway, and all other elements exactly the same. Do not change the building colors, architecture, or any ground-level features. Only replace the sky area.',
   };
 
   return skyPrompts[options.skyType];
@@ -809,7 +805,7 @@ export async function generateSkyMask(
   const result = await secureSubscribe(TOOL_MODEL_MAP['sky-segmentation'], {
     input: {
       image_url: imageUrl,
-      model: 'General',
+      model: 'General Use (Heavy)',
       operating_resolution: '1024x1024',
       output_format: 'png',
     },
@@ -1050,19 +1046,14 @@ export async function generatePhotoEnhancement(
 }
 
 /**
- * Sky Replacement Generation
+ * Sky Replacement Generation (FLUX Kontext Pro)
  *
- * Uses fal-ai/flux-pro/v1/fill which requires a mask.
- * If no mask is provided, auto-generates one using BiRefNet.
+ * Uses fal-ai/flux-pro/kontext for intelligent sky replacement.
+ * This approach works like the Twilight tool - no mask needed.
+ * The model understands the image and only replaces the sky area.
  *
- * For best results:
- * - Mask should be sky-only (exclude roofs, chimneys, tree lines)
- * - Feathered edge: 2-8px blur depending on resolution
- * - Slightly erode mask by 1-3px to avoid overwriting rooflines
- * - Mask dimensions must exactly match image dimensions
- *
- * Note: flux-pro/v1/fill does NOT support guidance_scale or num_inference_steps.
- * Prompt discipline + mask quality are the primary levers.
+ * If a manual mask is provided, falls back to flux-pro/v1/fill
+ * for more precise control over the replacement area.
  */
 export async function generateSkyReplacement(
   imageFile: File,
@@ -1070,65 +1061,73 @@ export async function generateSkyReplacement(
   maskCanvas?: HTMLCanvasElement,
   onProgress?: GenerationProgressCallback
 ): Promise<string> {
-  onProgress?.(5, 'Uploading image...');
+  onProgress?.(10, 'Uploading image...');
 
   const imageUrl = await uploadFile(imageFile, 'sky-replacement');
-
-  let maskUrl: string | undefined;
-
-  if (maskCanvas) {
-    // Use provided manual mask
-    onProgress?.(15, 'Processing sky mask...');
-    const maskBlob = await canvasMaskToBlob(maskCanvas);
-    const maskFile = new File([maskBlob], 'mask.png', { type: 'image/png' });
-    maskUrl = await uploadFile(maskFile, 'sky-replacement-masks');
-  } else {
-    // Auto-generate sky mask using BiRefNet
-    onProgress?.(15, 'Auto-detecting sky area...');
-
-    try {
-      // BiRefNet returns foreground with transparent background
-      // The transparent area IS the sky - we use this directly as the mask
-      maskUrl = await generateSkyMask(imageUrl, (progress, status) => {
-        // Scale progress from 15-40%
-        const scaledProgress = Math.round(15 + (progress * 0.25));
-        onProgress?.(scaledProgress, status || 'Detecting sky...');
-      });
-      onProgress?.(40, 'Sky mask generated');
-    } catch (error) {
-      console.warn('Auto sky segmentation failed, proceeding without mask:', error);
-      // Continue without mask - results may be less accurate
-    }
-  }
-
-  onProgress?.(45, 'Replacing sky...');
-
   const prompt = buildSkyPrompt(options);
 
-  // Use flux-pro/v1/fill for inpainting
-  // Parameters based on fal.ai documentation - no guidance_scale/steps support
-  const result = await secureSubscribe(TOOL_MODEL_MAP['sky-replacement'], {
+  // If manual mask provided, use the precise inpainting approach
+  if (maskCanvas) {
+    onProgress?.(20, 'Processing manual mask...');
+    const maskBlob = await canvasMaskToBlob(maskCanvas);
+    const maskFile = new File([maskBlob], 'mask.png', { type: 'image/png' });
+    const maskUrl = await uploadFile(maskFile, 'sky-replacement-masks');
+
+    onProgress?.(40, 'Replacing sky with mask...');
+
+    // Use flux-pro/v1/fill for precise mask-based inpainting
+    const result = await secureSubscribe('fal-ai/flux-pro/v1/fill', {
+      input: {
+        image_url: imageUrl,
+        mask_url: maskUrl,
+        prompt,
+        num_images: 1,
+        output_format: 'jpeg',
+      },
+      logs: true,
+      onQueueUpdate: (update) => {
+        if (update.status === 'IN_PROGRESS') {
+          onProgress?.(Math.round(50 + Math.random() * 40), 'Replacing sky...');
+        }
+      },
+    });
+
+    onProgress?.(100, 'Complete');
+
+    const data = result.data as { images?: Array<{ url: string }> };
+    if (data?.images?.[0]?.url) {
+      return data.images[0].url;
+    }
+    throw new Error('No image returned from sky replacement');
+  }
+
+  // Use Kontext for automatic sky replacement (no mask needed)
+  onProgress?.(30, 'Replacing sky...');
+
+  const result = await secureSubscribe(TOOL_MODEL_MAP['twilight'], {
     input: {
       image_url: imageUrl,
-      mask_url: maskUrl,
       prompt,
-      num_images: 3, // Generate multiple candidates, pick best
-      enhance_prompt: false, // Keep stable, predictable results
+      guidance_scale: 3.5,
+      num_inference_steps: 28,
       output_format: 'jpeg',
     },
     logs: true,
     onQueueUpdate: (update) => {
       if (update.status === 'IN_PROGRESS') {
-        onProgress?.(Math.round(55 + Math.random() * 35), 'Replacing sky...');
+        onProgress?.(Math.round(40 + Math.random() * 50), 'Replacing sky...');
       }
     },
   });
 
   onProgress?.(100, 'Complete');
 
-  const data = result.data as { images?: Array<{ url: string }> };
+  const data = result.data as { images?: Array<{ url: string }>; image?: { url: string } };
   if (data?.images?.[0]?.url) {
     return data.images[0].url;
+  }
+  if (data?.image?.url) {
+    return data.image.url;
   }
   throw new Error('No image returned from sky replacement');
 }

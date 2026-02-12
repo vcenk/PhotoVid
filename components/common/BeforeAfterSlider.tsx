@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { RefreshCw, AlertCircle, Loader2 } from 'lucide-react';
 
 interface BeforeAfterSliderProps {
@@ -9,6 +9,9 @@ interface BeforeAfterSliderProps {
   className?: string;
   onRetry?: () => void;
 }
+
+const MAX_AUTO_RETRIES = 3;
+const RETRY_DELAY_MS = 1000;
 
 export const BeforeAfterSlider: React.FC<BeforeAfterSliderProps> = ({
   beforeImage,
@@ -27,6 +30,7 @@ export const BeforeAfterSlider: React.FC<BeforeAfterSliderProps> = ({
   const [beforeError, setBeforeError] = useState(false);
   const [afterError, setAfterError] = useState(false);
   const [retryCount, setRetryCount] = useState(0);
+  const [autoRetryCount, setAutoRetryCount] = useState(0);
 
   const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPosition(Number(e.target.value));
@@ -35,24 +39,43 @@ export const BeforeAfterSlider: React.FC<BeforeAfterSliderProps> = ({
   const handleBeforeLoad = () => {
     setBeforeLoaded(true);
     setBeforeError(false);
+    setAutoRetryCount(0); // Reset auto-retry on success
   };
 
   const handleAfterLoad = () => {
     setAfterLoaded(true);
     setAfterError(false);
+    setAutoRetryCount(0); // Reset auto-retry on success
   };
 
   const handleBeforeError = () => {
-    console.error('Before image failed to load:', beforeImage);
+    console.error('Before image failed to load:', beforeImage, 'retry:', autoRetryCount);
     setBeforeError(true);
     setBeforeLoaded(false);
   };
 
   const handleAfterError = () => {
-    console.error('After image failed to load:', afterImage);
+    console.error('After image failed to load:', afterImage, 'retry:', autoRetryCount);
     setAfterError(true);
     setAfterLoaded(false);
   };
+
+  // Auto-retry effect for network errors (QUIC, etc.)
+  useEffect(() => {
+    if ((beforeError || afterError) && autoRetryCount < MAX_AUTO_RETRIES) {
+      const timer = setTimeout(() => {
+        console.log(`Auto-retrying image load (attempt ${autoRetryCount + 1}/${MAX_AUTO_RETRIES})...`);
+        setBeforeError(false);
+        setAfterError(false);
+        setBeforeLoaded(false);
+        setAfterLoaded(false);
+        setAutoRetryCount(prev => prev + 1);
+        setRetryCount(prev => prev + 1);
+      }, RETRY_DELAY_MS * (autoRetryCount + 1)); // Exponential backoff
+
+      return () => clearTimeout(timer);
+    }
+  }, [beforeError, afterError, autoRetryCount]);
 
   const handleRetry = useCallback(() => {
     // Reset error states and increment retry count to force reload
@@ -60,6 +83,7 @@ export const BeforeAfterSlider: React.FC<BeforeAfterSliderProps> = ({
     setAfterError(false);
     setBeforeLoaded(false);
     setAfterLoaded(false);
+    setAutoRetryCount(0); // Reset auto-retry counter on manual retry
     setRetryCount(prev => prev + 1);
 
     // Call external retry handler if provided
@@ -69,7 +93,8 @@ export const BeforeAfterSlider: React.FC<BeforeAfterSliderProps> = ({
   }, [onRetry]);
 
   const isLoading = !beforeLoaded || !afterLoaded;
-  const hasError = beforeError || afterError;
+  const hasError = (beforeError || afterError) && autoRetryCount >= MAX_AUTO_RETRIES;
+  const isAutoRetrying = (beforeError || afterError) && autoRetryCount < MAX_AUTO_RETRIES;
 
   // Add cache buster for retry
   const getImageSrc = (src: string) => {
@@ -87,11 +112,15 @@ export const BeforeAfterSlider: React.FC<BeforeAfterSliderProps> = ({
       {/* Image Container */}
       <div className="relative aspect-[4/3] w-full">
         {/* Loading Overlay */}
-        {isLoading && !hasError && (
+        {(isLoading || isAutoRetrying) && !hasError && (
           <div className="absolute inset-0 bg-zinc-900 flex items-center justify-center z-30">
             <div className="text-center">
               <Loader2 size={32} className="text-emerald-500 animate-spin mx-auto mb-2" />
-              <p className="text-zinc-400 text-sm">Loading images...</p>
+              <p className="text-zinc-400 text-sm">
+                {isAutoRetrying
+                  ? `Retrying... (${autoRetryCount}/${MAX_AUTO_RETRIES})`
+                  : 'Loading images...'}
+              </p>
             </div>
           </div>
         )}

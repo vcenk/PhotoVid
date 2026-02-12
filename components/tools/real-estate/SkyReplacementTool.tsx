@@ -153,6 +153,25 @@ const SkyReplacementToolInner: React.FC = () => {
         setResultImage(null);
     };
 
+    const handleDownload = async () => {
+        if (!resultImage) return;
+        try {
+            const response = await fetch(resultImage);
+            const blob = await response.blob();
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            const skyName = selectedSkyData?.name?.toLowerCase().replace(/\s+/g, '-') || 'sky';
+            link.download = `sky-replacement-${skyName}-${Date.now()}.jpg`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        } catch (err) {
+            console.error('Download failed:', err);
+        }
+    };
+
     const handleGenerate = async () => {
         if (!uploadedImage) return;
         setIsGenerating(true);
@@ -331,7 +350,7 @@ const SkyReplacementToolInner: React.FC = () => {
                                 ) : (
                                     <button onClick={async () => { if (resultImage) { try { await addAsset(resultImage, 'image', 'Sky Replacement Result'); setSavedToLibrary(true); } catch {} } }} className="px-3 py-1.5 text-xs font-medium text-zinc-400 hover:text-white bg-white/5 hover:bg-white/10 rounded-lg transition-colors flex items-center gap-1.5"><BookmarkPlus size={14} />Save to Library</button>
                                 )}
-                                <button className="px-3 py-1.5 text-xs font-medium text-white bg-cyan-600 hover:bg-cyan-500 rounded-lg transition-colors flex items-center gap-1.5"><Download size={14} />Download</button>
+                                <button onClick={handleDownload} className="px-3 py-1.5 text-xs font-medium text-white bg-cyan-600 hover:bg-cyan-500 rounded-lg transition-colors flex items-center gap-1.5"><Download size={14} />Download</button>
                             </div>
                         )}
                     </div>

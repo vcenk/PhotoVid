@@ -4,7 +4,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, useInView, AnimatePresence } from 'framer-motion';
 import {
   Sparkles, Wand2, Sofa, Sun, Trash2, Paintbrush, TreeDeciduous, Home,
-  Camera, CloudSun, Moon, Leaf, Waves, PaintBucket, Grid3X3, CloudRain, Sunrise
+  Camera, CloudSun, Moon, Leaf, Waves, PaintBucket, Grid3X3, CloudRain, Sunrise,
+  Cloud, Video, Armchair
 } from 'lucide-react';
 
 interface TransformExample {
@@ -28,6 +29,15 @@ const TRANSFORM_EXAMPLES: TransformExample[] = [
     afterLabel: 'AI Staged',
   },
   {
+    id: 'custom-furniture-staging',
+    title: 'Custom Staging',
+    icon: Armchair,
+    before: '/showcase/real-estate/before/virtual-staging.jpg',
+    after: '/showcase/real-estate/after/virtual-staging.jpg',
+    beforeLabel: 'Empty Room',
+    afterLabel: 'Custom Staged',
+  },
+  {
     id: 'photo-enhancement',
     title: 'Photo Enhancement',
     icon: Camera,
@@ -35,6 +45,15 @@ const TRANSFORM_EXAMPLES: TransformExample[] = [
     after: '/showcase/real-estate/after/photo-enhancement.jpg',
     beforeLabel: 'Original',
     afterLabel: 'Enhanced',
+  },
+  {
+    id: 'sky-replacement',
+    title: 'Sky Replacement',
+    icon: Cloud,
+    before: '/showcase/real-estate/before/day-to-twilight.jpg',
+    after: '/showcase/real-estate/after/sky-replacement.jpg',
+    beforeLabel: 'Overcast',
+    afterLabel: 'Blue Sky',
   },
   {
     id: 'day-to-twilight',
@@ -154,6 +173,24 @@ const TRANSFORM_EXAMPLES: TransformExample[] = [
     afterLabel: 'Enhanced',
   },
   {
+    id: 'quick-video',
+    title: 'Quick Video',
+    icon: Video,
+    before: '/showcase/real-estate/before/virtual-staging.jpg',
+    after: '/showcase/real-estate/after/virtual-staging.jpg',
+    beforeLabel: 'Photo',
+    afterLabel: 'Video',
+  },
+  {
+    id: 'room-tour',
+    title: 'Room Tour Video',
+    icon: Video,
+    before: '/showcase/real-estate/before/photo-enhancement.jpg',
+    after: '/showcase/real-estate/after/photo-enhancement.jpg',
+    beforeLabel: 'Photo',
+    afterLabel: 'Tour Video',
+  },
+  {
     id: 'social-media-poster',
     title: 'Social Media Poster',
     icon: Camera,
@@ -164,15 +201,15 @@ const TRANSFORM_EXAMPLES: TransformExample[] = [
   },
 ];
 
-// Magic sparkle particles component
+// Magic sparkle particles component - ENHANCED for visibility
 const MagicParticles: React.FC<{ isActive: boolean }> = ({ isActive }) => {
-  const particles = Array.from({ length: 30 }, (_, i) => ({
+  const particles = Array.from({ length: 60 }, (_, i) => ({
     id: i,
     x: Math.random() * 100,
     y: Math.random() * 100,
-    size: Math.random() * 6 + 2,
-    delay: Math.random() * 0.5,
-    duration: Math.random() * 1 + 0.5,
+    size: Math.random() * 16 + 8,
+    delay: Math.random() * 0.8,
+    duration: Math.random() * 1.2 + 0.8,
   }));
 
   return (
@@ -184,6 +221,40 @@ const MagicParticles: React.FC<{ isActive: boolean }> = ({ isActive }) => {
           exit={{ opacity: 0 }}
           className="absolute inset-0 pointer-events-none z-20 overflow-hidden"
         >
+          {/* Bright flash effect */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: [0, 1, 0] }}
+            transition={{ duration: 0.4, ease: "easeOut" }}
+            className="absolute inset-0 bg-white/40"
+          />
+
+          {/* Multiple glow layers */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.3 }}
+            animate={{
+              opacity: [0, 1, 1, 0],
+              scale: [0.3, 1, 1.5, 2],
+            }}
+            transition={{ duration: 1.5, ease: "easeOut" }}
+            className="absolute inset-0 flex items-center justify-center"
+          >
+            <div className="w-[400px] h-[400px] rounded-full bg-gradient-to-r from-emerald-400/60 via-teal-400/60 to-cyan-400/60 blur-[100px]" />
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, scale: 0.5 }}
+            animate={{
+              opacity: [0, 0.8, 0.6, 0],
+              scale: [0.5, 1.2, 1.8, 2.5],
+            }}
+            transition={{ duration: 1.2, ease: "easeOut", delay: 0.1 }}
+            className="absolute inset-0 flex items-center justify-center"
+          >
+            <div className="w-[300px] h-[300px] rounded-full bg-gradient-to-r from-yellow-400/50 via-emerald-400/50 to-teal-400/50 blur-[80px]" />
+          </motion.div>
+
+          {/* Sparkle particles */}
           {particles.map((particle) => (
             <motion.div
               key={particle.id}
@@ -195,59 +266,91 @@ const MagicParticles: React.FC<{ isActive: boolean }> = ({ isActive }) => {
               }}
               animate={{
                 opacity: [0, 1, 1, 0],
-                scale: [0, 1.5, 1, 0],
-                y: [`${particle.y}%`, `${particle.y - 20}%`],
+                scale: [0, 2, 1.5, 0],
+                y: [`${particle.y}%`, `${particle.y - 30}%`],
+                rotate: [0, 180],
               }}
               transition={{
                 duration: particle.duration,
                 delay: particle.delay,
                 ease: "easeOut",
               }}
-              className="absolute"
+              className="absolute drop-shadow-[0_0_10px_rgba(52,211,153,0.8)]"
               style={{
                 width: particle.size,
                 height: particle.size,
               }}
             >
               <Sparkles
-                className="text-emerald-400"
+                className="text-emerald-300"
                 style={{ width: '100%', height: '100%' }}
               />
             </motion.div>
           ))}
 
-          {/* Central magic glow */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.5 }}
-            animate={{
-              opacity: [0, 0.8, 0.8, 0],
-              scale: [0.5, 1.5, 2, 2.5],
-            }}
-            transition={{ duration: 1.2, ease: "easeOut" }}
-            className="absolute inset-0 flex items-center justify-center"
-          >
-            <div className="w-32 h-32 rounded-full bg-gradient-to-r from-emerald-500/40 via-teal-500/40 to-cyan-500/40 blur-3xl" />
-          </motion.div>
+          {/* Radial burst lines */}
+          {Array.from({ length: 12 }).map((_, i) => (
+            <motion.div
+              key={`line-${i}`}
+              initial={{ opacity: 0, scale: 0 }}
+              animate={{
+                opacity: [0, 0.8, 0],
+                scale: [0, 1],
+              }}
+              transition={{
+                duration: 0.6,
+                delay: 0.1 + i * 0.02,
+                ease: "easeOut",
+              }}
+              className="absolute left-1/2 top-1/2 h-1 w-32 bg-gradient-to-r from-emerald-400 to-transparent origin-left"
+              style={{
+                transform: `rotate(${i * 30}deg)`,
+              }}
+            />
+          ))}
         </motion.div>
       )}
     </AnimatePresence>
   );
 };
 
-// Shimmer sweep effect
+// Shimmer sweep effect - ENHANCED for visibility
 const ShimmerSweep: React.FC<{ isActive: boolean }> = ({ isActive }) => {
   return (
     <AnimatePresence>
       {isActive && (
-        <motion.div
-          initial={{ x: '-100%', opacity: 0 }}
-          animate={{ x: '200%', opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.8, ease: "easeInOut" }}
-          className="absolute inset-0 z-20 pointer-events-none"
-        >
-          <div className="h-full w-1/3 bg-gradient-to-r from-transparent via-white/30 to-transparent skew-x-12" />
-        </motion.div>
+        <>
+          {/* Main bright sweep */}
+          <motion.div
+            initial={{ x: '-100%', opacity: 0 }}
+            animate={{ x: '200%', opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 1, ease: "easeInOut" }}
+            className="absolute inset-0 z-20 pointer-events-none"
+          >
+            <div className="h-full w-1/2 bg-gradient-to-r from-transparent via-white/60 to-transparent skew-x-12" />
+          </motion.div>
+          {/* Secondary colored sweep */}
+          <motion.div
+            initial={{ x: '-100%', opacity: 0 }}
+            animate={{ x: '200%', opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 1, ease: "easeInOut", delay: 0.1 }}
+            className="absolute inset-0 z-20 pointer-events-none"
+          >
+            <div className="h-full w-1/3 bg-gradient-to-r from-transparent via-emerald-400/40 to-transparent skew-x-12" />
+          </motion.div>
+          {/* Border glow effect */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: [0, 1, 1, 0] }}
+            transition={{ duration: 1.2 }}
+            className="absolute inset-0 z-10 pointer-events-none rounded-2xl"
+            style={{
+              boxShadow: 'inset 0 0 60px rgba(52, 211, 153, 0.5), 0 0 80px rgba(52, 211, 153, 0.4)',
+            }}
+          />
+        </>
       )}
     </AnimatePresence>
   );
@@ -263,7 +366,7 @@ const TransformCard: React.FC<TransformCardProps> = ({ example, isActive, onClic
   const [showAfter, setShowAfter] = useState(false);
   const [isTransforming, setIsTransforming] = useState(false);
 
-  // Auto-animate when card becomes active
+  // Auto-animate when card becomes active - ENHANCED timing for visibility
   useEffect(() => {
     if (isActive) {
       setShowAfter(false);
@@ -272,8 +375,8 @@ const TransformCard: React.FC<TransformCardProps> = ({ example, isActive, onClic
         setTimeout(() => {
           setShowAfter(true);
           setIsTransforming(false);
-        }, 800);
-      }, 500);
+        }, 1500); // Longer transformation for better visibility
+      }, 800);
       return () => clearTimeout(timer);
     }
   }, [isActive, example.id]);
@@ -288,8 +391,11 @@ const TransformCard: React.FC<TransformCardProps> = ({ example, isActive, onClic
       {/* Before Image */}
       <motion.div
         className="absolute inset-0"
-        animate={{ opacity: showAfter ? 0 : 1 }}
-        transition={{ duration: 0.6 }}
+        animate={{
+          opacity: showAfter ? 0 : 1,
+          scale: isTransforming ? 1.02 : 1,
+        }}
+        transition={{ duration: 0.8 }}
       >
         <img
           src={example.before}
@@ -301,9 +407,12 @@ const TransformCard: React.FC<TransformCardProps> = ({ example, isActive, onClic
       {/* After Image */}
       <motion.div
         className="absolute inset-0"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: showAfter ? 1 : 0 }}
-        transition={{ duration: 0.6 }}
+        initial={{ opacity: 0, scale: 1.05 }}
+        animate={{
+          opacity: showAfter ? 1 : 0,
+          scale: showAfter ? 1 : 1.05,
+        }}
+        transition={{ duration: 0.8 }}
       >
         <img
           src={example.after}
@@ -341,41 +450,52 @@ const TransformCard: React.FC<TransformCardProps> = ({ example, isActive, onClic
             </div>
           </div>
 
-          {/* Transform indicator */}
+          {/* Transform indicator - ENHANCED for visibility */}
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
+            animate={{
+              opacity: 1,
+              scale: isTransforming ? [1, 1.1, 1] : 1,
+            }}
+            transition={isTransforming ? { duration: 0.5, repeat: Infinity } : {}}
             className={`
-              px-4 py-2 rounded-full text-sm font-bold flex items-center gap-2
-              ${showAfter
-                ? 'bg-emerald-500 text-white'
-                : 'bg-white/10 text-white backdrop-blur-sm'
+              px-5 py-2.5 rounded-full text-sm font-bold flex items-center gap-2 transition-all duration-300
+              ${isTransforming
+                ? 'bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 text-white shadow-lg shadow-emerald-500/50 animate-pulse'
+                : showAfter
+                  ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/30'
+                  : 'bg-white/10 text-white backdrop-blur-sm'
               }
             `}
           >
             {isTransforming ? (
               <>
-                <Wand2 size={16} className="animate-pulse" />
-                Transforming...
+                <motion.div
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                >
+                  <Wand2 size={18} />
+                </motion.div>
+                <span className="text-base">AI Transforming...</span>
               </>
             ) : showAfter ? (
               <>
-                <Sparkles size={16} />
-                AI Enhanced
+                <Sparkles size={18} />
+                <span className="text-base">AI Enhanced</span>
               </>
             ) : (
-              'Original'
+              <span className="text-base">Original</span>
             )}
           </motion.div>
         </div>
       </div>
 
-      {/* Play Again Button */}
+      {/* Play Again Button - ENHANCED for visibility */}
       {showAfter && (
         <motion.button
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
+          initial={{ opacity: 0, y: 10, scale: 0.9 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ delay: 0.3, type: "spring", stiffness: 200 }}
           onClick={(e) => {
             e.stopPropagation();
             setShowAfter(false);
@@ -384,12 +504,12 @@ const TransformCard: React.FC<TransformCardProps> = ({ example, isActive, onClic
               setTimeout(() => {
                 setShowAfter(true);
                 setIsTransforming(false);
-              }, 800);
-            }, 300);
+              }, 1500); // Longer for better recording visibility
+            }, 500);
           }}
-          className="absolute top-4 right-4 px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm text-white text-sm font-medium hover:bg-white/20 transition-colors flex items-center gap-2 border border-white/20"
+          className="absolute top-4 right-4 px-5 py-2.5 rounded-full bg-emerald-500/90 backdrop-blur-sm text-white text-sm font-bold hover:bg-emerald-400 transition-all flex items-center gap-2 border border-emerald-400/50 shadow-lg shadow-emerald-500/30"
         >
-          <Wand2 size={14} />
+          <Wand2 size={16} className="animate-pulse" />
           Replay Magic
         </motion.button>
       )}
@@ -402,13 +522,13 @@ export const TransformShowcase: React.FC = () => {
   const sectionRef = useRef<HTMLElement>(null);
   const isInView = useInView(sectionRef, { once: true, margin: "-100px" });
 
-  // Auto-cycle through examples
+  // Auto-cycle through examples - EXTENDED for recording
   useEffect(() => {
     if (!isInView) return;
 
     const interval = setInterval(() => {
       setActiveIndex((prev) => (prev + 1) % TRANSFORM_EXAMPLES.length);
-    }, 6000);
+    }, 8000); // Longer interval for better recording
 
     return () => clearInterval(interval);
   }, [isInView]);
@@ -474,7 +594,7 @@ export const TransformShowcase: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ delay: 0.3 }}
-          className="grid grid-cols-4 md:grid-cols-8 gap-2 max-w-5xl mx-auto"
+          className="grid grid-cols-5 md:grid-cols-10 gap-2 max-w-6xl mx-auto"
         >
           {TRANSFORM_EXAMPLES.map((example, index) => {
             const Icon = example.icon;
