@@ -23,18 +23,18 @@ export const BLOG_POSTS: BlogPost[] = [
     author: "Sarah Jenkins",
     tags: ["AI", "Virtual Staging", "Tech Trends"],
     content: `
-      <p className="lead">In the competitive world of real estate, first impressions are everything. Historically, staging a home meant hiring movers, renting expensive furniture, and spending thousands of dollars before a single potential buyer even walked through the door. Enter <strong>AI Virtual Staging</strong>—the technology that is turning the industry on its head.</p>
-      
+      <p class="lead">In the competitive world of real estate, first impressions are everything. Historically, staging a home meant hiring movers, renting expensive furniture, and spending thousands of dollars before a single potential buyer even walked through the door. Enter <strong>AI Virtual Staging</strong>—the technology that is turning the industry on its head.</p>
+
       <h2>The Cost-Benefit Analysis</h2>
       <p>Traditional staging can cost anywhere from $2,000 to $10,000 depending on the size of the home and the duration of the listing. AI virtual staging, on the other hand, allows agents to furnish an entire property for a fraction of that cost—often less than the price of a single lunch. But the benefits aren't just financial.</p>
-      
+
       <blockquote>
-        "Virtual staging isn't just a cost-saving measure; it's a strategic marketing tool that allows us to sell a lifestyle, not just a property."
+        <p>"Virtual staging isn't just a cost-saving measure; it's a strategic marketing tool that allows us to sell a lifestyle, not just a property."</p>
       </blockquote>
 
       <h2>Speed and Versatility</h2>
       <p>With Photovid's AI, you can stage a room in under 30 seconds. Don't like the Scandinavian look? Switch to Modern Industrial with one click. This versatility allows agents to market the same property to different demographics simultaneously—showing a home office for the remote worker and a nursery for the young family.</p>
-      
+
       <h3>The Psychology of the Sale</h3>
       <p>An empty room feels small and cold. High-quality AI staging provides a sense of scale and helps buyers visualize their future lives. Statistics show that staged homes sell <strong>73% faster</strong> than their vacant counterparts. By leveraging AI, you're not just saving money; you're actively accelerating your commission cycle.</p>
     `
@@ -50,13 +50,13 @@ export const BLOG_POSTS: BlogPost[] = [
     author: "Mark Thompson",
     tags: ["Photography", "Marketing", "Sky Replacement"],
     content: `
-      <p>It sounds simple, but the color of the sky in your listing photos can be the difference between a lead and a pass. Psychology tells us that blue skies evoke feelings of optimism, safety, and happiness. In real estate marketing, those emotions translate directly into clicks.</p>
+      <p class="lead">It sounds simple, but the color of the sky in your listing photos can be the difference between a lead and a pass. Psychology tells us that blue skies evoke feelings of optimism, safety, and happiness. In real estate marketing, those emotions translate directly into clicks.</p>
 
       <h2>The "Gray Day" Problem</h2>
       <p>As an agent, you can't control the weather. A rainy Tuesday shoot can result in gloomy, uninspiring photos that make even the most beautiful estate look drab. This is where <strong>AI Sky Replacement</strong> becomes an essential tool in your arsenal.</p>
 
       <blockquote>
-        "Our data suggests that properties featured under a clear blue sky receive nearly double the engagement of those shot under overcast conditions."
+        <p>"Our data suggests that properties featured under a clear blue sky receive nearly double the engagement of those shot under overcast conditions."</p>
       </blockquote>
 
       <h2>Perfect Lighting, Every Time</h2>
@@ -77,13 +77,13 @@ export const BLOG_POSTS: BlogPost[] = [
     author: "Elena Rodriguez",
     tags: ["Twilight", "AI Editing", "Luxury"],
     content: `
-      <p>There is nothing quite as cinematic as a luxury home at dusk. The warm glow from the windows contrasting with the deep blue of the evening sky creates a "hero shot" that screams prestige. However, traditional twilight shoots require photographers to stay late, use complex lighting equipment, and charge premium rates.</p>
+      <p class="lead">There is nothing quite as cinematic as a luxury home at dusk. The warm glow from the windows contrasting with the deep blue of the evening sky creates a "hero shot" that screams prestige. However, traditional twilight shoots require photographers to stay late, use complex lighting equipment, and charge premium rates.</p>
 
       <h2>The AI Twilight Advantage</h2>
       <p>Using <strong>Day-to-Twilight AI</strong>, you can take a photo captured at 2:00 PM and transform it into a stunning evening shot in seconds. Our engine automatically detects windows and "turns on" the interior lights, adds a sunset gradient to the sky, and casts realistic shadows across the lawn.</p>
 
       <blockquote>
-        "Twilight shots create an emotional connection. They make a house feel like a home before the buyer even steps inside."
+        <p>"Twilight shots create an emotional connection. They make a house feel like a home before the buyer even steps inside."</p>
       </blockquote>
 
       <h2>When to Use Twilight Shots</h2>
@@ -104,7 +104,7 @@ export const BLOG_POSTS: BlogPost[] = [
     author: "David Chen",
     tags: ["Optimization", "Photo Quality", "AI"],
     content: `
-      <p>Most listing photos are taken with iPhones or entry-level DSLRs, often resulting in "flat" images that don't capture the true essence of a space. <strong>AI Photo Enhancement</strong> is the bridge between a "snapshot" and a "professional architectural photograph."</p>
+      <p class="lead">Most listing photos are taken with iPhones or entry-level DSLRs, often resulting in "flat" images that don't capture the true essence of a space. <strong>AI Photo Enhancement</strong> is the bridge between a "snapshot" and a "professional architectural photograph."</p>
 
       <h2>What Does AI Actually Do?</h2>
       <p>It's not just a filter. Photovid's enhancement engine performs hundreds of micro-adjustments simultaneously:</p>
@@ -116,7 +116,7 @@ export const BLOG_POSTS: BlogPost[] = [
       </ul>
 
       <blockquote>
-        "Architectural photography is about lines and light. AI brings that precision to every agent, instantly."
+        <p>"Architectural photography is about lines and light. AI brings that precision to every agent, instantly."</p>
       </blockquote>
 
       <h2>The Return on Investment</h2>
@@ -134,13 +134,13 @@ export const BLOG_POSTS: BlogPost[] = [
     author: "Rachel Adams",
     tags: ["Decluttering", "AI Tools", "Clean Space"],
     content: `
-      <p>We've all been there: a beautiful home filled with "stuff." Family photos, cluttered countertops, and bulky furniture can make a room feel small and prevent buyers from seeing themselves in the space. <strong>AI Object Removal</strong> is like a digital cleaning crew.</p>
+      <p class="lead">We've all been there: a beautiful home filled with "stuff." Family photos, cluttered countertops, and bulky furniture can make a room feel small and prevent buyers from seeing themselves in the space. <strong>AI Object Removal</strong> is like a digital cleaning crew.</p>
 
       <h2>The "Clean Slate" Strategy</h2>
       <p>Our AI can seamlessly remove objects while intelligently "hallucinating" what should be behind them—whether it's more of the hardwood floor, a baseboard, or a section of the wall. This allows you to show the true square footage of a room.</p>
 
       <blockquote>
-        "By removing the owner's personal items, you create a blank canvas where the buyer can start painting their own future."
+        <p>"By removing the owner's personal items, you create a blank canvas where the buyer can start painting their own future."</p>
       </blockquote>
 
       <h2>Case Study: The Overstuffed Living Room</h2>
@@ -161,13 +161,13 @@ export const BLOG_POSTS: BlogPost[] = [
     author: "James Wilson",
     tags: ["Video", "Social Media", "AI Generation"],
     content: `
-      <p>The algorithms have spoken: Video is king. Whether it's Instagram Reels, TikTok, or Zillow's video walkthroughs, motion captures attention in a way that static images simply cannot. In 2026, <strong>AI Video Generation</strong> has made cinematic property tours accessible to every agent.</p>
+      <p class="lead">The algorithms have spoken: Video is king. Whether it's Instagram Reels, TikTok, or Zillow's video walkthroughs, motion captures attention in a way that static images simply cannot. In 2026, <strong>AI Video Generation</strong> has made cinematic property tours accessible to every agent.</p>
 
       <h2>From Photo to Motion</h2>
       <p>You no longer need a drone pilot and a film crew for every listing. Photovid's "Photo-to-Video" technology can take your high-quality still images and turn them into 4K slow-motion pans, "fly-through" transitions, and dramatic reveals.</p>
 
       <blockquote>
-        "Motion stops the scroll. If you want to be remembered in a crowded feed, you need to be moving."
+        <p>"Motion stops the scroll. If you want to be remembered in a crowded feed, you need to be moving."</p>
       </blockquote>
 
       <h2>Engagement Metrics</h2>

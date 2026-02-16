@@ -185,18 +185,88 @@ export const BlogPostPage: React.FC = () => {
 
             {/* Main Article Content */}
             <div className="lg:col-span-8 order-1 lg:order-2">
-              <div 
-                className="prose prose-invert prose-teal max-w-none 
-                  prose-headings:font-black prose-headings:tracking-tighter prose-headings:text-white
-                  prose-p:text-zinc-400 prose-p:leading-[1.8] prose-p:text-lg prose-p:mb-8
-                  prose-strong:text-white prose-strong:font-bold
-                  prose-h2:text-4xl prose-h2:mt-16 prose-h2:mb-8
-                  prose-h3:text-2xl prose-h3:mt-12 prose-h3:mb-6
-                  prose-blockquote:border-l-4 prose-blockquote:border-teal-500 prose-blockquote:bg-white/5 prose-blockquote:p-8 prose-blockquote:rounded-r-3xl prose-blockquote:italic prose-blockquote:text-zinc-300 prose-blockquote:text-xl
-                  prose-ul:my-8 prose-li:text-zinc-400 prose-li:mb-4
-                  prose-img:rounded-[32px] prose-img:border prose-img:border-white/10"
+              <div
+                className="blog-content"
                 dangerouslySetInnerHTML={{ __html: post.content }}
               />
+              <style>{`
+                .blog-content p {
+                  color: #a1a1aa;
+                  font-size: 1.125rem;
+                  line-height: 1.9;
+                  margin-bottom: 1.75rem;
+                }
+                .blog-content p.lead {
+                  font-size: 1.35rem;
+                  color: #d4d4d8;
+                  line-height: 1.8;
+                  margin-bottom: 2.5rem;
+                }
+                .blog-content strong {
+                  color: white;
+                  font-weight: 700;
+                }
+                .blog-content h2 {
+                  color: white;
+                  font-size: 2rem;
+                  font-weight: 900;
+                  letter-spacing: -0.025em;
+                  margin-top: 3.5rem;
+                  margin-bottom: 1.5rem;
+                  line-height: 1.2;
+                }
+                .blog-content h3 {
+                  color: white;
+                  font-size: 1.5rem;
+                  font-weight: 800;
+                  letter-spacing: -0.025em;
+                  margin-top: 2.5rem;
+                  margin-bottom: 1rem;
+                  line-height: 1.3;
+                }
+                .blog-content blockquote {
+                  border-left: 4px solid #14b8a6;
+                  background: rgba(255,255,255,0.03);
+                  padding: 1.75rem 2rem;
+                  margin: 2.5rem 0;
+                  border-radius: 0 1.5rem 1.5rem 0;
+                  font-style: italic;
+                  color: #d4d4d8;
+                  font-size: 1.2rem;
+                  line-height: 1.7;
+                }
+                .blog-content blockquote p {
+                  margin: 0;
+                  color: inherit;
+                  font-size: inherit;
+                }
+                .blog-content ul {
+                  margin: 2rem 0;
+                  padding-left: 0;
+                  list-style: none;
+                }
+                .blog-content ul li {
+                  color: #a1a1aa;
+                  margin-bottom: 1rem;
+                  padding-left: 1.75rem;
+                  position: relative;
+                  font-size: 1.05rem;
+                  line-height: 1.7;
+                }
+                .blog-content ul li::before {
+                  content: '';
+                  position: absolute;
+                  left: 0;
+                  top: 0.6rem;
+                  width: 6px;
+                  height: 6px;
+                  background: #14b8a6;
+                  border-radius: 50%;
+                }
+                .blog-content ul li strong {
+                  color: white;
+                }
+              `}</style>
 
               {/* Share Bottom */}
               <div className="mt-16 pt-8 border-t border-white/10 flex items-center justify-between">
