@@ -60,6 +60,9 @@ import { QuickVideoV2Page } from './components/quick-video-v2/QuickVideoV2Page';
 import { AuthPage } from './components/pages/AuthPage';
 import { AuthCallbackPage } from './components/pages/AuthCallbackPage';
 import { ResetPasswordPage } from './components/pages/ResetPasswordPage';
+import { BlogPage } from './components/pages/BlogPage';
+import { BlogPostPage } from './components/pages/BlogPostPage';
+import { TutorialsPage } from './components/pages/TutorialsPage';
 import { PrivacyPolicyPage } from './components/pages/PrivacyPolicyPage';
 import { TermsOfServicePage } from './components/pages/TermsOfServicePage';
 import { CreditsPage } from './components/pages/CreditsPage';
@@ -85,6 +88,9 @@ import { ProfilePage } from './components/pages/ProfilePage';
 import { SettingsPage } from './components/pages/SettingsPage';
 import { AdminPage } from './components/pages/AdminPage';
 import { AuthProvider } from './lib/store/contexts/AuthContext';
+import { IntegrationsPage } from './components/pages/IntegrationsPage';
+import { SocialCallbackPage } from './components/pages/SocialCallbackPage';
+import { SocialIntegrationsProvider } from './lib/store/contexts/SocialIntegrationsContext';
 
 // Simple Error Boundary to catch crashes
 class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { hasError: boolean, error: Error | null }> {
@@ -131,6 +137,7 @@ const App: React.FC = () => {
         <ToastProvider>
           <AuthProvider>
             <CreditsProvider>
+              <SocialIntegrationsProvider>
               <Router>
               <Routes>
             <Route path="/" element={<LandingPage />} />
@@ -205,6 +212,8 @@ const App: React.FC = () => {
             <Route path="/studio/credits" element={<CreditsPage />} />
             <Route path="/studio/profile" element={<ProfilePage />} />
             <Route path="/studio/settings" element={<SettingsPage />} />
+            <Route path="/studio/integrations" element={<IntegrationsPage />} />
+            <Route path="/studio/integrations/callback" element={<SocialCallbackPage />} />
             <Route path="/studio/admin" element={<AdminPage />} />
             {/* Redirect old dashboard routes to studio */}
             <Route path="/dashboard" element={<Navigate to="/studio" replace />} />
@@ -214,10 +223,14 @@ const App: React.FC = () => {
             <Route path="/auth/callback" element={<AuthCallbackPage />} />
             <Route path="/auth/reset-password" element={<ResetPasswordPage />} />
             <Route path="/login" element={<AuthPage />} />
+            <Route path="/blog" element={<BlogPage />} />
+            <Route path="/blog/:id" element={<BlogPostPage />} />
+            <Route path="/tutorials" element={<TutorialsPage />} />
             <Route path="/privacy" element={<PrivacyPolicyPage />} />
             <Route path="/terms" element={<TermsOfServicePage />} />
             </Routes>
               </Router>
+              </SocialIntegrationsProvider>
             </CreditsProvider>
           </AuthProvider>
         </ToastProvider>

@@ -26,6 +26,10 @@ CREATE INDEX IF NOT EXISTS idx_subscriptions_stripe_customer_id ON subscriptions
 -- RLS Policies for subscriptions
 ALTER TABLE subscriptions ENABLE ROW LEVEL SECURITY;
 
+-- Drop existing policies if they exist (idempotent)
+DROP POLICY IF EXISTS "Users can view own subscription" ON subscriptions;
+DROP POLICY IF EXISTS "Service role can manage subscriptions" ON subscriptions;
+
 -- Users can read their own subscription
 CREATE POLICY "Users can view own subscription"
   ON subscriptions FOR SELECT

@@ -39,6 +39,12 @@ CREATE TABLE IF NOT EXISTS properties (
 -- Enable RLS
 ALTER TABLE properties ENABLE ROW LEVEL SECURITY;
 
+-- Drop existing policies if they exist (idempotent)
+DROP POLICY IF EXISTS "Users can view own properties" ON properties;
+DROP POLICY IF EXISTS "Users can insert own properties" ON properties;
+DROP POLICY IF EXISTS "Users can update own properties" ON properties;
+DROP POLICY IF EXISTS "Users can delete own properties" ON properties;
+
 -- Users can only access their own properties
 CREATE POLICY "Users can view own properties"
   ON properties
@@ -74,6 +80,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS trigger_properties_updated_at ON properties;
 CREATE TRIGGER trigger_properties_updated_at
   BEFORE UPDATE ON properties
   FOR EACH ROW
@@ -109,6 +116,11 @@ CREATE TABLE IF NOT EXISTS generations (
 -- Enable RLS on generations
 ALTER TABLE generations ENABLE ROW LEVEL SECURITY;
 
+-- Drop existing policies if they exist (idempotent)
+DROP POLICY IF EXISTS "Users can view own generations" ON generations;
+DROP POLICY IF EXISTS "Users can insert own generations" ON generations;
+DROP POLICY IF EXISTS "Users can update own generations" ON generations;
+
 -- Users can only access their own generations
 CREATE POLICY "Users can view own generations"
   ON generations
@@ -125,8 +137,28 @@ CREATE POLICY "Users can update own generations"
   FOR UPDATE
   USING (auth.uid() = user_id);
 
+-- Add property_id column if it doesn't exist (without FK constraint for compatibility)
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_name = 'generations' AND column_name = 'property_id'
+  ) THEN
+    ALTER TABLE generations ADD COLUMN property_id TEXT;
+  END IF;
+END $$;
+
 -- Indexes
 CREATE INDEX IF NOT EXISTS idx_generations_user_id ON generations(user_id);
-CREATE INDEX IF NOT EXISTS idx_generations_property_id ON generations(property_id);
 CREATE INDEX IF NOT EXISTS idx_generations_created_at ON generations(created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_generations_status ON generations(status);
+-- Only create property_id index if column exists
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_name = 'generations' AND column_name = 'property_id'
+  ) THEN
+    CREATE INDEX IF NOT EXISTS idx_generations_property_id ON generations(property_id);
+  END IF;
+END $$;

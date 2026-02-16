@@ -90,7 +90,7 @@ export const PrivacyPolicyPage: React.FC = () => {
             </ul>
           </section>
 
-          <section>
+          <section id="cookies">
             <h2 className="text-xl font-semibold text-white mb-4">7. Cookies</h2>
             <p className="text-zinc-300 leading-relaxed">
               We use essential cookies to maintain your session and preferences. We do not use

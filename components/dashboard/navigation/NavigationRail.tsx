@@ -23,6 +23,7 @@ import {
   FileText,
   Film,
   Clapperboard,
+  Link2,
 } from 'lucide-react';
 import { cn } from '../../../lib/utils';
 import { useTheme } from '../../common/ThemeProvider';
@@ -89,6 +90,7 @@ export function NavigationRail({ isMobileOpen, onMobileClose }: NavigationRailPr
         { id: 'library', label: 'Library', icon: FolderOpen, path: '/studio/library' },
         { id: 'properties', label: 'Properties', icon: Building2, path: '/studio/properties' },
         { id: 'workflow', label: 'Workflow', icon: Workflow, path: '/studio/workflow' },
+        // { id: 'integrations', label: 'Integrations', icon: Link2, path: '/studio/integrations' },
       ],
     },
   ];

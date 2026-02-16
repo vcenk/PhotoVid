@@ -7,31 +7,31 @@ import { Twitter, Instagram, Linkedin, Youtube } from 'lucide-react';
 
 const FOOTER_LINKS = [
   {
-    title: "Product",
+    title: "Platform",
     links: [
-      { label: "Login", href: "/login" },
-      { label: "Studio", href: "/studio" },
-      { label: "Pricing", href: "/#pricing" },
-      { label: "Enterprise", href: "#" },
+      { label: "AI Studio", href: "/studio" },
+      { label: "Workflow Canvas", href: "/studio/workflow" },
+      { label: "Listing Creator", href: "/studio/listing" },
+      { label: "Video Editor", href: "/studio/real-estate/video-builder" },
+      { label: "Pricing Plans", href: "/#pricing" },
     ]
   },
   {
-    title: "AI Tools",
+    title: "Real Estate",
     links: [
       { label: "Virtual Staging", href: "/studio/real-estate/virtual-staging" },
       { label: "Sky Replacement", href: "/studio/real-estate/sky-replacement" },
+      { label: "Day to Twilight", href: "/studio/real-estate/twilight" },
       { label: "Photo Enhancement", href: "/studio/real-estate/photo-enhancement" },
       { label: "Item Removal", href: "/studio/real-estate/item-removal" },
-      { label: "Twilight Conversion", href: "/studio/real-estate/twilight" },
     ]
   },
   {
     title: "Resources",
     links: [
       { label: "Help Center", href: "#" },
-      { label: "API Documentation", href: "#" },
-      { label: "Blog", href: "#" },
-      { label: "Changelog", href: "#" },
+      { label: "Tutorials", href: "/tutorials" },
+      { label: "Blog", href: "/blog" },
     ]
   },
   {
@@ -39,58 +39,59 @@ const FOOTER_LINKS = [
     links: [
       { label: "Privacy Policy", href: "/privacy" },
       { label: "Terms of Service", href: "/terms" },
-      { label: "Contact", href: "#" },
+      { label: "Cookie Policy", href: "/privacy#cookies" },
+      { label: "Support", href: "mailto:support@photovid.studio" },
     ]
   }
 ];
 
 export const Footer = () => {
   return (
-    <footer className="relative bg-black pt-24 pb-12 border-t border-white/10 overflow-hidden">
+    <footer className="relative bg-black pt-28 pb-16 border-t border-white/10 overflow-hidden">
       <div className="max-w-7xl mx-auto px-6">
 
         {/* Top Section: Logo & Grid */}
-        <div className="flex flex-col lg:flex-row gap-16 lg:gap-32 mb-32">
+        <div className="flex flex-col lg:flex-row gap-16 lg:gap-32 mb-24">
 
           {/* Brand Column */}
-          <div className="flex-shrink-0 w-64 space-y-6">
-            <div className="flex items-center gap-3">
+          <div className="flex-shrink-0 lg:w-72 space-y-8">
+            <div className="flex items-center gap-4">
               <img src="/logo.png" alt="Photovid" className="h-10 w-auto" />
-              <span className="text-xl font-bold text-white">Photovid</span>
+              <span className="text-2xl font-bold text-white tracking-tighter uppercase">Photovid</span>
             </div>
-            <p className="text-zinc-500 text-sm leading-relaxed font-sans">
-              AI-powered photo editing for real estate professionals. Transform listing photos in seconds.
+            <p className="text-zinc-500 text-base leading-relaxed font-sans max-w-sm">
+              The next-generation AI studio for real estate visual marketing.
             </p>
-            <div className="flex gap-4">
+            <div className="flex gap-5">
               {[Twitter, Instagram, Linkedin, Youtube].map((Icon, i) => (
-                <a key={i} href="#" className="p-2 rounded-full bg-white/5 text-zinc-500 hover:bg-teal-600 hover:text-white transition-all">
-                  <Icon size={16} />
+                <a key={i} href="#" className="p-3 rounded-2xl bg-white/5 text-zinc-500 hover:bg-teal-600 hover:text-white transition-all duration-300">
+                  <Icon size={20} />
                 </a>
               ))}
             </div>
           </div>
 
           {/* Links Grid */}
-          <div className="flex-grow grid grid-cols-2 md:grid-cols-4 gap-10">
+          <div className="flex-grow grid grid-cols-2 md:grid-cols-4 gap-x-10 gap-y-12">
             {FOOTER_LINKS.map((column) => (
               <div key={column.title} className="space-y-6">
-                <h4 className="text-sm font-bold text-white uppercase tracking-widest">
+                <h4 className="text-[11px] font-black text-zinc-400 uppercase tracking-[0.25em]">
                   {column.title}
                 </h4>
                 <ul className="space-y-4">
                   {column.links.map((link) => (
                     <li key={link.label}>
-                      {link.href.startsWith('/') ? (
+                      {link.href.startsWith('/') || link.href.startsWith('#') ? (
                         <Link
                           to={link.href}
-                          className="text-sm text-zinc-500 hover:text-teal-400 transition-colors font-medium"
+                          className="text-[14px] md:text-base text-zinc-500 hover:text-teal-400 transition-all duration-200 font-medium hover:pl-1.5 block"
                         >
                           {link.label}
                         </Link>
                       ) : (
                         <a
                           href={link.href}
-                          className="text-sm text-zinc-500 hover:text-teal-400 transition-colors font-medium"
+                          className="text-[14px] md:text-base text-zinc-500 hover:text-teal-400 transition-all duration-200 font-medium hover:pl-1.5 block"
                         >
                           {link.label}
                         </a>
@@ -103,30 +104,30 @@ export const Footer = () => {
           </div>
         </div>
 
-        {/* Bottom Section */}
-        <div className="relative border-t border-white/10 pt-12 flex flex-col items-center">
-
-          {/* Copyright Row */}
-          <div className="w-full flex flex-col items-center gap-4 text-[10px] font-bold uppercase tracking-widest text-zinc-600 mb-12">
-            <div className="flex gap-8">
+        {/* Bottom Bar: Copyright & Legal */}
+        <div className="relative border-t border-white/10 py-12 flex flex-col items-center gap-6">
+          <div className="w-full flex flex-col md:flex-row items-center justify-between gap-6 text-xs font-bold uppercase tracking-[0.2em] text-zinc-600">
+            <p className="opacity-50 order-2 md:order-1">&copy; {new Date().getFullYear()} Photovid Inc. All rights reserved.</p>
+            <div className="flex flex-wrap justify-center gap-x-10 gap-y-4 order-1 md:order-2">
               <Link to="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link>
               <Link to="/terms" className="hover:text-white transition-colors">Terms of Service</Link>
-              <a href="#" className="hover:text-white transition-colors">Cookies</a>
+              <Link to="/privacy#cookies" className="hover:text-white transition-colors">Cookies</Link>
             </div>
-            <p>&copy; {new Date().getFullYear()} Photovid Inc.</p>
           </div>
-
-          {/* Big Statement Type */}
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="w-full text-center text-[18vw] leading-[0.8] font-black tracking-tighter text-white select-none pointer-events-none"
-          >
-            photovid
-          </motion.h1>
-
         </div>
+      </div>
+
+      {/* Brand Mark: Centered and elevated */}
+      <div className="relative w-full mt-16 pb-10 pointer-events-none select-none overflow-hidden">
+        <motion.h1
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.9, ease: "easeOut" }}
+          className="text-center text-[20vw] leading-[0.8] font-black tracking-tighter text-white/90"
+        >
+          photovid
+        </motion.h1>
       </div>
     </footer>
   );

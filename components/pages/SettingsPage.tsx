@@ -19,7 +19,10 @@ import {
   Check,
   AlertCircle,
   Loader2,
+  CreditCard,
+  Crown,
 } from 'lucide-react';
+import { useCredits } from '@/lib/store/contexts/CreditsContext';
 
 // Settings keys for localStorage
 const SETTINGS_KEYS = {
@@ -32,8 +35,10 @@ export function SettingsPage() {
   const navigate = useNavigate();
   const { theme, toggleTheme } = useTheme();
   const { user } = useAuth();
+  const { subscription, openCustomerPortal } = useCredits();
   const supabase = createClient();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [cancellingSubscription, setCancellingSubscription] = useState(false);
 
   // Settings state - load from localStorage
   const [notifications, setNotifications] = useState(() => {
@@ -184,6 +189,21 @@ export function SettingsPage() {
     }
   };
 
+  // Manage subscription (opens Stripe portal)
+  const handleManageSubscription = async () => {
+    setCancellingSubscription(true);
+    try {
+      const url = await openCustomerPortal();
+      if (url) {
+        window.location.href = url;
+      }
+    } catch (error) {
+      console.error('Failed to open subscription portal:', error);
+    } finally {
+      setCancellingSubscription(false);
+    }
+  };
+
   return (
     <div className="flex h-screen bg-white dark:bg-[#09090b] text-zinc-900 dark:text-white font-[Space_Grotesk] overflow-hidden">
       <NavigationRail
@@ -289,6 +309,76 @@ export function SettingsPage() {
                       />
                     </button>
                   </div>
+                </div>
+              </div>
+
+              {/* Subscription */}
+              <div className="bg-zinc-50 dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 overflow-hidden">
+                <div className="px-6 py-4 border-b border-zinc-200 dark:border-zinc-800">
+                  <h2 className="font-semibold">Subscription</h2>
+                </div>
+                <div className="px-6 py-4">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
+                        <Crown size={20} className="text-emerald-600 dark:text-emerald-400" />
+                      </div>
+                      <div>
+                        <p className="font-medium">{subscription.tier.name}</p>
+                        <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                          {subscription.monthlyAllowance} credits/month
+                          {subscription.cancelAtPeriodEnd && (
+                            <span className="text-amber-500"> • Cancels at period end</span>
+                          )}
+                        </p>
+                      </div>
+                    </div>
+                    {subscription.tierId !== 'free' && (
+                      <span className="px-2 py-1 rounded-full text-xs font-medium bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400">
+                        Active
+                      </span>
+                    )}
+                  </div>
+
+                  {subscription.currentPeriodEnd && subscription.tierId !== 'free' && (
+                    <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-4">
+                      {subscription.cancelAtPeriodEnd ? 'Access until' : 'Renews on'}{' '}
+                      {new Date(subscription.currentPeriodEnd).toLocaleDateString()}
+                    </p>
+                  )}
+
+                  {subscription.tierId !== 'free' ? (
+                    <button
+                      onClick={handleManageSubscription}
+                      disabled={cancellingSubscription}
+                      className="w-full py-3 border border-zinc-300 dark:border-zinc-700 rounded-xl font-medium hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+                    >
+                      {cancellingSubscription ? (
+                        <>
+                          <Loader2 size={18} className="animate-spin" />
+                          Opening Portal...
+                        </>
+                      ) : (
+                        <>
+                          <CreditCard size={18} />
+                          Manage Subscription
+                        </>
+                      )}
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => navigate('/studio/credits')}
+                      className="w-full py-3 bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-xl font-semibold hover:from-emerald-700 hover:to-teal-700 transition-all"
+                    >
+                      Upgrade Plan
+                    </button>
+                  )}
+
+                  {subscription.tierId !== 'free' && (
+                    <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-3 text-center">
+                      You can cancel or change your plan in the subscription portal
+                    </p>
+                  )}
                 </div>
               </div>
 

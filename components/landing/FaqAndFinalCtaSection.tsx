@@ -155,7 +155,7 @@ export const FaqAndFinalCtaSection: React.FC = () => {
                 </div>
                 <div>
                   <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest">Need help?</p>
-                  <a href="mailto:support@photovid.ai" className="text-sm font-bold text-white hover:text-teal-400 transition-colors">Contact Support</a>
+                  <a href="mailto:support@photovid.studio" className="text-sm font-bold text-white hover:text-teal-400 transition-colors">Contact Support</a>
                 </div>
               </div>
             </motion.div>

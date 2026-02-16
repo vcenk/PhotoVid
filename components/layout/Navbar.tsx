@@ -104,15 +104,23 @@ export const Navbar: React.FC = () => {
       >
         {/* ── Logo (left) ── */}
         <div
-          className="flex items-center gap-3 cursor-pointer flex-shrink-0"
-          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          className="flex items-center gap-3 cursor-pointer flex-shrink-0 group"
+          onClick={() => {
+            if (window.location.pathname === '/') {
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            } else {
+              navigate('/');
+            }
+          }}
         >
           <img
             src="/logo.png"
             alt="Photovid"
-            className="h-10 md:h-12 w-auto"
+            className="h-9 md:h-10 w-auto transition-transform duration-500 group-hover:scale-110"
           />
-          <span className="text-xl md:text-2xl font-bold text-zinc-900 dark:text-white">Photovid</span>
+          <span className="text-xl md:text-2xl font-bold text-zinc-900 dark:text-white">
+            PHOTOVID
+          </span>
         </div>
 
         {/* ── Centered Nav Links ── */}
