@@ -3,7 +3,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { Twitter, Instagram, Linkedin, Youtube } from 'lucide-react';
+import { Instagram, Linkedin, Youtube, Facebook } from 'lucide-react';
 
 const FOOTER_LINKS = [
   {
@@ -63,11 +63,18 @@ export const Footer = () => {
               The next-generation AI studio for real estate visual marketing.
             </p>
             <div className="flex gap-5">
-              {[Twitter, Instagram, Linkedin, Youtube].map((Icon, i) => (
-                <a key={i} href="#" className="p-3 rounded-2xl bg-white/5 text-zinc-500 hover:bg-teal-600 hover:text-white transition-all duration-300">
-                  <Icon size={20} />
-                </a>
-              ))}
+              <a href="https://www.facebook.com/photovidstudio" target="_blank" rel="noopener noreferrer" className="p-3 rounded-2xl bg-white/5 text-zinc-500 hover:bg-teal-600 hover:text-white transition-all duration-300">
+                <Facebook size={20} />
+              </a>
+              <a href="https://www.instagram.com/photovidstudio" target="_blank" rel="noopener noreferrer" className="p-3 rounded-2xl bg-white/5 text-zinc-500 hover:bg-teal-600 hover:text-white transition-all duration-300">
+                <Instagram size={20} />
+              </a>
+              <a href="https://www.linkedin.com/company/photovidstudio" target="_blank" rel="noopener noreferrer" className="p-3 rounded-2xl bg-white/5 text-zinc-500 hover:bg-teal-600 hover:text-white transition-all duration-300">
+                <Linkedin size={20} />
+              </a>
+              <a href="https://www.youtube.com/@photovidstudio" target="_blank" rel="noopener noreferrer" className="p-3 rounded-2xl bg-white/5 text-zinc-500 hover:bg-teal-600 hover:text-white transition-all duration-300">
+                <Youtube size={20} />
+              </a>
             </div>
           </div>
 
