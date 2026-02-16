@@ -118,7 +118,7 @@ export const Navbar: React.FC = () => {
             alt="Photovid"
             className="h-9 md:h-10 w-auto transition-transform duration-500 group-hover:scale-110"
           />
-          <span className="text-xl md:text-2xl font-bold text-zinc-900 dark:text-white">
+          <span className="text-xl md:text-2xl font-bold text-white drop-shadow-lg">
             PHOTOVID
           </span>
         </div>
@@ -130,10 +130,10 @@ export const Navbar: React.FC = () => {
               key={item.id}
               onClick={() => scrollToSection(item.id)}
               className={`
-                text-base font-medium transition-all duration-300 relative py-1
+                text-base font-medium transition-all duration-300 relative py-1 drop-shadow-md
                 ${activeId === item.id
-                  ? 'text-zinc-900 dark:text-white'
-                  : 'text-zinc-600 hover:text-zinc-900 dark:text-white/60 dark:hover:text-white'
+                  ? 'text-white'
+                  : 'text-white/80 hover:text-white'
                 }
               `}
             >
@@ -141,7 +141,7 @@ export const Navbar: React.FC = () => {
               {activeId === item.id && (
                 <motion.div
                   layoutId="navUnderline"
-                  className="absolute -bottom-1 left-0 right-0 h-px bg-zinc-400 dark:bg-white/60"
+                  className="absolute -bottom-1 left-0 right-0 h-px bg-white/80"
                   transition={{ type: 'spring', stiffness: 300, damping: 30 }}
                 />
               )}
@@ -152,10 +152,10 @@ export const Navbar: React.FC = () => {
             <button
               onClick={() => scrollToSection(SECONDARY_NAV[0].id)}
               className={`
-                text-base font-medium transition-all duration-300 py-1
+                text-base font-medium transition-all duration-300 py-1 drop-shadow-md
                 ${activeId === SECONDARY_NAV[0].id
-                  ? 'text-zinc-900 dark:text-white'
-                  : 'text-zinc-600 hover:text-zinc-900 dark:text-white/60 dark:hover:text-white'
+                  ? 'text-white'
+                  : 'text-white/80 hover:text-white'
                 }
               `}
             >
@@ -169,7 +169,7 @@ export const Navbar: React.FC = () => {
           {/* Sign In */}
           <button
             onClick={() => navigate(user ? '/studio' : '/login')}
-            className="hidden sm:inline-flex text-base font-medium text-zinc-600 hover:text-zinc-900 dark:text-white/70 dark:hover:text-white transition-colors px-5 py-2.5"
+            className="hidden sm:inline-flex text-base font-medium text-white/80 hover:text-white transition-colors px-5 py-2.5 drop-shadow-md"
           >
             {user ? 'Dashboard' : 'Sign In'}
           </button>
@@ -177,14 +177,14 @@ export const Navbar: React.FC = () => {
           {/* Primary CTA */}
           <button
             onClick={() => navigate(user ? '/studio' : '/login')}
-            className="hidden sm:inline-flex items-center gap-2 px-7 py-2.5 bg-zinc-900 text-white dark:bg-white dark:text-black text-base font-semibold rounded-full hover:bg-zinc-800 dark:hover:bg-white/90 transition-all duration-300"
+            className="hidden sm:inline-flex items-center gap-2 px-7 py-2.5 bg-white text-zinc-900 text-base font-semibold rounded-full hover:bg-white/90 transition-all duration-300 shadow-lg"
           >
             Start For Free
           </button>
 
           {/* Mobile Menu Toggle */}
           <button
-            className="lg:hidden p-2 rounded-full text-zinc-700 dark:text-white hover:bg-zinc-100 dark:hover:bg-white/10 transition-colors"
+            className="lg:hidden p-2 rounded-full text-white hover:bg-white/10 transition-colors"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
           >
