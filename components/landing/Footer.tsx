@@ -3,7 +3,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { Instagram, Linkedin, Youtube, Facebook } from 'lucide-react';
+import { Instagram, Linkedin, Facebook } from 'lucide-react';
 
 const FOOTER_LINKS = [
   {
@@ -66,14 +66,14 @@ export const Footer = () => {
               <a href="https://www.facebook.com/photovidstudio" target="_blank" rel="noopener noreferrer" className="p-3 rounded-2xl bg-white/5 text-zinc-500 hover:bg-teal-600 hover:text-white transition-all duration-300">
                 <Facebook size={20} />
               </a>
-              <a href="https://www.instagram.com/photovidstudio" target="_blank" rel="noopener noreferrer" className="p-3 rounded-2xl bg-white/5 text-zinc-500 hover:bg-teal-600 hover:text-white transition-all duration-300">
+              <a href="https://www.instagram.com/photovid.studio/" target="_blank" rel="noopener noreferrer" className="p-3 rounded-2xl bg-white/5 text-zinc-500 hover:bg-teal-600 hover:text-white transition-all duration-300">
                 <Instagram size={20} />
+              </a>
+              <a href="https://x.com/photovid_studio" target="_blank" rel="noopener noreferrer" className="p-3 rounded-2xl bg-white/5 text-zinc-500 hover:bg-teal-600 hover:text-white transition-all duration-300">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
               </a>
               <a href="https://www.linkedin.com/company/photovidstudio" target="_blank" rel="noopener noreferrer" className="p-3 rounded-2xl bg-white/5 text-zinc-500 hover:bg-teal-600 hover:text-white transition-all duration-300">
                 <Linkedin size={20} />
-              </a>
-              <a href="https://www.youtube.com/@photovidstudio" target="_blank" rel="noopener noreferrer" className="p-3 rounded-2xl bg-white/5 text-zinc-500 hover:bg-teal-600 hover:text-white transition-all duration-300">
-                <Youtube size={20} />
               </a>
             </div>
           </div>
