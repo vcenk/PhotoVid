@@ -406,3 +406,8 @@ entrypoint = "./functions/get-credits/index.ts"
 enabled = true
 verify_jwt = true
 entrypoint = "./functions/deduct-credits/index.ts"
+
+[functions.stripe-webhook]
+enabled = true
+verify_jwt = false
+entrypoint = "./functions/stripe-webhook/index.ts"
